@@ -35,7 +35,6 @@ Perf.Result = Ember.Object.extend({
     this.get('times').forEach(function (t) {
       result += Math.pow(t - mean, 2);
     });
-    console.log(result);
     return result / this.get('times.length');
   }.property('mean'),
 
