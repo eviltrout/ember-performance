@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ember Performance Suite</title>
+  <link rel="stylesheet" href="css/bootstrap.css">
+</head>
+<body>
+
+<script src="js/libs/jquery-1.9.1.js"></script>
+<script src="js/libs/handlebars-1.0.0.js"></script>
+<script src="js/libs/ember-master.js"></script>
+<script src="js/libs/ember-renderspeed.js"></script>
+<script src="js/app.js"></script>
+
+<script type="text/x-handlebars" data-template-name='application'>
+  <div class="container">
+  <h1>Ember Performance Suite</h1>
+
+  <button {{action profObjectCreate}} {{bindAttr disabled="profiling"}} class="btn">Object.create()</button>
+
+  {{#if profiling}}
+    Profiling... Please be patient.
+  {{/if}}
+
+  {{#if model}}
+    <hr>
+
+    <h3>Results</h3>
+
+    <table class="table">
+      <tr>
+        <th>Name</th>
+        <th># Runs</th>
+        <th>Geometric Mean</th>
+        <th>Mean</th>
+        <th>Std. Dev</th>
+      </tr>
+      {{#each model}}
+      <tr>
+        <td>{{name}}</td>
+        <td>{{times.length}}</td>
+        <td>{{time geometricMean}}</td>
+        <td>{{time mean}}</td>
+        <td>{{time standardDeviation}}</td>
+      </tr>
+      {{/each}}
+    </table>
+
+    <button {{action clear}} {{bindAttr disabled="profiling"}} class="btn">Clear Results</button>
+
+  {{/if}}
+
+  </div>
+</script>
+
+</body>
+</html>
