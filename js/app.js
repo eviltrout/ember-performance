@@ -2,10 +2,11 @@ Perf = Ember.Application.create();
 
 Ember.Handlebars.helper('time', function(value, options) {
   if (typeof value === "undefined" || value === 0) { return new Handlebars.SafeString("&mdash;"); }
-
   var rounded = Math.floor(value * 100) / 100;
   return new Handlebars.SafeString(rounded + 'ms');
 });
+
+Perf.ListItemsView = Ember.View.extend({ templateName: 'listItems' });
 
 Perf.Result = Ember.Object.extend({
   init: function() {
@@ -43,14 +44,47 @@ Perf.Result = Ember.Object.extend({
   },
 
   stop: function() {
-    this.get('times').pushObject(new Date().getTime() - this.get('timeStart'));
+
+    var timeStart = this.get('timeStart');
+    if (timeStart) {
+      this.get('times').pushObject(new Date().getTime() - timeStart);
+      this.set('timeStart', null);
+    }
   }
 });
 
 Perf.ApplicationController = Ember.ArrayController.extend({
+  testsRun: 0,
+  testCount: 0,
 
   clear: function() {
     this.get('model').clear();
+  },
+
+  profRenderList: function() {
+    var self = this;
+
+    var listItems = [];
+    for (var i=0; i<1000; i++) {
+      listItems.push("Item " + (i + 1));
+    }
+
+    this.profile("Render List", 20, function(result) {
+      var promise = Ember.Deferred.create();
+
+      self.set('listItems', listItems);
+      Em.run.next(function() {
+        // stop timing before we clean up
+        result.stop();
+
+        // clean up stuff
+        self.set('listItems', null);
+        promise.resolve();
+      });
+
+      return promise;
+    });
+
   },
 
   profObjectCreate: function() {
@@ -61,28 +95,46 @@ Perf.ApplicationController = Ember.ArrayController.extend({
     });
   },
 
-  profileMethod: function(result, test, moreTries) {
-    result.start();
-    test();
-    result.stop();
+  profileMethod: function(result, test) {
+    var self = this;
 
-    if (moreTries === 1) {
-      this.pushObject(result);
-      this.set('profiling', false);
-    } else {
-      // We delay between each run to allow the browser to clean up and stuff.
-      Em.run.later(this, 'profileMethod', result, test, moreTries - 1, 10);
+    // Support promise profiles
+    var complete = function() {
+      result.stop();
+
+      self.set('testsRun', self.get('testsRun') + 1);
+      if (self.get('testsRun') === self.get('testCount')) {
+        self.pushObject(result);
+        self.set('profiling', false);
+      } else {
+        // We delay between each run to allow the browser to clean up and stuff.
+        Em.run.later(self, 'profileMethod', result, test, 100);
+      }
     }
+
+    result.start();
+    var testResult = test(result);
+    if (testResult && testResult.then) {
+      testResult.then(complete);
+    } else {
+      complete();
+    }
+
   },
 
   profile: function(name, testRuns, test) {
     var self = this;
 
-    self.set('profiling', true);
+    self.setProperties({
+      profiling: true,
+      testsRun: 0,
+      testCount: testRuns
+    });
+
     var result = Perf.Result.create({name: name});
 
     Em.run.next(function () {
-      self.profileMethod(result, test, testRuns);
+      self.profileMethod(result, test);
     });
   }
 

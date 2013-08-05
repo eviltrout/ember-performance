@@ -10,17 +10,26 @@
 <script src="js/libs/jquery-1.9.1.js"></script>
 <script src="js/libs/handlebars-1.0.0.js"></script>
 <script src="js/libs/ember-master.js"></script>
-<script src="js/libs/ember-renderspeed.js"></script>
 <script src="js/app.js"></script>
+
+<script type="text/x-handlebars" data-template-name="listItems">
+  <ul style='display: none'>
+  {{#each controller.listItems}}
+    <li>{{this}}</li>
+  {{/each}}
+  </ul>
+</script>
 
 <script type="text/x-handlebars" data-template-name='application'>
   <div class="container">
+
   <h1>Ember Performance Suite</h1>
 
   <button {{action profObjectCreate}} {{bindAttr disabled="profiling"}} class="btn">Object.create()</button>
+  <button {{action profRenderList}} {{bindAttr disabled="profiling"}} class="btn">Render List</button>
 
   {{#if profiling}}
-    Profiling... Please be patient.
+    Profiling ({{testsRun}}/{{testCount}})... Please be patient.
   {{/if}}
 
   {{#if model}}
@@ -52,6 +61,11 @@
   {{/if}}
 
   </div>
+
+  {{#if listItems}}
+    {{view Perf.ListItemsView}}
+  {{/if}}
+
 </script>
 
 </body>
