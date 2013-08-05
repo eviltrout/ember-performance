@@ -4,6 +4,7 @@ ember-performance
 The goal of this project is to create a comprehensive suite of tests to improve
 the performance of Ember.js.
 
+![Screenshot](http://i.imgur.com/E4R4iMy.png)
 
 ## Usage
 
