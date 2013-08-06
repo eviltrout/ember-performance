@@ -1,141 +1,99 @@
 Perf = Ember.Application.create();
 
-Ember.Handlebars.helper('time', function(value, options) {
-  if (typeof value === "undefined" || value === 0) { return new Handlebars.SafeString("&mdash;"); }
-  var rounded = Math.floor(value * 100) / 100;
-  return new Handlebars.SafeString(rounded + 'ms');
-});
+Perf.ApplicationRoute = Em.Route.extend({
 
-Perf.ListItemsView = Ember.View.extend({ templateName: 'listItems' });
-
-Perf.Result = Ember.Object.extend({
-  init: function() {
-    this.set('times', []);
+  model: function() {
+    return Perf.Profiler.instance();
   },
 
-  geometricMean: function() {
-    var result = 1;
-    this.get('times').forEach(function (t) {
-      result *= t;
-    });
-    return Math.pow(result, 1 / this.get('times.length'));
-  }.property('times.@each'),
+  events: {
 
-  mean: function() {
-    var result = 0;
-    this.get('times').forEach(function (t) {
-      result += t;
-    });
-    return result / this.get('times.length');
-  }.property('times.@each'),
-
-  standardDeviation: function() {
-    var result = 0,
-         mean = this.get('mean');
-
-    this.get('times').forEach(function (t) {
-      result += Math.pow(t - mean, 2);
-    });
-    return result / this.get('times.length');
-  }.property('mean'),
-
-  start: function() {
-    this.set('timeStart', new Date().getTime());
-  },
-
-  stop: function() {
-
-    var timeStart = this.get('timeStart');
-    if (timeStart) {
-      this.get('times').pushObject(new Date().getTime() - timeStart);
-      this.set('timeStart', null);
-    }
-  }
-});
-
-Perf.ApplicationController = Ember.ArrayController.extend({
-  testsRun: 0,
-  testCount: 0,
-
-  clear: function() {
-    this.get('model').clear();
-  },
-
-  profRenderList: function() {
-    var self = this;
-
-    var listItems = [];
-    for (var i=0; i<1000; i++) {
-      listItems.push("Item " + (i + 1));
-    }
-
-    this.profile("Render List", 20, function(result) {
-      var promise = Ember.Deferred.create();
-
-      self.set('listItems', listItems);
-      Em.run.next(function() {
-        // stop timing before we clean up
-        result.stop();
-
-        // clean up stuff
-        self.set('listItems', null);
-        promise.resolve();
+    profObjectCreate: function() {
+      Perf.Profiler.profile("Object.create()", 50, function() {
+        for (var i=0; i<10000; i++) {
+          var instance = Ember.Object.create({});
+        }
       });
+    },
 
-      return promise;
-    });
-
-  },
-
-  profObjectCreate: function() {
-    this.profile("Object.create()", 50, function() {
-      for (var i=0; i<10000; i++) {
-        var instance = Ember.Object.create({});
+    profRenderList: function () {
+      var listItems = [];
+      for (var i=0; i<1500; i++) {
+        listItems.push("Item " + (i + 1));
       }
-    });
-  },
 
-  profileMethod: function(result, test) {
-    var self = this;
+      Perf.Profiler.profile("Render List", 20, function(result) {
+        var promise = Ember.Deferred.create();
 
-    // Support promise profiles
-    var complete = function() {
-      result.stop();
+        var listItemsView = Ember.View.create({
+          classNames: ['hidden'],
+          templateName: 'listItems',
+          listItems: listItems
+        });
 
-      self.set('testsRun', self.get('testsRun') + 1);
-      if (self.get('testsRun') === self.get('testCount')) {
-        self.pushObject(result);
-        self.set('profiling', false);
-      } else {
-        // We delay between each run to allow the browser to clean up and stuff.
-        Em.run.later(self, 'profileMethod', result, test, 100);
+        listItemsView.appendTo('#scratch');
+        Em.run.next(function() {
+          // stop timing before we clean up
+          result.stop();
+
+          // clean up stuff
+          listItemsView.destroy();
+          promise.resolve();
+        });
+
+        return promise;
+      });
+    },
+
+    profTemplateBindings: function() {
+      var people = [],
+          lastAge = 1;
+
+      var nextAge = function() {
+        lastAge++;
+        if (lastAge > 99) { lastAge = 1; }
+        return lastAge;
       }
-    }
 
-    result.start();
-    var testResult = test(result);
-    if (testResult && testResult.then) {
-      testResult.then(complete);
-    } else {
-      complete();
-    }
+      for (var i=0; i<500; i++) {
+        people.push(Em.Object.create({name: "Person " + i, age: nextAge()}));
+      }
 
-  },
+      var templateBindingsView = Ember.View.create({
+        classNames: ['hidden'],
+        templateName: 'templateBindings',
+        people: people
+      });
+      templateBindingsView.appendTo('#scratch');
 
-  profile: function(name, testRuns, test) {
-    var self = this;
+      Perf.Profiler.profile("Template Bindings", 40, function(result) {
+        var promise = Ember.Deferred.create();
+        for (var i=0; i<people.length; i++) {
+          people[i].set('age', nextAge());
+        }
 
-    self.setProperties({
-      profiling: true,
-      testsRun: 0,
-      testCount: testRuns
-    });
+        Em.run.next(function() {
+          result.stop();
 
-    var result = Perf.Result.create({name: name});
+          // clean up stuff
+          promise.resolve();
+        });
 
-    Em.run.next(function () {
-      self.profileMethod(result, test);
-    });
+        return promise;
+
+      }).then(function () {
+        templateBindingsView.destroy();
+      });
+    },
   }
+
+});
+
+
+Perf.ApplicationController = Ember.ObjectController.extend({
+
+  clearResults: function() {
+    this.get('model').clearResults();
+  },
 
 });

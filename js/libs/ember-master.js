@@ -1836,7 +1836,7 @@ function suspendListener(obj, eventName, target, method, callback) {
 
   Suspends multiple listeners during a callback.
 
-
+  
   @method suspendListeners
   @for Ember
   @param obj
@@ -1903,7 +1903,7 @@ function watchedEvents(obj) {
   is skipped, and once listeners are removed. A listener without
   a target is executed on the passed object. If an array of actions
   is not passed, the actions stored on the passed object are invoked.
-
+  
   @method sendEvent
   @for Ember
   @param obj
@@ -2629,14 +2629,14 @@ Map.create = function() {
 Map.prototype = {
   /**
     This property will change as the number of objects in the map changes.
-
+   
     @property length
     @type number
     @default 0
   */
   length: 0,
-
-
+    
+    
   /**
     Retrieve the value associated with a given key.
 
@@ -4238,7 +4238,7 @@ Ember.computed.alias = function(dependentKey) {
   @return {Ember.ComputedProperty} computed property which creates an
   one way computed property to the original value for property.
 
-  Where `computed.alias` aliases `get` and `set`, and allows for bidirectional
+  Where `computed.alias` aliases `get` and `set`, and allows for bidirectional 
   data flow, `computed.oneWay` only provides an aliased `get`. The `set` will
   not mutate the upstream property, rather causes the current property to
   become the value set. This causes the downstream property to permentantly
@@ -6140,7 +6140,7 @@ function addNormalizedProperty(base, key, value, meta, descs, values, concats, m
     // impl super if needed...
     if (isMethod(value)) {
       value = giveMethodSuper(base, key, value, values, descs);
-    } else if ((concats && a_indexOf.call(concats, key) >= 0) ||
+    } else if ((concats && a_indexOf.call(concats, key) >= 0) || 
                 key === 'concatenatedProperties' ||
                 key === 'mergedProperties') {
       value = applyConcatenatedProperties(base, key, value, values);
@@ -19215,7 +19215,7 @@ Ember.Component = Ember.View.extend(Ember.TargetActionSupport, {
         this.sendAction('didClickTreeNode', this.get('node'));
       }
     });
-
+   
     App.CategoriesController = Ember.Controller.extend({
       didClickCategory: function(category) {
         //Do something with the node/category that was clicked
@@ -23749,7 +23749,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, hashTypes, hashContexts, escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-
+  
   var buffer = '', hashTypes, hashContexts;
   data.buffer.push("<option value=\"\">");
   hashTypes = {};
@@ -23760,7 +23760,7 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-
+  
   var stack1, hashTypes, hashContexts;
   hashTypes = {};
   hashContexts = {};
@@ -23769,7 +23769,7 @@ function program3(depth0,data) {
   else { data.buffer.push(''); }
   }
 function program4(depth0,data) {
-
+  
   var hashContexts, hashTypes;
   hashContexts = {'contentBinding': depth0,'labelBinding': depth0};
   hashTypes = {'contentBinding': "ID",'labelBinding': "ID"};
@@ -23780,7 +23780,7 @@ function program4(depth0,data) {
   }
 
 function program6(depth0,data) {
-
+  
   var stack1, hashTypes, hashContexts;
   hashTypes = {};
   hashContexts = {};
@@ -23789,7 +23789,7 @@ function program6(depth0,data) {
   else { data.buffer.push(''); }
   }
 function program7(depth0,data) {
-
+  
   var hashContexts, hashTypes;
   hashContexts = {'contentBinding': depth0};
   hashTypes = {'contentBinding': "STRING"};
@@ -23807,7 +23807,7 @@ function program7(depth0,data) {
   stack1 = helpers['if'].call(depth0, "view.optionGroupPath", {hash:{},inverse:self.program(6, program6, data),fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   return buffer;
-
+  
 }),
   attributeBindings: ['multiple', 'disabled', 'tabindex', 'name'],
 
@@ -24805,12 +24805,12 @@ define("router",
 
       A Transition is a thennable (a promise-like object) that represents
       an attempt to transition to another route. It can be aborted, either
-      explicitly via `abort` or by attempting another transition while a
+      explicitly via `abort` or by attempting another transition while a 
       previous one is still underway. An aborted transition can also
-      be `retry()`d later.
+      be `retry()`d later. 
      */
 
-    function Transition(router, promise) {
+    function Transition(router, promise) { 
       this.router = router;
       this.promise = promise;
       this.data = {};
@@ -24834,9 +24834,9 @@ define("router",
         The Transition's internal promise. Calling `.then` on this property
         is that same as calling `.then` on the Transition object itself, but
         this property is exposed for when you want to pass around a
-        Transition's promise, but not the Transition object itself, since
+        Transition's promise, but not the Transition object itself, since 
         Transition object can be externally `abort`ed, while the promise
-        cannot.
+        cannot. 
        */
       promise: null,
 
@@ -24850,12 +24850,12 @@ define("router",
       data: null,
 
       /**
-        A standard promise hook that resolves if the transition
+        A standard promise hook that resolves if the transition 
         succeeds and rejects if it fails/redirects/aborts.
 
         Forwards to the internal `promise` property which you can
         use in situations where you want to pass around a thennable,
-        but not the Transition itself.
+        but not the Transition itself. 
 
         @param {Function} success
         @param {Function} failure
@@ -24866,18 +24866,18 @@ define("router",
 
       /**
         Aborts the Transition. Note you can also implicitly abort a transition
-        by initiating another transition while a previous one is underway.
+        by initiating another transition while a previous one is underway. 
        */
       abort: function() {
         if (this.isAborted) { return this; }
         log(this.router, this.sequence, this.targetName + ": transition was aborted");
         this.isAborted = true;
         this.router.activeTransition = null;
-        return this;
+        return this; 
       },
 
       /**
-        Retries a previously-aborted transition (making sure to abort the
+        Retries a previously-aborted transition (making sure to abort the 
         transition if it's still active). Returns a new transition that
         represents the new attempt to transition.
        */
@@ -24891,7 +24891,7 @@ define("router",
       },
 
       /**
-        Sets the URL-changing method to be employed at the end of a
+        Sets the URL-changing method to be employed at the end of a 
         successful transition. By default, a new Transition will just
         use `updateURL`, but passing 'replace' to this method will
         cause the URL to update using 'replaceWith' instead. Omitting
@@ -24924,12 +24924,12 @@ define("router",
       handlers for failed transitions.
      */
     Router.UnrecognizedURLError = function(message) {
-      this.message = (message || "UnrecognizedURLError");
+      this.message = (message || "UnrecognizedURLError"); 
       this.name = "UnrecognizedURLError";
     };
 
     Router.TransitionAborted = function(message) {
-      this.message = (message || "TransitionAborted");
+      this.message = (message || "TransitionAborted"); 
       this.name = "TransitionAborted";
     };
 
@@ -25096,8 +25096,8 @@ define("router",
               if (isParam(object)) {
                 var recogHandler = recogHandlers[i], name = recogHandler.names[0];
                 if (object.toString() !== this.currentParams[name]) { return false; }
-              } else if (handlerInfo.context !== object) {
-                return false;
+              } else if (handlerInfo.context !== object) { 
+                return false; 
               }
             }
           }
@@ -25128,7 +25128,7 @@ define("router",
      */
     function getMatchPoint(router, handlers, objects, inputParams) {
 
-      var matchPoint = handlers.length,
+      var matchPoint = handlers.length, 
           providedModels = {}, i,
           currentHandlerInfos = router.currentHandlerInfos || [],
           params = {},
@@ -25139,9 +25139,9 @@ define("router",
 
       objects = slice.call(objects);
       merge(params, inputParams);
-
+   
       for (i = handlers.length - 1; i >= 0; i--) {
-        var handlerObj = handlers[i],
+        var handlerObj = handlers[i], 
             handlerName = handlerObj.handler,
             oldHandlerInfo = currentHandlerInfos[i],
             hasChanged = false;
@@ -25179,7 +25179,7 @@ define("router",
               handlerParams[handlerName][name] = params[name] = params[name] || oldParams[name];
             }
           }
-        }
+        } 
 
         if (hasChanged) { matchPoint = i; }
       }
@@ -25207,7 +25207,7 @@ define("router",
         // Use model from previous transition attempt, preferably the resolved one.
         return (paramName && activeTransition.providedModels[handlerName]) ||
                activeTransition.resolvedModels[handlerName];
-      }
+      } 
     }
 
     function isParam(object) {
@@ -25373,7 +25373,7 @@ define("router",
         if (handler.setup) { handler.setup(context); }
         checkAbort(transition);
       } catch(e) {
-        if (!(e instanceof Router.TransitionAborted)) {
+        if (!(e instanceof Router.TransitionAborted)) { 
           // Trigger the `error` event starting from this failed handler.
           trigger(currentHandlerInfos.concat(handlerInfo), true, ['error', e, transition]);
         }
@@ -25524,11 +25524,11 @@ define("router",
           currentHandlerInfos = router.currentHandlerInfos;
 
       // Check if there's already a transition underway.
-      if (router.activeTransition) {
+      if (router.activeTransition) { 
         if (transitionsIdentical(router.activeTransition, targetName, providedModelsArray)) {
           return router.activeTransition;
         }
-        router.activeTransition.abort();
+        router.activeTransition.abort(); 
         wasTransitioning = true;
       }
 
@@ -25564,7 +25564,7 @@ define("router",
 
           // Don't overwrite contexts / update URL if this was a noop transition.
           if (!currentHandlerInfos || !currentHandlerInfos.length ||
-              currentHandlerInfos.length !== matchPointResults.matchPoint) {
+              currentHandlerInfos.length !== matchPointResults.matchPoint) { 
             finalizeTransition(transition, handlerInfos);
           }
 
@@ -25596,8 +25596,8 @@ define("router",
       @private
 
       Accepts handlers in Recognizer format, either returned from
-      recognize() or handlersFor(), and returns unified
-      `HandlerInfo`s.
+      recognize() or handlersFor(), and returns unified 
+      `HandlerInfo`s. 
      */
     function generateHandlerInfos(router, recogHandlers) {
       var handlerInfos = [];
@@ -25659,7 +25659,7 @@ define("router",
       router.currentParams = params;
 
       var urlMethod = transition.urlMethod;
-      if (urlMethod) {
+      if (urlMethod) { 
         var url = router.recognizer.generate(handlerName, params);
 
         if (urlMethod === 'replace') {
@@ -25734,12 +25734,12 @@ define("router",
 
         log(router, seq, handlerName + ": handling error: " + reason);
 
-        // An error was thrown / promise rejected, so fire an
+        // An error was thrown / promise rejected, so fire an 
         // `error` event from this handler info up to root.
         trigger(handlerInfos.slice(0, index + 1), true, ['error', reason, transition]);
 
-        if (handler.error) {
-          handler.error(reason, transition);
+        if (handler.error) { 
+          handler.error(reason, transition); 
         }
 
         // Propagate the original error.
@@ -25789,7 +25789,7 @@ define("router",
       Throws a TransitionAborted if the provided transition has been aborted.
      */
     function checkAbort(transition) {
-      if (transition.isAborted) {
+      if (transition.isAborted) { 
         log(transition.router, transition.sequence, "detected abort.");
         throw new Router.TransitionAborted();
       }
@@ -25819,7 +25819,7 @@ define("router",
     }
 
     /**
-      @private
+      @private 
      */
     function log(router, sequence, msg) {
 
@@ -25878,7 +25878,7 @@ define("router",
       // Use custom serialize if it exists.
       if (handler.serialize) {
         return handler.serialize(model, names);
-      }
+      } 
 
       if (names.length !== 1) { return; }
 
@@ -26421,7 +26421,7 @@ Ember.Route = Ember.Object.extend({
     from within a template and the application's current route is this route.
 
     Events can also be invoked from other parts of your application via `Route#send`
-    or `Controller#send`.
+    or `Controller#send`. 
 
     The `events` hash will inherit event handlers from
     the `events` hash defined on extended Route parent classes
@@ -26455,7 +26455,7 @@ Ember.Route = Ember.Object.extend({
     event handler if it overrides a handle defined on a parent
     class or mixin.
 
-    Within a route's event handler, the value of the `this` context
+    Within a route's event handler, the value of the `this` context 
     is the Route object.
 
     ## Bubbling
@@ -26826,7 +26826,7 @@ Ember.Route = Ember.Object.extend({
     @param {Object} params the parameters extracted from the URL
     @param {Transition} transition
     @return {Object|Promise} the model for this route. If
-      a promise is returned, the transition will pause until
+      a promise is returned, the transition will pause until 
       the promise resolves, and the resolved value of the promise
       will be used as the model for this route.
   */
@@ -28458,7 +28458,7 @@ Ember.ControllerMixin.reopen({
     Optionally supply a model for the route in question. The model
     will be serialized into the URL using the `serialize` hook of
     the route:
-
+    
     ```javascript
       aController.transitionToRoute('blogPost', aPost);
     ```
@@ -28582,7 +28582,7 @@ Ember.View.reopen({
 
 // Add a new named queue after the 'actions' queue (where RSVP promises
 // resolve), which is used in router transitions to prevent unnecessary
-// loading state entry if all context promises resolve on the
+// loading state entry if all context promises resolve on the 
 // 'actions' queue first.
 
 var queues = Ember.run.queues,
