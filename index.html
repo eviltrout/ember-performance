@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>Ember Performance Suite</title>
   <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
 
@@ -14,13 +15,16 @@
 <script src="js/models.js"></script>
 <script src="js/helpers.js"></script>
 
-
 <script type="text/x-handlebars" data-template-name="listItems">
   <ul>
   {{#each view.listItems}}
     <li>{{this}}</li>
   {{/each}}
   </ul>
+</script>
+
+<script type="text/x-handlebars" data-template-name="htmlBindings">
+  {{{view.html}}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="templateBindings">
@@ -36,6 +40,7 @@
     <button {{action profObjectCreate}} {{bindAttr disabled="profiling"}} class="btn">Object.create()</button>
     <button {{action profRenderList}} {{bindAttr disabled="profiling"}} class="btn">Render List of Items</button>
     <button {{action profTemplateBindings}} {{bindAttr disabled="profiling"}} class="btn">Template Bindings</button>
+    <button {{action profHtmlBindings}} {{bindAttr disabled="profiling"}} class="btn">HTML Bindings</button>
 
     <div style='min-height:30px; margin-top: 10px;'>
       {{#if profiling}}
@@ -70,7 +75,9 @@
     {{/if}}
   </div>
 
-  <div id='scratch'></div>
+  <div id='scratch-container'>
+    <div id='scratch'></div>
+  </div>
 </script>
 
 </body>

@@ -1,5 +1,12 @@
 Perf = Ember.Application.create();
 
+var renderToScratch = function(template, args) {
+  var viewArgs = {templateName: template}
+  var view = Ember.View.create(jQuery.extend(viewArgs, args || {}));
+  view.appendTo('#scratch');
+  return view;
+}
+
 Perf.ApplicationRoute = Em.Route.extend({
 
   model: function() {
@@ -8,6 +15,9 @@ Perf.ApplicationRoute = Em.Route.extend({
 
   events: {
 
+    /**
+      Profiles the creation of Ember.Objects.
+    **/
     profObjectCreate: function() {
       Perf.Profiler.profile("Object.create()", 50, function() {
         for (var i=0; i<10000; i++) {
@@ -16,22 +26,19 @@ Perf.ApplicationRoute = Em.Route.extend({
       });
     },
 
+    /**
+      Profiles the rendering of a list of many bound items.
+    **/
     profRenderList: function () {
       var listItems = [];
-      for (var i=0; i<1500; i++) {
+      for (var i=0; i<5000; i++) {
         listItems.push("Item " + (i + 1));
       }
 
       Perf.Profiler.profile("Render List", 20, function(result) {
         var promise = Ember.Deferred.create();
 
-        var listItemsView = Ember.View.create({
-          classNames: ['hidden'],
-          templateName: 'listItems',
-          listItems: listItems
-        });
-
-        listItemsView.appendTo('#scratch');
+        var listItemsView = renderToScratch('listItems', {listItems: listItems});
         Em.run.next(function() {
           // stop timing before we clean up
           result.stop();
@@ -45,6 +52,9 @@ Perf.ApplicationRoute = Em.Route.extend({
       });
     },
 
+    /**
+      Renders a list of items, then changes them all.
+    **/
     profTemplateBindings: function() {
       var people = [],
           lastAge = 1;
@@ -59,13 +69,7 @@ Perf.ApplicationRoute = Em.Route.extend({
         people.push(Em.Object.create({name: "Person " + i, age: nextAge()}));
       }
 
-      var templateBindingsView = Ember.View.create({
-        classNames: ['hidden'],
-        templateName: 'templateBindings',
-        people: people
-      });
-      templateBindingsView.appendTo('#scratch');
-
+      var templateBindingsView = renderToScratch('templateBindings', {people: people});
       Perf.Profiler.profile("Template Bindings", 40, function(result) {
         var promise = Ember.Deferred.create();
         for (var i=0; i<people.length; i++) {
@@ -85,6 +89,35 @@ Perf.ApplicationRoute = Em.Route.extend({
         templateBindingsView.destroy();
       });
     },
+
+    /**
+      Renders a view with a binding that contains a lot of HTML. The idea
+      here is to check how the W3C Range API performs on large chunks of HTML
+      nodes.
+    **/
+    profHtmlBindings: function() {
+      var largeHtmlChunk = "<ul>";
+      for (var i=0; i<5000; i++) {
+        largeHtmlChunk += "<li>Evil Trout</li>";
+      }
+      largeHtmlChunk += "</ul>";
+
+      var htmlBindingsView = renderToScratch('htmlBindings');
+      Perf.Profiler.profile("HTML Bindings", 40, function(result) {
+        var promise = Ember.Deferred.create();
+
+        htmlBindingsView.set('html', largeHtmlChunk)
+        Em.run.next(function() {
+          result.stop();
+
+          // clean up stuff
+          htmlBindingsView.set('html', '');
+          promise.resolve();
+        });
+        return promise;
+      });
+    }
+
   }
 
 });
