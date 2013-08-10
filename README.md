@@ -15,11 +15,11 @@ the performance of Ember.js.
 
 ## Running against a new Ember.js Build
 
-Simply replace the `ember-master.js` file with the latest *production* build of EmberJS
+Simply replace the `ember-master.js` file with the latest *production* build of Ember.js
 you want to test.
 
 1. Clone ember-performance to your computer.
-2. Clone the [Ember.js](https://github.com/emberjs/ember.js) project someone on your computer.
+2. Clone the [Ember.js](https://github.com/emberjs/ember.js) project somewhere on your computer.
 3. In the Ember.js directory, execute a command like so: `rake clean && rake dist && cp dist/ember.prod.js /Users/robin/code/ember-performance/js/libs/ember-master.js` (you will need to replace `/Users/robin/code/ember-performance` with the appropriate path on your computer.)
 4. Reload in your browser and run the tests!
 
