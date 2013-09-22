@@ -1,11 +1,12 @@
-Perf.Profiler = Ember.Object.extend({
+Perf.ProfilerDisplay = Ember.Object.extend({
+  testsRun: Em.computed.alias('currentProfiler.testsRun'),
+  testCount: Em.computed.alias('currentProfiler.testCount'),
+  profiling: Em.computed.alias('currentProfiler.profiling'),
 
-  init: function() {
+  init: function(){
     this.setProperties({
-      results: [],
-      testsRun: 0,
-      testCount: 0,
-      profiling: false
+      'results': [],
+      'currentProfiler': null
     });
   },
 
@@ -13,68 +14,101 @@ Perf.Profiler = Ember.Object.extend({
     this.set('results', []);
   },
 
+  addResult: function(result){
+    this.get('results').pushObject(result);
+  }
+});
 
-  profileMethod: function(result, test) {
-    var self = this;
+Perf.ProfilerDisplay.reopenClass({
+  instance: function() {
+    if (!this._profilerDisplay) { this._profilerDisplay = Perf.ProfilerDisplay.create(); }
+    return this._profilerDisplay;
+  }
+})
+
+Perf.Profiler = Ember.Object.extend({
+  name:       Ember.required('You must set the name of each profile job.'),
+  testCount:  Ember.required('You must override the number of runs for each profile job.'),
+
+  setup:     Ember.K,
+  test:      Ember.K,
+  teardown:  Ember.K,
+
+  init: function() {
+    this.setProperties({
+      testsRun: 0,
+      profiling: false,
+      display: Perf.ProfilerDisplay.instance()
+    });
+  },
+
+  updateTestCount: function(){
+    var display = this.get('display');
+
+    this.set('testsRun', this.get('testsRun') + 1);
+    display.set('restRun', this.get('testRun'));
+  },
+
+  profileMethod: function() {
+    var self   = this,
+        result = this.get('result');
 
     // Support promise profiles
     var complete = function() {
       result.stop();
 
-      self.set('testsRun', self.get('testsRun') + 1);
+      self.updateTestCount();
       if (self.get('testsRun') === self.get('testCount')) {
-        self.get('results').pushObject(result);
+        self.get('display').addResult(result);
+        self.get('display').set('currentProfiler', null);
         self.set('profiling', false);
         self.get('promise').resolve();
       } else {
         // We delay between each run to allow the browser to clean up and stuff.
-        Em.run.later(self, 'profileMethod', result, test, 100);
+        Em.run.later(self, 'profileMethod', 100);
       }
     }
 
     result.start();
-    var testResult = test(result);
+    var testResult = this.test();
     if (testResult && testResult.then) {
       testResult.then(complete);
     } else {
       complete();
     }
-
   },
 
-  profile: function(name, testRuns, test) {
+  profile: function() {
     var self = this,
         promise = Ember.Deferred.create();
 
     self.setProperties({
       profiling: true,
       testsRun: 0,
-      testCount: testRuns,
       promise: promise
     });
 
+    this.set('result', Perf.Result.create({name: this.get('name')}))
 
-    var result = Perf.Result.create({name: name});
+    this.get('display').set('currentProfiler', this);
 
+    this.setup();
     Em.run.next(function () {
-      self.profileMethod(result, test);
+      self.profileMethod();
     });
 
-    return promise;
-  }
-});
-
-Perf.Profiler.reopenClass({
-  instance: function() {
-    if (!this._profiler) { this._profiler = Perf.Profiler.create(); }
-    return this._profiler;
+    return promise.then(function(){
+      self.teardown();
+    });
   },
 
-  profile: function() {
-    var profiler = this.instance();
-    return profiler.profile.apply(profiler, arguments);
+  renderToScratch: function(template, args) {
+    var viewArgs = {templateName: template}
+    var view = Ember.View.create(jQuery.extend(viewArgs, args || {}));
+    view.appendTo('#scratch');
+    return view;
   }
-})
+});
 
 
 Perf.Result = Ember.Object.extend({
@@ -118,5 +152,19 @@ Perf.Result = Ember.Object.extend({
       this.get('times').pushObject(new Date().getTime() - timeStart);
       this.set('timeStart', null);
     }
-  }
+  },
+
+  runCount: function(){
+    return this.get('times').length;
+  }.property('times'),
+
+  dump: function(){
+    return this.getProperties('name', 'times', 'geometricMean', 'mean',
+                              'standardDeviation', 'runCount');
+  }.property('name', 'times', 'geometricMean', 'mean', 'standardDeviation', 'runCount')
+});
+
+Perf.Job = Ember.Object.extend({
+  title: Em.required('You must provide a title for each job.'),
+
 });
