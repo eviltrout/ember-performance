@@ -1,3 +1,5 @@
+'use strict';
+
 Perf.ProfilerDisplay = Ember.Object.extend({
   testsRun: Em.computed.alias('currentProfiler.testsRun'),
   testCount: Em.computed.alias('currentProfiler.testCount'),
@@ -53,15 +55,14 @@ Perf.Profiler = Ember.Object.extend({
     var self   = this,
         result = this.get('result');
 
+
     // Support promise profiles
     var complete = function() {
       result.stop();
 
       self.updateTestCount();
       if (self.get('testsRun') === self.get('testCount')) {
-        self.get('display').addResult(result);
-        self.get('display').set('currentProfiler', null);
-        self.set('profiling', false);
+
         self.get('promise').resolve();
       } else {
         // We delay between each run to allow the browser to clean up and stuff.
@@ -88,18 +89,74 @@ Perf.Profiler = Ember.Object.extend({
       promise: promise
     });
 
-    this.set('result', Perf.Result.create({name: this.get('name')}))
-
+    var result = Perf.Result.create({name: this.get('name')});
     this.get('display').set('currentProfiler', this);
-
     this.setup();
-    Em.run.next(function () {
-      self.profileMethod();
+
+    // Em.run.next(function () {
+    //   self.profileMethod();
+
+    //   var b = new Benchmark(function() {
+    //     self.test();
+    //   });
+    // });
+
+    var robin = this;
+
+    console.log('benching...');
+    var b = new Benchmark('asdfa', {
+      'defer': true,
+
+      'fn': function(p) {
+        Em.run.next(function() {
+          for (var i=0; i<1000; i++) {
+            var instance = Ember.Object.create();
+          } 
+          p.resolve();       
+        });
+      },
+
+      'delay': 0.05,
+
+      'onCycle': function() {
+        self.updateTestCount();
+      },
+
+      'onComplete': function() {
+        console.log(b);
+        result.set('count', b.count);
+        self.set('profiling', false);
+        self.get('display').addResult(result);
+        self.get('display').set('currentProfiler', null);
+
+        self.teardown();        
+      }
+
     });
 
-    return promise.then(function(){
-      self.teardown();
+    Em.run.next(function() {
+      b.run({'async': true});  
     });
+
+    // var b = new Benchmark({
+    //   defer: true,
+
+    //   fn: tester,
+
+
+    //   onComplete: function() {
+    //     result.set('count', b.count);
+
+    //     self.set('profiling', false);
+    //     self.get('display').addResult(result);
+    //     self.get('display').set('currentProfiler', null);
+
+    //     self.teardown();        
+    //   }
+    // });    
+    // b.run();
+    // console.log(b);
+
   },
 
   renderToScratch: function(template, args) {

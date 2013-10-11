@@ -19,6 +19,8 @@ page.onLoadFinished = function() {
       timeout = parseInt(args[1] || 60000, 10),
       start   = Date.now();
 
+  console.log("Running tests...");
+  
   var interval = setInterval(function() {
     if (Date.now() > start + timeout) {
       console.error("Timed out");
@@ -38,7 +40,7 @@ page.onLoadFinished = function() {
 }
 
 function runPerformanceTests(){
-  var promise = Ember.RSVP.resolve(true);
+  var promise = Ember.RSVP.resolve(true); 
 
   return promise
     .then(function(){ return Perf.ObjectCreateProfiler.create().profile(); })
