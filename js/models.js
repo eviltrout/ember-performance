@@ -74,7 +74,7 @@ Perf.Profiler = Ember.Object.extend({
         // We delay between each run to allow the browser to clean up and stuff.
         Em.run.later(self, 'profileMethod', 100);
       }
-    }
+    };
 
     result.start();
     var testResult = this.test();
@@ -95,7 +95,7 @@ Perf.Profiler = Ember.Object.extend({
       promise: promise
     });
 
-    this.set('result', Perf.Result.create({name: this.get('name')}))
+    this.set('result', Perf.Result.create({name: this.get('name')}));
 
     this.get('display').set('currentProfiler', this);
 
@@ -110,7 +110,7 @@ Perf.Profiler = Ember.Object.extend({
   },
 
   renderToScratch: function(template, args) {
-    var viewArgs = {templateName: template}
+    var viewArgs = {templateName: template};
     var view = Ember.View.create(jQuery.extend(viewArgs, args || {}));
     view.appendTo('#scratch');
     return view;
