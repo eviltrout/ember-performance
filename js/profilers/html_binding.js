@@ -21,19 +21,20 @@ Perf.HtmlBindingProfiler = Perf.Profiler.extend({
   },
 
   test: function(){
-    var promise          = Ember.Deferred.create(),
+    var deferred = Ember.RSVP.defer(),
         htmlBindingsView = this.get('htmlBindingsView'),
         result           = this.get('result');
 
-    htmlBindingsView.set('html', this.get('largeHtmlChunk'))
+    htmlBindingsView.set('html', this.get('largeHtmlChunk'));
     Em.run.next(function() {
       result.stop();
 
       // clean up stuff
       htmlBindingsView.set('html', '');
-      promise.resolve();
+      deferred.resolve();
     });
-    return promise;
+
+    return deferred.promise;
   },
 
   teardown: function(){

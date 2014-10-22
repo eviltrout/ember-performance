@@ -4,11 +4,16 @@ Perf.ProfilerDisplay = Ember.Object.extend({
   profiling: Em.computed.alias('currentProfiler.profiling'),
 
   init: function(){
+    var versions = ["1.5.1", "1.6.1", "1.7.0", "1.8.0"];
+    if(versions.indexOf(window.testVersion) === -1) {
+      versions.push(window.testVersion);
+    }
+
     this.setProperties({
       'results': [],
       'currentProfiler': null,
       testVersion: window.testVersion,
-      versions: ["1.5.1", "1.6.1", "1.7.0", "1.8.0"],
+      versions: versions,
       selectedVersion: window.testVersion
     });
   },
@@ -69,7 +74,7 @@ Perf.Profiler = Ember.Object.extend({
         self.get('display').addResult(result);
         self.get('display').set('currentProfiler', null);
         self.set('profiling', false);
-        self.get('promise').resolve();
+        self.get('deferred').resolve();
       } else {
         // We delay between each run to allow the browser to clean up and stuff.
         Em.run.later(self, 'profileMethod', 100);
@@ -87,12 +92,12 @@ Perf.Profiler = Ember.Object.extend({
 
   profile: function() {
     var self = this,
-        promise = Ember.Deferred.create();
+        deferred = Ember.RSVP.defer();
 
     self.setProperties({
       profiling: true,
       testsRun: 0,
-      promise: promise
+      deferred: deferred
     });
 
     this.set('result', Perf.Result.create({name: this.get('name')}));
@@ -104,7 +109,7 @@ Perf.Profiler = Ember.Object.extend({
       self.profileMethod();
     });
 
-    return promise.then(function(){
+    return deferred.promise.then(function(){
       self.teardown();
     });
   },

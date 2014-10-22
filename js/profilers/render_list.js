@@ -15,7 +15,7 @@ Perf.RenderListProfiler = Perf.Profiler.extend({
   },
 
   test: function() {
-    var promise = Ember.Deferred.create(),
+    var deferred = Ember.RSVP.defer(),
         result  = this.get('result');
 
     var listItemsView = this.renderToScratch('listItems', {listItems: this.get('listItems')});
@@ -25,9 +25,9 @@ Perf.RenderListProfiler = Perf.Profiler.extend({
 
       // clean up stuff
       listItemsView.destroy();
-      promise.resolve();
+      deferred.resolve();
     });
 
-    return promise;
+    return deferred.promise;
   }
 });

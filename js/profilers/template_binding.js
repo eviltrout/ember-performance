@@ -20,7 +20,7 @@ Perf.TemplateBindingProfiler = Perf.Profiler.extend({
   },
 
   test: function() {
-    var promise              = Ember.Deferred.create(),
+    var promise              = Ember.RSVP.defer(),
         people               = this.get('people'),
         result               = this.get('result'),
         templateBindingsView = this.get('templateBindingsView');
@@ -43,10 +43,9 @@ Perf.TemplateBindingProfiler = Perf.Profiler.extend({
     this.get('templateBindingsView').destroy();
   },
 
-  
   nextAge: function() {
     this.incrementProperty('lastAge');
-    if (this.get('lastAge') > 99) { this.set('lastAge', 1)}
+    if (this.get('lastAge') > 99) { this.set('lastAge', 1); }
 
     return this.get('lastAge');
   }

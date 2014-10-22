@@ -6,7 +6,7 @@ Perf.ApplicationRoute = Em.Route.extend({
     return Perf.ProfilerDisplay.instance();
   },
 
-  events: {
+  actions: {
 
     profObjectCreate: function() {
       Perf.ObjectCreateProfiler.create().profile();
