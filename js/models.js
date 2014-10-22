@@ -6,9 +6,16 @@ Perf.ProfilerDisplay = Ember.Object.extend({
   init: function(){
     this.setProperties({
       'results': [],
-      'currentProfiler': null
+      'currentProfiler': null,
+      testVersion: window.testVersion,
+      versions: ["1.5.1", "1.6.1", "1.7.0", "1.8.0"],
+      selectedVersion: window.testVersion
     });
   },
+
+  selectedVersionChanged: function(){
+    window.location.href = window.location.pathname + "?v=" + this.get('selectedVersion');
+  }.observes('selectedVersion'),
 
   clearResults: function() {
     this.set('results', []);
@@ -24,7 +31,7 @@ Perf.ProfilerDisplay.reopenClass({
     if (!this._profilerDisplay) { this._profilerDisplay = Perf.ProfilerDisplay.create(); }
     return this._profilerDisplay;
   }
-})
+});
 
 Perf.Profiler = Ember.Object.extend({
   name:       Ember.required('You must set the name of each profile job.'),

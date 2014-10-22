@@ -10,7 +10,16 @@
 
 <script src="js/libs/jquery-1.9.1.js"></script>
 <script src="js/libs/handlebars-v1.3.0.js"></script>
-<script src="js/libs/ember.prod.js"></script>
+<script>
+
+   if(window.location.search){
+     window.testVersion = window.location.search.split("=")[1];
+   }
+
+   window.testVersion = window.testVersion || "1.8.0";
+
+   document.write('<script src="js/libs/ember.' + window.testVersion + '.js"><\/script>');
+</script>
 <script src="js/app.js"></script>
 <script src="js/models.js"></script>
 <script src="js/profilers/object_create.js"></script>
@@ -39,7 +48,10 @@
 
 <script type="text/x-handlebars" data-template-name='application'>
   <div class="container">
-    <h1>Ember Performance Suite</h1>
+    <h1>Ember Performance Suite : Ember {{testVersion}}</h1>
+    <p>
+    Select Ember Version {{view Ember.Select content=versions value=selectedVersion}}
+    </p>
 
     <button {{action profObjectCreate}} {{bindAttr disabled="profiling"}} class="btn">Object.create()</button>
     <button {{action profRenderList}} {{bindAttr disabled="profiling"}} class="btn">Render List of Items</button>
