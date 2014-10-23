@@ -1,4 +1,11 @@
-Perf = Ember.Application.create();
+Perf = Ember.Application.create({});
+
+Perf.ScratchView = Ember.ContainerView.extend({
+  didInsertElement: function(){
+    window.Perf.scratchView = this;
+  },
+  classNames: ["scratch"]
+});
 
 Perf.ApplicationRoute = Em.Route.extend({
 
@@ -36,3 +43,4 @@ Perf.ApplicationController = Ember.ObjectController.extend({
   },
 
 });
+

@@ -117,11 +117,12 @@ Perf.Profiler = Ember.Object.extend({
   renderToScratch: function(template, args) {
     var viewArgs = {templateName: template};
     var view = Ember.View.create(jQuery.extend(viewArgs, args || {}));
-    view.appendTo('#scratch');
+
+    Perf.scratchView.clear();
+    Perf.scratchView.pushObject(view);
     return view;
   }
 });
-
 
 Perf.Result = Ember.Object.extend({
   init: function() {
