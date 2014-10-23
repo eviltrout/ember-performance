@@ -15,24 +15,25 @@ Perf.RenderListProfiler = Perf.Profiler.extend({
   },
 
   test: function() {
-    var deferred = Ember.RSVP.defer(),
-        result  = this.get('result');
+    var profiler = this;
+    return new Ember.RSVP.Promise(function(resolve) {
+      var result  = profiler.get('result');
 
-    var listItemsView = this.renderToScratch('listItems', {
-      listItems: this.get('listItems')
+      var listItemsView = profiler.renderToScratch('listItems', {
+        listItems: profiler.get('listItems')
+      });
+
+      // micro-task queue
+      window.Promise.resolve().then(function() {
+        // stop timing before we clean up
+        result.stop();
+
+        setTimeout(function() {
+          // clean up stuff
+          listItemsView.destroy();
+          resolve();
+        }, 0);
+      });
     });
-
-    window.Promise.resolve().then(function() {
-      // stop timing before we clean up
-      result.stop();
-
-      setTimeout(function() {
-        // clean up stuff
-        listItemsView.destroy();
-        deferred.resolve();
-      }, 0);
-    });
-
-    return deferred.promise;
   }
 });

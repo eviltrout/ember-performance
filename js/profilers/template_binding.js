@@ -20,25 +20,27 @@ Perf.TemplateBindingProfiler = Perf.Profiler.extend({
   },
 
   test: function() {
-    var promise              = Ember.RSVP.defer(),
-        people               = this.get('people'),
-        result               = this.get('result'),
-        templateBindingsView = this.get('templateBindingsView');
+    var profiler = this;
+    return new Ember.RSVP.Promise(function(resolve) {
+      var people               = profiler.get('people');
+      var result               = profiler.get('result');
+      var templateBindingsView = profiler.get('templateBindingsView');
 
-    for (var i=0; i<people.length; i++) {
-      people[i].set('age', this.nextAge());
-    }
+      for (var i=0; i<people.length; i++) {
+        people[i].set('age', profiler.nextAge());
+      }
 
-    window.Promise.resolve().then(function(){
-      result.stop();
+      // micro-task queue
+      window.Promise.resolve().then(function(){
+        result.stop();
 
-      setTimeout(function() {
-        promise.resolve();
-      }, 0);
-      // clean up stuff
+        setTimeout(function() {
+          // clean up stuff
+          resolve();
+        }, 0);
+      });
+
     });
-
-    return promise;
   },
 
   teardown: function(){

@@ -22,25 +22,24 @@ Perf.HtmlBindingProfiler = Perf.Profiler.extend({
   },
 
   test: function(){
+    var profiler = this;
+    return new Ember.RSVP.Promise(function() {
+      var htmlBindingsView = profiler.get('htmlBindingsView');
+      var result           = profiler.get('result');
 
-    var deferred = Ember.RSVP.defer(),
-        htmlBindingsView = this.get('htmlBindingsView'),
-        result           = this.get('result');
+      htmlBindingsView.set('html', profiler.get('largeHtmlChunk'));
 
-    htmlBindingsView.set('html', this.get('largeHtmlChunk'));
+      // stop gathering statistics on the turn of the next micro-task queue
+      window.Promise.resolve().then(function(){
+        result.stop();
 
-    // stop gathering statistics on the turn of the next micro-task queue
-    window.Promise.resolve().then(function(){
-      result.stop();
-
-      // clean up stuff
-      setTimeout(function() {
-        Ember.run(htmlBindingsView, 'set', 'html' ,'');
-        deferred.resolve();
-      }, 0);
+        // clean up stuff
+        setTimeout(function() {
+          Ember.run(htmlBindingsView, 'set', 'html' ,'');
+          resolve();
+        }, 0);
+      });
     });
-
-    return deferred.promise;
   },
 
   teardown: function(){
