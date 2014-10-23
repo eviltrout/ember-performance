@@ -23,7 +23,7 @@ Perf.HtmlBindingProfiler = Perf.Profiler.extend({
 
   test: function(){
     var profiler = this;
-    return new Ember.RSVP.Promise(function() {
+    return new Ember.RSVP.Promise(function(resolve) {
       var htmlBindingsView = profiler.get('htmlBindingsView');
       var result           = profiler.get('result');
 
