@@ -31,7 +31,31 @@
 <script src="js/profilers/render_list.js"></script>
 <script src="js/profilers/template_binding.js"></script>
 <script src="js/profilers/html_binding.js"></script>
+<script src="js/profilers/complex_list.js"></script>
 <script src="js/helpers.js"></script>
+
+<script type="text/x-handlebars" data-template-name="components/nested-thing">
+  a: {{a}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/my-template-thing">
+  a: {{a}}
+  b: {{b}}
+  c: {{c}}
+  d: {{d}}
+  {{nested-thing a=a}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="complexItems">
+  <ul>
+  {{#each view.listItems}}
+    <li>{{my-thing data=a}} {{my-thing data=b}} {{my-thing data=c}} {{my-thing data=d}}</li>
+    <li>{{my-thing data=a}} {{my-thing data=b}} {{my-thing data=c}} {{my-thing data=d}}</li>
+    <li>{{my-template-thing a=a b=b c=c d=d}}</li>
+    <li>{{my-template-thing a=a b=b c=c d=d}}</li>
+  {{/each}}
+  </ul>
+</script>
 
 <script type="text/x-handlebars" data-template-name="listItems">
   <ul>
@@ -62,6 +86,7 @@
     <button {{action 'profRenderList'}} {{bind-attr disabled="profiling"}} class="btn">Render List of Items</button>
     <button {{action 'profTemplateBindings'}} {{bind-attr disabled="profiling"}} class="btn">Template Bindings</button>
     <button {{action 'profHtmlBindings'}} {{bind-attr disabled="profiling"}} class="btn">HTML Bindings</button>
+    <button {{action 'profComplexList'}} {{bind-attr disabled="profiling"}} class="btn">Complex List</button>
 
     <div style='min-height:30px; margin-top: 10px;'>
       {{#if profiling}}
@@ -79,6 +104,7 @@
           <th>Geometric Mean</th>
           <th>Mean</th>
           <th>Std. Dev</th>
+          <th>Max</th>
         </tr>
         {{#each results}}
         <tr>
@@ -87,6 +113,7 @@
           <td>{{time geometricMean}}</td>
           <td>{{time mean}}</td>
           <td>{{time standardDeviation}}</td>
+          <td>{{time max}}</td>
         </tr>
         {{/each}}
       </table>

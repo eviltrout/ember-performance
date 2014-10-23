@@ -77,9 +77,17 @@ Perf.Profiler = Ember.Object.extend({
         self.get('deferred').resolve();
       } else {
         // We delay between each run to allow the browser to clean up and stuff.
+        Perf.scratchView.clear();
         Em.run.later(self, 'profileMethod', 100);
       }
     };
+
+    if(Perf.scratchView.get('length') > 0){
+      // We delay between each run to allow the browser to clean up and stuff.
+      Perf.scratchView.clear();
+      Em.run.later(self, 'profileMethod', 100);
+      return;
+    }
 
     result.start();
     var testResult = this.test();
@@ -118,7 +126,6 @@ Perf.Profiler = Ember.Object.extend({
     var viewArgs = {templateName: template};
     var view = Ember.View.create(jQuery.extend(viewArgs, args || {}));
 
-    Perf.scratchView.clear();
     Perf.scratchView.pushObject(view);
     return view;
   }
@@ -128,6 +135,12 @@ Perf.Result = Ember.Object.extend({
   init: function() {
     this.set('times', []);
   },
+
+  max: function() {
+    return this.get('times').reduce(function (x,y) {
+      return Math.max(x,y);
+    });
+  }.property('times.@each'),
 
   geometricMean: function() {
     var result = 1;

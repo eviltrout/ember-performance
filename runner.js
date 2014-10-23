@@ -11,7 +11,7 @@ page.open(args[0], function(status) {
   if (status !== 'success') {
     console.error("Unable to access page.");
     phantom.exit(1);
-  } 
+  }
 });
 
 page.onLoadFinished = function() {
@@ -35,7 +35,7 @@ page.onLoadFinished = function() {
       }
     }
   }, 500);
-}
+};
 
 function runPerformanceTests(){
   var promise = Ember.RSVP.resolve(true);
@@ -51,4 +51,4 @@ function runPerformanceTests(){
 
       return true;
     });
-};
+}

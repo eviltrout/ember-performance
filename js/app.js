@@ -29,8 +29,11 @@ Perf.ApplicationRoute = Em.Route.extend({
 
     profHtmlBindings: function() {
       Perf.HtmlBindingProfiler.create().profile();
-    }
+    },
 
+    profComplexList: function() {
+      Perf.ComplexListProfiler.create().profile();
+    }
   }
 
 });

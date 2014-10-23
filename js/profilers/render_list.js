@@ -29,8 +29,6 @@ Perf.RenderListProfiler = Perf.Profiler.extend({
         result.stop();
 
         setTimeout(function() {
-          // clean up stuff
-          listItemsView.destroy();
           resolve();
         }, 0);
       });
