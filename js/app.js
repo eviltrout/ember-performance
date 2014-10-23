@@ -8,13 +8,11 @@ Perf.ScratchView = Ember.ContainerView.extend({
 });
 
 Perf.ApplicationRoute = Em.Route.extend({
-
   model: function() {
     return Perf.ProfilerDisplay.instance();
   },
 
   actions: {
-
     profObjectCreate: function() {
       Perf.ObjectCreateProfiler.create().profile();
     },
@@ -35,15 +33,11 @@ Perf.ApplicationRoute = Em.Route.extend({
       Perf.ComplexListProfiler.create().profile();
     }
   }
-
 });
 
 
 Perf.ApplicationController = Ember.ObjectController.extend({
-
   clearResults: function() {
     this.get('model').clearResults();
   },
-
 });
-
