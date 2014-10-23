@@ -39,15 +39,15 @@ Perf.ComplexListProfiler = Perf.Profiler.extend({
         listItems: profiler.get('listItems')
       });
 
-      // micro-task queue
-      window.Promise.resolve().then(function() {
+      listItemsView.didInsertElement = function(){
         // stop timing before we clean up
         result.stop();
 
         setTimeout(function() {
           resolve();
         }, 0);
-      });
+      };
+
     });
   }
 });
