@@ -3,6 +3,7 @@
   here is to check how the W3C Range API performs on large chunks of HTML
   nodes.
 **/
+
 Perf.HtmlBindingProfiler = Perf.Profiler.extend({
   testCount: 40,
   name: 'HTML Bindings',
@@ -21,20 +22,24 @@ Perf.HtmlBindingProfiler = Perf.Profiler.extend({
   },
 
   test: function(){
-    var deferred = Ember.RSVP.defer(),
-        htmlBindingsView = this.get('htmlBindingsView'),
-        result           = this.get('result');
+    var profiler = this;
+    return new Ember.RSVP.Promise(function(resolve) {
+      var htmlBindingsView = profiler.get('htmlBindingsView');
+      var result           = profiler.get('result');
 
-    htmlBindingsView.set('html', this.get('largeHtmlChunk'));
-    Em.run.next(function() {
-      result.stop();
+      htmlBindingsView.set('html', profiler.get('largeHtmlChunk'));
 
-      // clean up stuff
-      htmlBindingsView.set('html', '');
-      deferred.resolve();
+      // stop gathering statistics on the turn of the next micro-task queue
+      window.Promise.resolve().then(function(){
+        result.stop();
+
+        // clean up stuff
+        setTimeout(function() {
+          Ember.run(htmlBindingsView, 'set', 'html' ,'');
+          resolve();
+        }, 0);
+      });
     });
-
-    return deferred.promise;
   },
 
   teardown: function(){
