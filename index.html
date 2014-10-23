@@ -8,6 +8,7 @@
 </head>
 <body>
 
+<script src="js/libs/ascii-table.min.js"></script>
 <script src="js/libs/jquery-1.9.1.js"></script>
 <script>
   if(window.location.search){
@@ -100,7 +101,7 @@
     </div>
 
     {{#if results}}
-      <h3>Results</h3>
+      <h3>Results ({{version}})</h3>
 
       <table class="table">
         <tr>
@@ -123,8 +124,13 @@
         {{/each}}
       </table>
 
-      <button {{action clearResults}} {{bind-attr disabled="profiling"}} class="btn">Clear Results</button>
+      {{#if showAscii}}
+        <h3>Ascii Results</h3>
+        <pre>{{{asciiTable}}}</pre>
+      {{/if}}
 
+      <button {{action 'showAscii'}} {{bind-attr disabled=profiling}} class='btn'>Show Ascii</button>
+      <button {{action 'clearResults'}} {{bind-attr disabled=profiling}} class="btn">Clear Results</button>
     {{/if}}
   </div>
 

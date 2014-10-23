@@ -12726,7 +12726,7 @@ define("ember-metal/core",
       @default '1.7.0'
       @static
     */
-    Ember.VERSION = '1.7.0';
+    Ember.VERSION = '1.7.0+perf';
 
     /**
       Standard environmental variables. You can define these in a global `EmberENV`

@@ -4,7 +4,7 @@ Perf.ProfilerDisplay = Ember.Object.extend({
   profiling: Em.computed.alias('currentProfiler.profiling'),
 
   init: function(){
-    var versions = ["1.5.1", "1.6.1", "1.7.0", "1.7.0a", "1.8.0", "http://builds.emberjs.com/canary/ember.prod.js"];
+    var versions = ["1.5.1", "1.6.1", "1.7.0", "1.7.0+perf", "1.8.0", "http://builds.emberjs.com/canary/ember.prod.js"];
     if(versions.indexOf(window.testVersion) === -1) {
       versions.push(window.testVersion);
     }
@@ -23,7 +23,7 @@ Perf.ProfilerDisplay = Ember.Object.extend({
   }.observes('selectedVersion'),
 
   clearResults: function() {
-    this.set('results', []);
+    this.get('results').clear();
   },
 
   addResult: function(result){
@@ -109,7 +109,6 @@ Perf.Profiler = Ember.Object.extend({
     });
 
     this.set('result', Perf.Result.create({name: this.get('name')}));
-
     this.get('display').set('currentProfiler', this);
 
     this.setup();
@@ -192,5 +191,4 @@ Perf.Result = Ember.Object.extend({
 
 Perf.Job = Ember.Object.extend({
   title: Em.required('You must provide a title for each job.'),
-
 });

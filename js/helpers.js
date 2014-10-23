@@ -1,5 +1,9 @@
+window.roundedTime = function(ms) {
+  if (typeof ms === "undefined" || ms === 0) { return undefined; }
+  var rounded = Math.floor(ms * 100) / 100;
+  return rounded.toString() + 'ms';
+};
+
 Ember.Handlebars.helper('time', function(value, options) {
-  if (typeof value === "undefined" || value === 0) { return new Handlebars.SafeString("&mdash;"); }
-  var rounded = Math.floor(value * 100) / 100;
-  return new Handlebars.SafeString(rounded + 'ms');
+  return new Handlebars.SafeString(roundedTime(value) || "&mdash;");
 });

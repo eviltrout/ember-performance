@@ -35,9 +35,33 @@ Perf.ApplicationRoute = Em.Route.extend({
   }
 });
 
-
 Perf.ApplicationController = Ember.ObjectController.extend({
-  clearResults: function() {
-    this.get('model').clearResults();
-  },
+  version: Ember.VERSION,
+  showAscii: false,
+
+  asciiTable: function() {
+    var table = new AsciiTable('Ember Performance Suite - Ember ' + this.get('version'));
+
+    table.setHeading('Name', '# Runs', 'Geo Mean', 'Mean', 'Std Dev', 'Max');
+    this.get('results').forEach(function(r) {
+      table.addRow(r.get('name'),
+                   r.get('times.length'),
+                   roundedTime(r.get('geometricMean')),
+                   roundedTime(r.get('mean')),
+                   roundedTime(r.get('standardDeviation')),
+                   roundedTime(r.get('max')));
+    });
+    return table.toString();
+  }.property('results.@each'),
+
+  actions: {
+    clearResults: function() {
+      this.get('model').clearResults();
+      this.set('showAscii', false);
+    },
+
+    showAscii: function() {
+      this.toggleProperty('showAscii');
+    }
+  }
 });
