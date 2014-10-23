@@ -29,11 +29,13 @@ Perf.TemplateBindingProfiler = Perf.Profiler.extend({
       people[i].set('age', this.nextAge());
     }
 
-    Em.run.next(function() {
+    window.Promise.resolve().then(function(){
       result.stop();
 
+      setTimeout(function() {
+        promise.resolve();
+      }, 0);
       // clean up stuff
-      promise.resolve();
     });
 
     return promise;
