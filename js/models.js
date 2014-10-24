@@ -19,7 +19,7 @@ Perf.ProfilerDisplay = Ember.Object.extend({
   },
 
   selectedVersionChanged: function(){
-    window.location.href = window.location.pathname + "?v=" + this.get('selectedVersion');
+    window.location.href = window.location.pathname + "?ember=" + this.get('selectedVersion');
   }.observes('selectedVersion'),
 
   clearResults: function() {
