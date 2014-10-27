@@ -1,27 +1,25 @@
 (function(Perf) {
-  Perf.MyThingComponent = Ember.Component.extend({
-    render: function(buffer){
+  Perf.BufferRenderComponent = Ember.Component.extend({
+    render: function(buffer) {
       buffer.push(this.get("data"));
     }
   });
 
-  Perf.MyThing = Ember.Object.extend({
-    d: function(){
+  var MyThing = Ember.Object.extend({
+    d: function() {
       return this.get("a") + this.get("b");
     }.property("a","b")
   });
 
-  /**
-    Profiles the rendering of a list with complex rows
-  **/
+  // Profiles the rendering of a list with complex rows
   Perf.ComplexListProfiler = Perf.Profiler.extend({
     testCount: 40,
     name: 'Complex List',
 
-    setup: function(){
+    setup: function() {
       var listItems = [];
       for (var i=0; i<50; i++) {
-        listItems.push(Perf.MyThing.create({
+        listItems.push(MyThing.create({
           a: "a" + i,
           b: "b" + i,
           c: "c" + i
@@ -40,7 +38,7 @@
           listItems: profiler.get('listItems')
         });
 
-        listItemsView.didInsertElement = function(){
+        listItemsView.didInsertElement = function() {
           // stop timing before we clean up
           result.stop();
 

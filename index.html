@@ -21,25 +21,25 @@
 <script src="js/profilers/get.js"></script>
 <script src="js/helpers.js"></script>
 
-<script type="text/x-handlebars" data-template-name="components/nested-thing">
+<script type="text/x-handlebars" data-template-name="components/nested-component-render">
   a: {{a}}
 </script>
 
-<script type="text/x-handlebars" data-template-name="components/my-template-thing">
+<script type="text/x-handlebars" data-template-name="components/handlebars-render">
   a: {{a}}
   b: {{b}}
   c: {{c}}
   d: {{d}}
-  {{nested-thing a=a}}
+  {{nested-component-render a=a}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="complexItems">
   <ul>
   {{#each view.listItems}}
-    <li>{{my-thing data=a}} {{my-thing data=b}} {{my-thing data=c}} {{my-thing data=d}}</li>
-    <li>{{my-thing data=a}} {{my-thing data=b}} {{my-thing data=c}} {{my-thing data=d}}</li>
-    <li>{{my-template-thing a=a b=b c=c d=d}}</li>
-    <li>{{my-template-thing a=a b=b c=c d=d}}</li>
+    <li>{{buffer-render data=a}} {{buffer-render data=b}} {{buffer-render data=c}} {{buffer-render data=d}}</li>
+    <li>{{buffer-render data=a}} {{buffer-render data=b}} {{buffer-render data=c}} {{buffer-render data=d}}</li>
+    <li>{{handlebars-render a=a b=b c=c d=d}}</li>
+    <li>{{handlebars-render a=a b=b c=c d=d}}</li>
   {{/each}}
   </ul>
 </script>
