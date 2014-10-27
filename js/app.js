@@ -17,6 +17,10 @@ Perf.ApplicationRoute = Em.Route.extend({
       Perf.ObjectCreateProfiler.create().profile();
     },
 
+    profGet: function() {
+      Perf.GetProfiler.create().profile();
+    },
+
     profRenderList: function () {
       Perf.RenderListProfiler.create().profile();
     },
