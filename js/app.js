@@ -44,8 +44,11 @@ Perf.ApplicationController = Ember.ObjectController.extend({
   showAscii: false,
 
   asciiTable: function() {
-    var table = new AsciiTable('Ember Performance Suite - Ember ' + this.get('version'));
 
+    var result = "Ember Version: " + this.get('version') + "\n";
+    result += "User Agent: " + navigator.userAgent + "\n\n";
+
+    var table = new AsciiTable('Ember Performance Suite - Results');
     table.setHeading('Name', '# Runs', 'Geo Mean', 'Mean', 'Std Dev', 'Max');
     this.get('results').forEach(function(r) {
       table.addRow(r.get('name'),
@@ -55,7 +58,8 @@ Perf.ApplicationController = Ember.ObjectController.extend({
                    roundedTime(r.get('standardDeviation')),
                    roundedTime(r.get('max')));
     });
-    return table.toString();
+
+    return result + table.toString();
   }.property('results.@each'),
 
   actions: {
