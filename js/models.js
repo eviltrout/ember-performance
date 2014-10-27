@@ -7,7 +7,7 @@ Perf.ProfilerDisplay = Ember.Object.extend({
     var versions = ["1.5.1", "1.5.1.min",
                     "1.6.1", "1.6.1.min",
                     "1.7.1", "1.7.1.min",
-                    "1.8.0", "1.8.0.min",
+                    "1.8.0", "1.8.0.min", "1.8.0.patched",
                     "http://builds.emberjs.com/canary/ember.prod.js"];
     if(versions.indexOf(window.testVersion) === -1) {
       versions.push(window.testVersion);
