@@ -69,12 +69,9 @@
     Select Ember Version {{view Ember.Select content=versions value=selectedVersion}}
     </p>
 
-    <button {{action 'profObjectCreate'}} {{bind-attr disabled="profiling"}} class="btn">Object.create()</button>
-    <button {{action 'profGet'}} {{bind-attr disabled="profiling"}} class="btn">Ember.get()</button>
-    <button {{action 'profRenderList'}} {{bind-attr disabled="profiling"}} class="btn">Render List of Items</button>
-    <button {{action 'profTemplateBindings'}} {{bind-attr disabled="profiling"}} class="btn">Template Bindings</button>
-    <button {{action 'profHtmlBindings'}} {{bind-attr disabled="profiling"}} class="btn">HTML Bindings</button>
-    <button {{action 'profComplexList'}} {{bind-attr disabled="profiling"}} class="btn">Complex List</button>
+    {{#each pt in profileTypes}}
+      <button {{action profile pt.klass}} {{bind-attr disabled=profiling}} class="btn">{{pt.name}}</button>
+    {{/each}}
 
     <div style='min-height:30px; margin-top: 10px;'>
       {{#if profiling}}

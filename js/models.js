@@ -1,31 +1,15 @@
 (function(Perf) {
+
+  var _profilerDisplay;
+
   Perf.ProfilerDisplay = Ember.Object.extend({
     testsRun: Ember.computed.alias('currentProfiler.testsRun'),
     testCount: Ember.computed.alias('currentProfiler.testCount'),
     profiling: Ember.computed.alias('currentProfiler.profiling'),
 
-    init: function(){
-      var versions = ["1.5.1", "1.5.1.min",
-                      "1.6.1", "1.6.1.min",
-                      "1.7.1", "1.7.1.min",
-                      "1.8.0", "1.8.0.min", "1.8.0.patched",
-                      "http://builds.emberjs.com/canary/ember.prod.js"];
-      if(versions.indexOf(window.testVersion) === -1) {
-        versions.push(window.testVersion);
-      }
-
-      this.setProperties({
-        'results': [],
-        'currentProfiler': null,
-        testVersion: window.testVersion,
-        versions: versions,
-        selectedVersion: window.testVersion
-      });
-    },
-
-    selectedVersionChanged: function(){
-      window.location.href = window.location.pathname + "?ember=" + this.get('selectedVersion');
-    }.observes('selectedVersion'),
+    _initDisplay: function(){
+      this.setProperties({ results: [], currentProfiler: null });
+    }.on('init'),
 
     clearResults: function() {
       this.get('results').clear();
@@ -38,8 +22,8 @@
 
   Perf.ProfilerDisplay.reopenClass({
     instance: function() {
-      if (!this._profilerDisplay) { this._profilerDisplay = Perf.ProfilerDisplay.create(); }
-      return this._profilerDisplay;
+      if (!_profilerDisplay) { _profilerDisplay = Perf.ProfilerDisplay.create(); }
+      return _profilerDisplay;
     }
   });
 
