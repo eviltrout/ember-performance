@@ -1,198 +1,200 @@
-Perf.ProfilerDisplay = Ember.Object.extend({
-  testsRun: Em.computed.alias('currentProfiler.testsRun'),
-  testCount: Em.computed.alias('currentProfiler.testCount'),
-  profiling: Em.computed.alias('currentProfiler.profiling'),
+(function(Perf) {
+  Perf.ProfilerDisplay = Ember.Object.extend({
+    testsRun: Ember.computed.alias('currentProfiler.testsRun'),
+    testCount: Ember.computed.alias('currentProfiler.testCount'),
+    profiling: Ember.computed.alias('currentProfiler.profiling'),
 
-  init: function(){
-    var versions = ["1.5.1", "1.5.1.min",
-                    "1.6.1", "1.6.1.min",
-                    "1.7.1", "1.7.1.min",
-                    "1.8.0", "1.8.0.min", "1.8.0.patched",
-                    "http://builds.emberjs.com/canary/ember.prod.js"];
-    if(versions.indexOf(window.testVersion) === -1) {
-      versions.push(window.testVersion);
+    init: function(){
+      var versions = ["1.5.1", "1.5.1.min",
+                      "1.6.1", "1.6.1.min",
+                      "1.7.1", "1.7.1.min",
+                      "1.8.0", "1.8.0.min", "1.8.0.patched",
+                      "http://builds.emberjs.com/canary/ember.prod.js"];
+      if(versions.indexOf(window.testVersion) === -1) {
+        versions.push(window.testVersion);
+      }
+
+      this.setProperties({
+        'results': [],
+        'currentProfiler': null,
+        testVersion: window.testVersion,
+        versions: versions,
+        selectedVersion: window.testVersion
+      });
+    },
+
+    selectedVersionChanged: function(){
+      window.location.href = window.location.pathname + "?ember=" + this.get('selectedVersion');
+    }.observes('selectedVersion'),
+
+    clearResults: function() {
+      this.get('results').clear();
+    },
+
+    addResult: function(result){
+      this.get('results').pushObject(result);
     }
+  });
 
-    this.setProperties({
-      'results': [],
-      'currentProfiler': null,
-      testVersion: window.testVersion,
-      versions: versions,
-      selectedVersion: window.testVersion
-    });
-  },
+  Perf.ProfilerDisplay.reopenClass({
+    instance: function() {
+      if (!this._profilerDisplay) { this._profilerDisplay = Perf.ProfilerDisplay.create(); }
+      return this._profilerDisplay;
+    }
+  });
 
-  selectedVersionChanged: function(){
-    window.location.href = window.location.pathname + "?ember=" + this.get('selectedVersion');
-  }.observes('selectedVersion'),
+  Perf.Profiler = Ember.Object.extend({
+    name:       Ember.required('You must set the name of each profile job.'),
+    testCount:  Ember.required('You must override the number of runs for each profile job.'),
 
-  clearResults: function() {
-    this.get('results').clear();
-  },
+    setup:     Ember.K,
+    test:      Ember.K,
+    teardown:  Ember.K,
 
-  addResult: function(result){
-    this.get('results').pushObject(result);
-  }
-});
+    init: function() {
+      this.setProperties({
+        testsRun: 0,
+        profiling: false,
+        display: Perf.ProfilerDisplay.instance()
+      });
+    },
 
-Perf.ProfilerDisplay.reopenClass({
-  instance: function() {
-    if (!this._profilerDisplay) { this._profilerDisplay = Perf.ProfilerDisplay.create(); }
-    return this._profilerDisplay;
-  }
-});
+    updateTestCount: function(){
+      var display = this.get('display');
 
-Perf.Profiler = Ember.Object.extend({
-  name:       Ember.required('You must set the name of each profile job.'),
-  testCount:  Ember.required('You must override the number of runs for each profile job.'),
+      this.set('testsRun', this.get('testsRun') + 1);
+      display.set('restRun', this.get('testRun'));
+    },
 
-  setup:     Ember.K,
-  test:      Ember.K,
-  teardown:  Ember.K,
+    profileMethod: function() {
+      var self   = this,
+          result = this.get('result');
 
-  init: function() {
-    this.setProperties({
-      testsRun: 0,
-      profiling: false,
-      display: Perf.ProfilerDisplay.instance()
-    });
-  },
+      // Support promise profiles
+      var complete = function() {
+        result.stop();
 
-  updateTestCount: function(){
-    var display = this.get('display');
+        self.updateTestCount();
+        if (self.get('testsRun') === self.get('testCount')) {
+          self.get('display').addResult(result);
+          self.get('display').set('currentProfiler', null);
+          self.set('profiling', false);
+          self.get('deferred').resolve();
+        } else {
+          // We delay between each run to allow the browser to clean up and stuff.
+          Perf.scratchView.clear();
+          Ember.run.later(self, 'profileMethod', 100);
+        }
+      };
 
-    this.set('testsRun', this.get('testsRun') + 1);
-    display.set('restRun', this.get('testRun'));
-  },
-
-  profileMethod: function() {
-    var self   = this,
-        result = this.get('result');
-
-    // Support promise profiles
-    var complete = function() {
-      result.stop();
-
-      self.updateTestCount();
-      if (self.get('testsRun') === self.get('testCount')) {
-        self.get('display').addResult(result);
-        self.get('display').set('currentProfiler', null);
-        self.set('profiling', false);
-        self.get('deferred').resolve();
-      } else {
+      if(Perf.scratchView.get('length') > 0){
         // We delay between each run to allow the browser to clean up and stuff.
         Perf.scratchView.clear();
-        Em.run.later(self, 'profileMethod', 100);
+        Ember.run.later(self, 'profileMethod', 100);
+        return;
       }
-    };
 
-    if(Perf.scratchView.get('length') > 0){
-      // We delay between each run to allow the browser to clean up and stuff.
-      Perf.scratchView.clear();
-      Em.run.later(self, 'profileMethod', 100);
-      return;
+      result.start();
+      var testResult = this.test();
+      if (testResult && testResult.then) {
+        testResult.then(complete);
+      } else {
+        complete();
+      }
+    },
+
+    profile: function() {
+      var self = this,
+          deferred = Ember.RSVP.defer();
+
+      self.setProperties({
+        profiling: true,
+        testsRun: 0,
+        deferred: deferred
+      });
+
+      this.set('result', Perf.Result.create({name: this.get('name')}));
+      this.get('display').set('currentProfiler', this);
+
+      this.setup();
+      Ember.run.next(function () {
+        self.profileMethod();
+      });
+
+      return deferred.promise.then(function(){
+        self.teardown();
+      });
+    },
+
+    renderToScratch: function(template, args) {
+      var viewArgs = {templateName: template};
+      var view = Ember.View.create($.extend(viewArgs, args || {}));
+
+      Perf.scratchView.pushObject(view);
+      return view;
     }
+  });
 
-    result.start();
-    var testResult = this.test();
-    if (testResult && testResult.then) {
-      testResult.then(complete);
-    } else {
-      complete();
-    }
-  },
+  Perf.Result = Ember.Object.extend({
+    init: function() {
+      this.set('times', []);
+    },
 
-  profile: function() {
-    var self = this,
-        deferred = Ember.RSVP.defer();
+    max: function() {
+      return this.get('times').reduce(function (x,y) {
+        return Math.max(x,y);
+      });
+    }.property('times.@each'),
 
-    self.setProperties({
-      profiling: true,
-      testsRun: 0,
-      deferred: deferred
-    });
+    geometricMean: function() {
+      var result = 1;
+      this.get('times').forEach(function (t) {
+        result *= t;
+      });
+      return Math.pow(result, 1 / this.get('times.length'));
+    }.property('times.@each'),
 
-    this.set('result', Perf.Result.create({name: this.get('name')}));
-    this.get('display').set('currentProfiler', this);
+    mean: function() {
+      var result = 0;
+      this.get('times').forEach(function (t) {
+        result += t;
+      });
+      return result / this.get('times.length');
+    }.property('times.@each'),
 
-    this.setup();
-    Em.run.next(function () {
-      self.profileMethod();
-    });
+    standardDeviation: function() {
+      var result = 0,
+           mean = this.get('mean');
 
-    return deferred.promise.then(function(){
-      self.teardown();
-    });
-  },
+      this.get('times').forEach(function (t) {
+        result += Math.pow(t - mean, 2);
+      });
+      return Math.sqrt(result / this.get('times.length'));
+    }.property('mean'),
 
-  renderToScratch: function(template, args) {
-    var viewArgs = {templateName: template};
-    var view = Ember.View.create(jQuery.extend(viewArgs, args || {}));
+    start: function() {
+      this.set('timeStart', new Date().getTime());
+    },
 
-    Perf.scratchView.pushObject(view);
-    return view;
-  }
-});
+    stop: function() {
+      var timeStart = this.get('timeStart');
+      if (timeStart) {
+        this.get('times').pushObject(new Date().getTime() - timeStart);
+        this.set('timeStart', null);
+      }
+    },
 
-Perf.Result = Ember.Object.extend({
-  init: function() {
-    this.set('times', []);
-  },
+    runCount: function(){
+      return this.get('times').length;
+    }.property('times'),
 
-  max: function() {
-    return this.get('times').reduce(function (x,y) {
-      return Math.max(x,y);
-    });
-  }.property('times.@each'),
+    dump: function(){
+      return this.getProperties('name', 'times', 'geometricMean', 'mean',
+                                'standardDeviation', 'runCount');
+    }.property('name', 'times', 'geometricMean', 'mean', 'standardDeviation', 'runCount')
+  });
 
-  geometricMean: function() {
-    var result = 1;
-    this.get('times').forEach(function (t) {
-      result *= t;
-    });
-    return Math.pow(result, 1 / this.get('times.length'));
-  }.property('times.@each'),
-
-  mean: function() {
-    var result = 0;
-    this.get('times').forEach(function (t) {
-      result += t;
-    });
-    return result / this.get('times.length');
-  }.property('times.@each'),
-
-  standardDeviation: function() {
-    var result = 0,
-         mean = this.get('mean');
-
-    this.get('times').forEach(function (t) {
-      result += Math.pow(t - mean, 2);
-    });
-    return Math.sqrt(result / this.get('times.length'));
-  }.property('mean'),
-
-  start: function() {
-    this.set('timeStart', new Date().getTime());
-  },
-
-  stop: function() {
-    var timeStart = this.get('timeStart');
-    if (timeStart) {
-      this.get('times').pushObject(new Date().getTime() - timeStart);
-      this.set('timeStart', null);
-    }
-  },
-
-  runCount: function(){
-    return this.get('times').length;
-  }.property('times'),
-
-  dump: function(){
-    return this.getProperties('name', 'times', 'geometricMean', 'mean',
-                              'standardDeviation', 'runCount');
-  }.property('name', 'times', 'geometricMean', 'mean', 'standardDeviation', 'runCount')
-});
-
-Perf.Job = Ember.Object.extend({
-  title: Em.required('You must provide a title for each job.'),
-});
+  Perf.Job = Ember.Object.extend({
+    title: Ember.required('You must provide a title for each job.'),
+  });
+})(window.Perf);
