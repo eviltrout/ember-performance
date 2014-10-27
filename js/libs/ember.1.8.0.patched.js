@@ -18660,7 +18660,6 @@ define("ember-metal/utils",
 
         ret = new Meta(obj);
 
-        
         obj['__ember_meta__'] = ret;
 
         // make sure we don't accidentally try to create constructor like desc
@@ -18669,14 +18668,22 @@ define("ember-metal/utils",
       } else if (ret.source !== obj) {
         if (canDefineNonEnumerableProperties) o_defineProperty(obj, '__ember_meta__', META_DESC);
 
-        ret = o_create(ret);
-        ret.descs     = o_create(ret.descs);
-        ret.watching  = o_create(ret.watching);
-        ret.cache     = {};
-        ret.cacheMeta = {};
-        ret.source    = obj;
+        // ret = o_create(ret);
+        // ret.descs     = o_create(ret.descs);
+        // ret.watching  = o_create(ret.watching);
+        // ret.cache     = {};
+        // ret.cacheMeta = {};
+        // ret.source    = obj;
+        //
+        ret = {
+          __proto__: ret,
+          descs: { __proto__: ret.descs },
+          watching: { __proto__: ret.watching },
+          cache: {},
+          cacheMeta: {},
+          source: obj
+        };
 
-        
         obj['__ember_meta__'] = ret;
       }
       return ret;
@@ -34105,16 +34112,18 @@ define("ember-runtime/system/core_object",
         @param [arguments]*
       */
       create: function() {
-        var C = this;
-        var l = arguments.length;
-        if (l > 0) {
+        if (arguments.length === 1) {
+          this._initProperties([ arguments[0] ]);
+        }
+        else if (arguments.length > 1) {
+          var l = arguments.length;
           var args = new Array(l);
           for (var i = 0; i < l; i++) {
             args[i] = arguments[i];
           }
           this._initProperties(args);
         }
-        return new C();
+        return new this();
       },
 
       /**
@@ -37173,7 +37182,11 @@ define("ember-views/system/render_buffer",
         this.elementProperties = null;
         this.elementTag = null;
         this.elementStyle = null;
-        this.childViews.length = 0;
+
+        if(this.childViews.length > 0) {
+          this.childViews.length = 0;
+        }
+
       },
 
       // The root view's element
