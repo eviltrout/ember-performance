@@ -70,7 +70,7 @@
     </p>
 
     {{#each pt in profileTypes}}
-      <button {{action profile pt.klass}} {{bind-attr disabled=profiling}} class="btn">{{pt.name}}</button>
+      <button {{action 'profile' pt.klass}} {{bind-attr disabled=profiling}} class="btn">{{pt.name}}</button>
     {{/each}}
 
     <div style='min-height:30px; margin-top: 10px;'>
