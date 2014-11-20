@@ -1,3 +1,4 @@
+/* global require, module */
 var pickFiles = require('broccoli-static-compiler'),
     mergeTrees = require('broccoli-merge-trees'),
     concat = require('broccoli-concat'),
@@ -5,7 +6,9 @@ var pickFiles = require('broccoli-static-compiler'),
     compileSass = require('broccoli-sass'),
     uglifyJavaScript = require('broccoli-uglify-js'),
     cleanCSS = require('broccoli-clean-css'),
+    copyIndex = require('./lib/copy-index'),
     env = require('broccoli-env').getEnv();
+
 
 var appAndDependencies = pickFiles('app', {
   srcDir: '/',
@@ -15,12 +18,13 @@ var appAndDependencies = pickFiles('app', {
 
 appAndDependencies = mergeTrees([appAndDependencies, 'tests']);
 
-var testTrees = mergeTrees(['test-client', mergeTrees(findBowerTrees())]);
-var testClient = concat(testTrees, {
+var clientTree = mergeTrees(['test-client', mergeTrees(findBowerTrees())]);
+var testClient = concat(clientTree, {
   inputFiles: ['test-client.js', 'benchmark.js', 'people.js'],
   outputFile: '/assets/test-client.js'
 });
 
+var testTree = copyIndex('tests', { extensions: ['js'] });
 
 var vendorJs = concat(mergeTrees(findBowerTrees()), {
   inputFiles: ['jquery.js'],
@@ -36,8 +40,9 @@ var vendorCss = concat(mergeTrees(findBowerTrees()), {
 
 if (env === 'production') {
   vendorJs = uglifyJavaScript(vendorJs);
+  testClient = uglifyJavaScript(testClient);
   vendorCss = cleanCSS(vendorCss);
   appCss = cleanCSS(appCss);
 }
 
-module.exports = mergeTrees([appAndDependencies, appCss, vendorJs, vendorCss, testClient]);
+module.exports = mergeTrees([appAndDependencies, appCss, vendorJs, vendorCss, testClient, testTree]);

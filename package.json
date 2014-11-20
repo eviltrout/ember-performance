@@ -9,6 +9,7 @@
     "broccoli-clean-css": "^0.3.0",
     "broccoli-concat": "0.0.12",
     "broccoli-env": "0.0.1",
+    "broccoli-filter": "^0.1.10",
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-sane-watcher": "^0.1.0",
     "broccoli-sass": "^0.3.3",
