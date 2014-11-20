@@ -1,0 +1,20 @@
+{
+  "name": "ember-performance",
+  "version": "0.0.0",
+  "authors": [
+    "Robin Ward <robin.ward@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.1",
+    "jquery": "~2.1.1",
+    "benchmark": "git@github.com:bestiejs/benchmark.js.git"
+  }
+}
