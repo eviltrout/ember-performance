@@ -16,11 +16,17 @@ var appAndDependencies = pickFiles('app', {
   files: ['*.html'],
 });
 
+var emberTree = pickFiles('ember', {
+  srcDir: '/',
+  destDir: '/ember',
+  files: ['*.js'],
+});
+
 appAndDependencies = mergeTrees([appAndDependencies, 'tests']);
 
 var clientTree = mergeTrees(['test-client', mergeTrees(findBowerTrees())]);
 var testClient = concat(clientTree, {
-  inputFiles: ['test-client.js', 'benchmark.js', 'people.js'],
+  inputFiles: ['test-client.js', 'head.min.js', 'benchmark.js', 'people.js'],
   outputFile: '/assets/test-client.js'
 });
 
@@ -45,4 +51,4 @@ if (env === 'production') {
   appCss = cleanCSS(appCss);
 }
 
-module.exports = mergeTrees([appAndDependencies, appCss, vendorJs, vendorCss, testClient, testTree]);
+module.exports = mergeTrees([appAndDependencies, appCss, vendorJs, vendorCss, testClient, testTree, emberTree]);
