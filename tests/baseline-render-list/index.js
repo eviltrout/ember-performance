@@ -1,3 +1,4 @@
+/* global TestClient */
 (function() {
 
   function reset() {
@@ -5,7 +6,8 @@
   }
 
   TestClient.run({
-    name: 'Baseline: innerHTML List',
+    name: 'Baseline: Render List',
+    noEmber: true,
 
     reset: reset,
 

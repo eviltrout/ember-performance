@@ -15,6 +15,7 @@
   "dependencies": {
     "bootstrap": "~3.3.1",
     "jquery": "~2.1.1",
-    "benchmark": "git@github.com:bestiejs/benchmark.js.git"
+    "benchmark": "git@github.com:bestiejs/benchmark.js.git",
+    "headjs": "~1.0.3"
   }
 }
