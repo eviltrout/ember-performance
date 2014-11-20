@@ -1,3 +1,4 @@
+/* global Benchmark */
 (function() {
   window.TestClient = {
     run: function(t) {
@@ -10,7 +11,7 @@
         var suite = new Benchmark.Suite();
         suite.add(t.name, t.test);
         suite.on('cycle', function(event) {
-          t.reset();
+          if (t.reset) { t.reset(); }
           document.getElementById('status-text').innerText = String(event.target);
         });
         suite.run();
