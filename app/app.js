@@ -5,6 +5,8 @@
   var TEST_LIST = [
     {name: 'Baseline: Object Create', path: '/baseline-object-create'},
     {name: 'Baseline: Render List', path: '/baseline-render-list'},
+    {name: 'Ember.get', path: '/ember-get'},
+    {name: 'Ember.set', path: '/ember-set'},
     {name: 'Ember.Object.Create', path: '/object-create'},
   ];
 
