@@ -20,7 +20,7 @@
 
       var deps = [];
       if (!t.noEmber) {
-        deps =["/ember/jquery-2.1.1.min.js", "/ember/handlebars-v1.3.0.js", "/ember/1.8.1.js"];
+        deps = ["/ember/jquery-2.1.1.min.js", session.handlebarsUrl, session.emberUrl];
       }
       var runner = function() {
         update('status-text', "Profiling...");
@@ -35,7 +35,7 @@
               var result = evt.target;
               result.name = t.name;
               if (!t.noEmber) {
-                result.emberVersion = Ember.VERSION;
+                session.emberVersion = Ember.VERSION;
               }
               testItem.addResult(result);
 
