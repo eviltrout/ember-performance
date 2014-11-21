@@ -5,20 +5,71 @@
     <link rel="stylesheet" href="/assets/app.css">
   </head>
   <body>
-    <div class="container">
-      <h3 class="text-muted">Ember Performance</h3>
+    <script type="text/x-handlebars">
+      <div class="container">
+        <h3 class="text-muted">Ember Performance</h3>
 
-      <p>Select the tests you'd like to execute</p>
+        {{outlet}}
+      </div>
+    </script>
 
-      <label>
-        <input type="checkbox" name='test' value='t1'> Test 1
-      </label>
+    <script type="text/x-handlebars" data-template-name="index">
+
+      {{#if report}}
+
+        <table class='table'>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Speed</th>
+              <th>Error</th>
+              <th>Samples</th>
+              <th>Mean</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each result in report}}
+              <tr>
+                <td>
+                  {{result.name}}
+                  {{#if result.emberVersion}}({{result.emberVersion}}){{/if}}
+                </td>
+                <td>{{fmt-number result.hz}} Hz</td>
+                <td>&#x2213; {{fmt-number result.rme}}%</td>
+                <td>{{result.samples}}</td>
+                <td>{{fmt-number result.mean}} ms</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+        <button class='btn btn-default' {{action "clear"}}>Clear Results</button>
+
+        <hr>
+      {{/if}}
+
+      <h4>Select the tests you'd like to execute:</h4>
+
+      <div class='control'>
+        <a href {{action "toggleAll"}}>Toggle All</a>
+      </div>
+
+      <div class='control'>
+      {{#each test in model}}
+        <div>
+          <label>
+            {{input type="checkbox" checked=test.enabled}} {{test.name}}
+          </label>
+        </div>
+      {{/each}}
+      </div>
 
       <div>
-        <button class='btn btn-primary'>Start Tests</button>
+        <button class='btn btn-primary' {{action "start"}} {{bind-attr disabled=cantStart}}>Start Tests</button>
       </div>
-    </div>
+    </script>
 
+    <script src="/assets/app.js"></script>
     <script src="/assets/vendor.js"></script>
   </body>
 </html>
