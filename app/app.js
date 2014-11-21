@@ -12,7 +12,7 @@
 
   var EMBER_VERSIONS = [
     {name: '1.9.0-beta.3',
-     path: "http://builds.emberjs.com/tags/v1.9.0-beta.3/ember.js",
+     path: "http://builds.emberjs.com/tags/v1.9.0-beta.3/ember.prod.js",
      handlebarsPath: '/ember/handlebars-v2.0.0.js'},
     {name: '1.8.1', path: "/ember/1.8.1.js", handlebarsPath: HANDLEBARS_DEFAULT},
     {name: '1.7.1', path: "/ember/1.7.1.js", handlebarsPath: HANDLEBARS_DEFAULT}
@@ -26,24 +26,45 @@
   App.IndexController = Ember.ArrayController.extend({
     report: null,
     emberVersion: null,
-    handlebarsVersion: null,
     enabledTests: Ember.computed.filterBy('model', 'enabled', true),
-    cantStart: Ember.computed.equal('enabledTests.length', 0),
+    customEmber: false,
 
-    emberVersionChanged: function() {
-      var v = EMBER_VERSIONS.findProperty('path', this.get('emberVersion'));
-      if (v && v.handlebarsPath) {
-        this.set('handlebarsVersion', v.handlebarsPath);
+    emberUrl: function() {
+      if (this.get('customEmber')) {
+        return this.get('customEmberUrl');
+      } else {
+        return this.get('emberVersion');
       }
-    }.observes('emberVersion'),
+    }.property('customEmber', 'emberVersion', 'customEmberUrl'),
+
+    handlebarsUrl: function() {
+      if (this.get('customEmber')) {
+        return this.get('customHandlebarsUrl');
+      } else {
+        var v = EMBER_VERSIONS.findProperty('path', this.get('emberVersion'));
+        if (v && v.handlebarsPath) {
+          return v.handlebarsPath;
+        }
+      }
+    }.property('customEmber', 'emberVersion', 'customHandlebarsUrl'),
+
+    cantStart: function() {
+      return (this.get('enabledTests.length') === 0) ||
+              Ember.empty(this.get('emberUrl')) ||
+              Ember.empty(this.get('handlebarsUrl'));
+    }.property('emberUrl', 'handlebarsUrl', 'enabledTests.length'),
 
     actions: {
+      toggleCustom: function() {
+        this.toggleProperty('customEmber');
+      },
+
       start: function() {
         var enabledTests = this.get('enabledTests');
 
         var testSession = new TestSession();
-        testSession.emberUrl = this.get('emberVersion');
-        testSession.handlebarsUrl = this.get('handlebarsVersion') || HANDLEBARS_DEFAULT;
+        testSession.emberUrl = this.get('emberUrl');
+        testSession.handlebarsUrl = this.get('handlebarsUrl');
 
         testSession.enqueuePaths(enabledTests.map(function(t) {
           return t.get('path');
