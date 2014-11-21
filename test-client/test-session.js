@@ -37,6 +37,9 @@
 
   TestSession.prototype.toJSON = function() {
    return {
+      emberUrl: this.emberUrl,
+      handlebarsUrl: this.handlebarsUrl,
+      emberVersion: this.emberVersion,
       queue: this._queue.map(function(it) {
         return it.toJSON();
       })
@@ -44,6 +47,9 @@
   };
 
   TestSession.prototype.fromJSON = function(json) {
+    this.emberUrl = json.emberUrl;
+    this.handlebarsUrl = json.handlebarsUrl;
+    this.emberVersion = json.emberVersion;
     if (json.queue) {
       var self = this;
       json.queue.forEach(function(itJson) {
@@ -81,7 +87,10 @@
         res.push(it.result);
       }
     });
-    return res;
+    return { emberUrl: this.emberUrl,
+             handlebarsUrl: this.handlebarsUrl,
+             emberVersion: this.emberVersion,
+             results: res };
   };
 
   TestSession.prototype.enqueuePaths = function(paths) {
@@ -89,7 +98,6 @@
     paths.forEach(function(p) {
       self._queue.push(new TestItem(self, p));
     });
-    TestSession.persist(this);
   };
 
   TestSession.prototype.remainingCount = function(except) {
