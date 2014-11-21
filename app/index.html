@@ -66,18 +66,34 @@
         {{/each}}
       </div>
 
-      <div class='form-group'>
-        <label>
-          <p>Ember Version</p>
-          {{view "select" content=emberVersions
-                          value=emberVersion
-                          optionValuePath="content.path"
-                          optionLabelPath="content.name"}}
-        </label>
-        {{#if handlebarsVersion}}
-          <p>Using {{handlebarsVersion}}</p>
+        {{#if customEmber}}
+          <label>Custom Ember URL</label>
+          <div class="form-group">
+            {{input value=customEmberUrl}}
+          </div>
+
+          <label>Custom Handlebars URL</label>
+          <div class="form-group">
+            {{input value=customHandlebarsUrl}}
+          </div>
+
+          <p><a href {{action "toggleCustom"}}>Cancel</a></p>
+        {{else}}
+          <div class='form-group'>
+            <label>
+              <p>Ember Version</p>
+              {{view "select" content=emberVersions
+                              value=emberVersion
+                              optionValuePath="content.path"
+                              optionLabelPath="content.name"}}
+            </label>
+            {{#if handlebarsUrl}}
+              <p>Using {{handlebarsUrl}}</p>
+            {{/if}}
+
+            <p><a href {{action "toggleCustom"}}>Use Custom Ember</a></p>
+          </div>
         {{/if}}
-      </div>
 
       <div>
         <button class='btn btn-primary' {{action "start"}} {{bind-attr disabled=cantStart}}>Start Tests</button>
