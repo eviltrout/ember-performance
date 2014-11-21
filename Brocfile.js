@@ -26,7 +26,7 @@ appAndDependencies = mergeTrees([appAndDependencies, 'tests']);
 
 var clientTree = mergeTrees(['test-client', mergeTrees(findBowerTrees())]);
 var testClient = concat(clientTree, {
-  inputFiles: ['test-client.js', 'head.min.js', 'benchmark.js', 'people.js'],
+  inputFiles: ['test-client.js', 'test-session.js', 'head.min.js', 'benchmark.js', 'people.js'],
   outputFile: '/assets/test-client.js'
 });
 
@@ -35,6 +35,11 @@ var testTree = copyIndex('tests', { extensions: ['js'] });
 var vendorJs = concat(mergeTrees(findBowerTrees()), {
   inputFiles: ['jquery.js'],
   outputFile: '/assets/vendor.js'
+});
+
+var appJs = concat(mergeTrees(['app', 'ember', 'test-client']), {
+  inputFiles: ['jquery-2.1.1.min.js', 'handlebars-v1.3.0.js', '1.8.1.js', 'app.js', 'test-session.js'],
+  outputFile: '/assets/app.js'
 });
 
 var appCss = compileSass(['app/styles'], 'app.scss', 'assets/app.css');
@@ -51,4 +56,4 @@ if (env === 'production') {
   appCss = cleanCSS(appCss);
 }
 
-module.exports = mergeTrees([appAndDependencies, appCss, vendorJs, vendorCss, testClient, testTree, emberTree]);
+module.exports = mergeTrees([appAndDependencies, appJs, appCss, vendorJs, vendorCss, testClient, testTree, emberTree]);
