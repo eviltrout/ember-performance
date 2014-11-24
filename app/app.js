@@ -8,6 +8,7 @@
     {name: 'Ember.get', path: '/ember-get'},
     {name: 'Ember.set', path: '/ember-set'},
     {name: 'Ember.Object.Create', path: '/object-create'},
+    {name: 'Render List', path: '/render-list'},
   ];
 
   var HANDLEBARS_DEFAULT = "/ember/handlebars-v1.3.0.js";
