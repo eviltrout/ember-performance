@@ -8,13 +8,11 @@
   TestClient.run({
     name: 'Baseline: Render List',
     noEmber: true,
-
     reset: reset,
 
     test: function() {
       var html = "<table>";
 
-      reset();
       TestClient.PEOPLE_JSON.forEach(function(p) {
         html += "<tr class='row'>" +
                   "<td class='name'>" + p.name + "</td>" +

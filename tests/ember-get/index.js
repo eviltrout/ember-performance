@@ -3,6 +3,7 @@
 
   TestClient.run({
     name: 'Ember.get',
+    microBench: true,
 
     test: function() {
       var obj = Ember.Object.create({

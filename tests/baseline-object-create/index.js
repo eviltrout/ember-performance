@@ -3,6 +3,7 @@
 
   TestClient.run({
     name: 'Baseline: Object Create',
+    microBench: true,
     noEmber: true,
 
     test: function() {
