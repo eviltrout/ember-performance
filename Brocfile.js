@@ -26,7 +26,7 @@ appAndDependencies = mergeTrees([appAndDependencies, 'tests']);
 
 var clientTree = mergeTrees(['test-client', mergeTrees(findBowerTrees())]);
 var testClient = concat(clientTree, {
-  inputFiles: ['test-client.js', 'test-session.js', 'head.min.js', 'benchmark.js', 'people.js'],
+  inputFiles: ['test-client.js', 'test-session.js', 'head.min.js', 'benchmark.js', 'rsvp.js', 'people.js'],
   outputFile: '/assets/test-client.js'
 });
 

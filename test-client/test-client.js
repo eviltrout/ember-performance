@@ -1,7 +1,7 @@
-/* global head, Benchmark, TestSession */
+/* global head, Benchmark, TestSession, RSVP */
 (function() {
 
-  var MACRO_MAX_TIME = 30000,
+  var MACRO_MAX_TIME = 15000,
       MACRO_MIN_TIME = 2000,
       MACRO_STOP_RME = 3.0;
 
@@ -62,47 +62,67 @@
     var samples = [],
         sum = 0;
 
-    t.reset();
-
-    var result = { name: t.name },
+    var resetPromise = t.reset(),
+        result = { name: t.name },
         startTime = new Date().getTime();
 
     var tester = function() {
-      var t1 = new Date().getTime();
-      t.test();
-      var elapsed = new Date().getTime() - t1;
-      t.reset();
+      var t1 = new Date().getTime(),
+          promise = t.test();
 
-      sum += elapsed;
-      samples.push(elapsed);
-
-      result.mean = (sum / samples.length);
-      var squareSum = 0;
-      for (var j=0; j<samples.length; j++) {
-        var diff = samples[j] - result.mean;
-        squareSum += (diff * diff);
+      if (!promise || !promise.then) {
+        promise = new RSVP.resolve();
       }
-      result.deviation = (squareSum / samples.length);
-      var standardErr = result.deviation / Math.sqrt(samples.length),
-          critical = tTable[Math.round(result.samples - 1) || 1] || tTable.infinity;
 
-      result.rme = ((standardErr * critical) / result.mean) * 100 || 0;
+      promise.then(function() {
+        var elapsed = new Date().getTime() - t1,
+            nextPromise = t.reset();
 
-      result.samples = samples.length;
-      result.hz = (1000.0 / result.mean);
+        sum += elapsed;
+        samples.push(elapsed);
 
-      var totalEllapsed = (new Date().getTime() - startTime);
+        result.mean = (sum / samples.length);
+        var squareSum = 0;
+        for (var j=0; j<samples.length; j++) {
+          var diff = samples[j] - result.mean;
+          squareSum += (diff * diff);
+        }
+        result.deviation = (squareSum / samples.length);
+        var standardErr = result.deviation / Math.sqrt(samples.length),
+            critical = tTable[Math.round(result.samples - 1) || 1] || tTable.infinity;
 
-      // Loop until the min time is passed and the rme is low, or the max time ellapsed
-      if ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) && (totalEllapsed < MACRO_MAX_TIME)) {
-        setTimeout(tester, 10);
-      } else {
-        console.log(result);
-        complete(result);
-      }
+        result.rme = ((standardErr * critical) / result.mean) * 100 || 0;
+
+        result.samples = samples.length;
+        result.hz = (1000.0 / result.mean);
+
+        var totalEllapsed = (new Date().getTime() - startTime);
+
+        var next = function() {
+          // Loop until the min time is passed and the rme is low, or the max time ellapsed
+          if ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) && (totalEllapsed < MACRO_MAX_TIME)) {
+            setTimeout(tester, 10);
+          } else {
+            console.log(result);
+            complete(result);
+          }
+        };
+
+        if (nextPromise && nextPromise.then) {
+          nextPromise.then(next);
+        } else {
+          next();
+        }
+      });
     };
 
-    setTimeout(tester, 10);
+    if (resetPromise && resetPromise.then) {
+      resetPromise.then(function() {
+        setTimeout(tester, 10);
+      });
+    } else {
+      setTimeout(tester, 10);
+    }
   }
 
   var TestClient = {
@@ -157,6 +177,7 @@
           session.emberVersion = Ember.VERSION;
         }
 
+        if (t.setup) { t.setup(); }
         if (t.microBench) {
           microBenchmark(t, testItem, complete);
         } else {
