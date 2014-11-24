@@ -9,17 +9,7 @@
   };
 
   TestItem.prototype.addResult = function(r) {
-    this.result = {
-      name: r.name,
-      hz: r.hz,
-      rme: r.stats.rme,
-      deviation: r.stats.deviation,
-      mean: r.stats.mean,
-      samples: r.stats.sample.length,
-      emberVersion: r.emberVersion,
-      createdAt: new Date()
-    };
-
+    this.result = r;
     TestSession.persist(this.session);
   };
 

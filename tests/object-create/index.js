@@ -3,6 +3,7 @@
 
   TestClient.run({
     name: 'Ember.Object.create',
+    microBench: true,
 
     test: function() {
       TestClient.PEOPLE_JSON.forEach(function(p) {
