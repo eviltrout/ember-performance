@@ -46,8 +46,8 @@
 
 <script type="text/x-handlebars" data-template-name="listItems">
   <ul>
-  {{#each view.listItems}}
-    <li>{{this}}</li>
+  {{#each item in view.listItems}}
+    <li>{{item.title}}: {{item.number}}</li>
   {{/each}}
   </ul>
 </script>

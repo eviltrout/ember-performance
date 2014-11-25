@@ -7,7 +7,7 @@
     setup: function(){
       var listItems = [];
       for (var i=0; i<5000; i++) {
-        listItems.push("Item " + (i + 1));
+        listItems.push({number: i + 1, title: "Item " + (i + 1)});
       }
 
       this.set('listItems', listItems);
