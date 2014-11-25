@@ -1,7 +1,6 @@
 /* jshint evil: true */
 (function(exports) {
-  var handlebarsLib = "js/libs/handlebars-v1.3.0.js",
-      testVersion, htmlbars;
+  var handlebarsLib, testVersion, htmlbars;
 
   if(window.location.search){
     var params = window.location.search.slice(1).split('&');
@@ -21,9 +20,13 @@
   testVersion = testVersion || "http://builds.emberjs.com/canary/ember.prod.js";
 
   // Canary requires handlebars 2.0
-  if (testVersion.indexOf('canary') !== -1) {
+  if (!handlebarsLib && testVersion.indexOf('canary') !== -1) {
     handlebarsLib = "http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v2.0.0.js";
   }
+
+  handlebarsLib = handlebarsLib || "js/libs/handlebars-v1.3.0.js";
+
+  console.log('Handlebars: ' + handlebarsLib)
   document.write('<script src="' + handlebarsLib + '"><\/script>');
 
   if (htmlbars) {
@@ -31,11 +34,11 @@
   }
 
   // support for v=http://path.to.ember and v=file://
-  if(testVersion.match(/^(file|http)/)) {
-    document.write('<script src="' + testVersion + '"><\/script>');
-  } else {
-    document.write('<script src="js/libs/ember.' + testVersion + '.js"><\/script>');
+  if(!testVersion.match(/^(file|http)/)) {
+    testVersion = 'js/libs/ember.' + testVersion + '.js';
   }
+  console.log('Ember: ' + testVersion);
+  document.write('<script src="' + testVersion + '"><\/script>');
 
   exports.testVersion = testVersion;
 })(window);
