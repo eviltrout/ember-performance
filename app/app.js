@@ -84,10 +84,12 @@
 
       showHTML: function() {
         this.set('showingHTML', true);
+        localStorage.setItem('ember-perf-mode', 'html');
       },
 
       showText: function() {
         this.set('showingHTML', false);
+        localStorage.setItem('ember-perf-mode', 'text');
       },
 
       start: function() {
@@ -113,9 +115,15 @@
         this.set('report', []);
       },
 
-      toggleAll: function() {
+      selectNone: function() {
         this.get('model').forEach(function(t) {
-          t.toggleProperty('enabled');
+          t.set('enabled', false);
+        });
+      },
+
+      selectAll: function() {
+        this.get('model').forEach(function(t) {
+          t.set('enabled', true);
         });
       }
     }
@@ -128,17 +136,25 @@
 
   App.IndexRoute = Ember.Route.extend({
     model: function() {
-      return TEST_LIST.map(function(t) {
+      var session = TestSession.recover();
 
-        // By default all tests are enabled
-        t.enabled = true;
+      var tests = TEST_LIST.map(function(t) {
+
+        if (session) {
+          t.enabled = !!session.findItem(t.path);
+        } else {
+          // By default all tests are enabled
+          t.enabled = true;
+        }
 
         return Ember.Object.create(t);
       });
+
+      return { tests: tests, session: session };
     },
 
     setupController: function(controller, model) {
-      var session = TestSession.recover(),
+      var session = model.session,
           version = EMBER_VERSIONS[0].path;
 
       if (session) {
@@ -148,9 +164,13 @@
           version = report.emberUrl;
         }
       }
-      controller.set('emberVersion', version);
-      controller.set('emberVersions', EMBER_VERSIONS);
-      controller.set('model', model);
+
+      controller.setProperties({
+        emberVersion: version,
+        emberVersions: EMBER_VERSIONS,
+        model: model.tests,
+        showingHTML: localStorage.getItem('ember-perf-mode') !== 'text'
+      });
     }
   });
 
