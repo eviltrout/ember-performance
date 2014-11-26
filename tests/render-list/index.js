@@ -8,11 +8,13 @@
     "<table>" +
       "<tbody>" +
         "{{#each p in view.people}}" +
-          "<td class='name'>{{p.name}}</td>" +
-          "<td class='email'>{{p.email}}</td>" +
-          "<td class='company'>{{p.company}}</td>" +
-          "<td class='city'>{{p.city}}</td>" +
-          "<td class='url'><a {{bind-attr href=p.url}}>Link</a></td>" +
+          "<tr>" +
+            "<td class='name'>{{p.name}}</td>" +
+            "<td class='email'>{{p.email}}</td>" +
+            "<td class='company'>{{p.company}}</td>" +
+            "<td class='city'>{{p.city}}</td>" +
+            "<td class='url'><a {{bind-attr href=p.url}}>Link</a></td>" +
+          "</tr>" +
         "{{/each}}" +
       "</tbody>" +
     "</table>";

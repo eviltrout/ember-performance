@@ -15,11 +15,13 @@
       TestClient.PEOPLE_JSON.forEach(function(p) {
         html += "<tr class='row'>" +
                   "<tbody>" +
-                    "<td class='name'>" + p.name + "</td>" +
-                    "<td class='email'>" + p.email + "</td>" +
-                    "<td class='company'>" + p.company + "</td>" +
-                    "<td class='city'>" + p.city + "</td>" +
-                    "<td class='url'><a href='" + p.url + "'>Link</a></td>" +
+                    "<tr>" +
+                      "<td class='name'>" + p.name + "</td>" +
+                      "<td class='email'>" + p.email + "</td>" +
+                      "<td class='company'>" + p.company + "</td>" +
+                      "<td class='city'>" + p.city + "</td>" +
+                      "<td class='url'><a href='" + p.url + "'>Link</a></td>" +
+                    "</tr>" +
                   "</tbody>" +
                 "</tr>";
       });
