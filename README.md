@@ -28,16 +28,16 @@ and define an `index.js` file that calls `TestClient.run`.
 Example:
 
 ```javascript
-  TestClient.run({
-    name: 'Ember.Object.create',
-    microBench: true,
+TestClient.run({
+  name: 'Ember.Object.create',
+  microBench: true,
 
-    test: function() {
-      TestClient.PEOPLE_JSON.forEach(function(p) {
-        Ember.Object.create(p);
-      });
-    }
-  });
+  test: function() {
+    TestClient.PEOPLE_JSON.forEach(function(p) {
+      Ember.Object.create(p);
+    });
+  }
+});
 ```
 
 (Please see the other tests for more examples.)
