@@ -22,28 +22,37 @@
           {{/if}}
         </h4>
 
-        <table class='table'>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Speed</th>
-              <th>Error</th>
-              <th>Samples</th>
-              <th>Mean</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each result in report.results}}
+        <ul class="nav nav-tabs">
+          <li role="presentation" {{bind-attr class="showingHTML:active"}}><a href {{action "showHTML"}}>HTML Results</a></li>
+          <li role="presentation" {{bind-attr class="showingHTML::active"}}><a href {{action "showText"}}>Text Results</a></li>
+        </ul>
+
+        {{#if showingHTML}}
+          <table class='table'>
+            <thead>
               <tr>
-                <td>{{result.name}}</td>
-                <td>{{fmt-number result.hz}} Hz</td>
-                <td>&#x2213; {{fmt-number result.rme}}%</td>
-                <td>{{result.samples}}</td>
-                <td>{{fmt-number result.mean}} ms</td>
+                <th>Name</th>
+                <th>Speed</th>
+                <th>Error</th>
+                <th>Samples</th>
+                <th>Mean</th>
               </tr>
-            {{/each}}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {{#each result in report.results}}
+                <tr>
+                  <td>{{result.name}}</td>
+                  <td>{{fmt-number result.hz}} / sec</td>
+                  <td>&#x2213; {{fmt-number result.rme}}%</td>
+                  <td>{{result.samples}}</td>
+                  <td>{{fmt-number result.mean}} ms</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        {{else}}
+          <pre class='text-results'>{{{asciiTable}}}</pre>
+        {{/if}}
 
         <button class='btn btn-default' {{action "clear"}}>Clear Results</button>
 
@@ -95,7 +104,7 @@
           </div>
         {{/if}}
 
-      <div>
+      <div class='footer'>
         <button class='btn btn-primary' {{action "start"}} {{bind-attr disabled=cantStart}}>Start Tests</button>
       </div>
     </script>

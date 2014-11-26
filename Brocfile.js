@@ -37,8 +37,8 @@ var vendorJs = concat(mergeTrees(findBowerTrees()), {
   outputFile: '/assets/vendor.js'
 });
 
-var appJs = concat(mergeTrees(['app', 'ember', 'test-client']), {
-  inputFiles: ['jquery-2.1.1.min.js', 'handlebars-v1.3.0.js', '1.8.1.js', 'app.js', 'test-session.js'],
+var appJs = concat(mergeTrees(['app', 'ember', 'test-client', mergeTrees(findBowerTrees())]), {
+  inputFiles: ['jquery-2.1.1.min.js', 'handlebars-v1.3.0.js', '1.8.1.js', 'ascii-table.js', 'app.js', 'test-session.js'],
   outputFile: '/assets/app.js'
 });
 
