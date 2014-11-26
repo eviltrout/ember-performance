@@ -1,4 +1,4 @@
-/* globals TestSession */
+/* globals TestSession, AsciiTable */
 (function() {
 
   // TODO: Populate this automatically from the test definitions
@@ -33,6 +33,24 @@
     emberVersion: null,
     enabledTests: Ember.computed.filterBy('model', 'enabled', true),
     customEmber: false,
+    showingHTML: true,
+
+    asciiTable: function() {
+      var result = "Ember Version: " + this.get('report.emberVersion') + "\n";
+      result += "User Agent: " + navigator.userAgent + "\n\n";
+
+      var table = new AsciiTable('Ember Performance Suite - Results');
+      table.setHeading('Name', 'Speed', 'Error', 'Samples', 'Mean');
+      this.get('report.results').forEach(function(r) {
+        table.addRow(r.name,
+                     roundedNumber(r.hz),
+                     roundedNumber(r.rme),
+                     roundedNumber(r.samples),
+                     roundedNumber(r.mean));
+      });
+
+      return result + table.toString();
+    }.property('report.results'),
 
     emberUrl: function() {
       if (this.get('customEmber')) {
@@ -62,6 +80,14 @@
     actions: {
       toggleCustom: function() {
         this.toggleProperty('customEmber');
+      },
+
+      showHTML: function() {
+        this.set('showingHTML', true);
+      },
+
+      showText: function() {
+        this.set('showingHTML', false);
       },
 
       start: function() {
@@ -96,11 +122,8 @@
   });
 
   Ember.Handlebars.registerBoundHelper('fmt-number', function(num) {
-    if (num) {
-      return Math.round(num * 100, 10) / 100.0;
-    } else {
-      return new Ember.Handlebars.SafeString("&mdash;");
-    }
+    num = roundedNumber(num);
+    return typeof num !== "undefined" ? num : new Ember.Handlebars.SafeString("&mdash;");
   });
 
   App.IndexRoute = Ember.Route.extend({
@@ -130,5 +153,12 @@
       controller.set('model', model);
     }
   });
+
+  function roundedNumber(num) {
+    if (num) {
+      return Math.round(num * 100, 10) / 100.0;
+    }
+    return num;
+  }
 
 })();
