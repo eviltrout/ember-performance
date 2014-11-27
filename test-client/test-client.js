@@ -3,7 +3,8 @@
 
   var MACRO_MAX_TIME = 15000,
       MACRO_MIN_TIME = 2000,
-      MACRO_STOP_RME = 3.0;
+      MACRO_STOP_RME = 3.0,
+      MIN_SAMPLES = 5;
 
   /**
    * T-Distribution two-tailed critical values for 95% confidence
@@ -92,7 +93,6 @@
             critical = tTable[Math.round(result.samples - 1) || 1] || tTable.infinity;
 
         result.rme = ((standardErr * critical) / result.mean) * 100 || 0;
-
         result.samples = samples.length;
         result.hz = (1000.0 / result.mean);
 
@@ -100,10 +100,9 @@
 
         var next = function() {
           // Loop until the min time is passed and the rme is low, or the max time ellapsed
-          if ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) && (totalEllapsed < MACRO_MAX_TIME)) {
+          if ((samples.length < MIN_SAMPLES) || ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) && (totalEllapsed < MACRO_MAX_TIME))) {
             setTimeout(tester, 10);
           } else {
-            console.log(result);
             complete(result);
           }
         };
