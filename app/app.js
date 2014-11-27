@@ -1,6 +1,9 @@
 /* globals TestSession, AsciiTable */
 (function() {
 
+  // TODO: get from package.json
+  var EMBER_PERF_VERSION = "0.9.0";
+
   // TODO: Populate this automatically from the test definitions
   var TEST_LIST = [
     {name: 'Baseline: Object Create', path: '/baseline-object-create'},
@@ -34,6 +37,9 @@
     enabledTests: Ember.computed.filterBy('model', 'enabled', true),
     customEmber: false,
     showingHTML: true,
+    sending: false,
+    error: false,
+    sent: false,
 
     asciiTable: function() {
       var result = "Ember Version: " + this.get('report.emberVersion') + "\n";
@@ -78,6 +84,35 @@
     }.property('emberUrl', 'handlebarsUrl', 'enabledTests.length'),
 
     actions: {
+      submitResults: function() {
+
+        var self = this;
+        this.set('sending', true);
+        this.set('error', false);
+
+        var reportJson = this.get('report');
+        reportJson.emberPerfVersion = EMBER_PERF_VERSION;
+        new Ember.RSVP.Promise(function (resolve, reject) {
+          Ember.$.ajax({
+            url: "http://perflogger.eviltrout.com/api/results",
+            type: "POST",
+            data: { results: JSON.stringify(reportJson) },
+            success: function(result) {
+              Ember.run(null, resolve, result);
+            },
+            error: function(result) {
+              Ember.run(null, reject, result);
+            }
+          });
+        }).then(function() {
+          self.set('sent', true);
+        }).catch(function() {
+          self.set('error', true);
+        }).finally(function() {
+          self.set('sending', false);
+        });
+      },
+
       toggleCustom: function() {
         this.toggleProperty('customEmber');
       },
