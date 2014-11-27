@@ -20,6 +20,14 @@ the performance of the Ember.js framework. The general strategy is:
 
 And open a browser to http://localhost:4200
 
+### To build for production mode
+
+1. `npm install`
+2. `bower install`
+3. `brocolli build dist`
+
+The compiled version will be in your `dist` folder
+
 ### To add a new test
 
 Create a new directory under `tests`, for example `tests/my-test`
