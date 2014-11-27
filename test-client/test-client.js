@@ -181,7 +181,7 @@
           promise = t.setup();
         }
         if (!promise || !promise.then) {
-          promise = Ember.RSVP.resolve();
+          promise = RSVP.resolve();
         }
 
         promise.then(function() {
