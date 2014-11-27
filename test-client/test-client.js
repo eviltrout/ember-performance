@@ -176,13 +176,21 @@
           session.emberVersion = Ember.VERSION;
         }
 
-        if (t.setup) { t.setup(); }
-        if (t.microBench) {
-          microBenchmark(t, testItem, complete);
-        } else {
-          macroBenchmark(t, testItem, complete);
+        var promise;
+        if (t.setup) {
+          promise = t.setup();
+        }
+        if (!promise || !promise.then) {
+          promise = Ember.RSVP.resolve();
         }
 
+        promise.then(function() {
+          if (t.microBench) {
+            microBenchmark(t, testItem, complete);
+          } else {
+            macroBenchmark(t, testItem, complete);
+          }
+        });
       };
 
       if (deps.length) {
