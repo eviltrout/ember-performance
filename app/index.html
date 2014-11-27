@@ -27,26 +27,26 @@
           <li role="presentation" {{bind-attr class="showingHTML::active"}}><a href {{action "showText"}}>Text Results</a></li>
         </ul>
 
+        <div class='well'>
+          {{#unless sent}}
+            <p>Would you like to submit your results to help the Ember tuning effort? The server is maintained by
+               by <a href='http://eviltrout.com'>eviltrout</a> and the only identifying information stored is your
+               browser's user agent.</p>
+
+            <button class='btn btn-primary' {{action "submitResults"}}>Submit my Results</button>
+            {{#if sending}}
+              Sending...
+            {{/if}}
+
+            {{#if error}}
+              <div class='alert alert-danger'><strong>Error Sending Results</strong> perhaps there is a problem with the remote server?</div>
+            {{/if}}
+          {{else}}
+            Thanks for sending your results.
+          {{/unless}}
+        </div>
+
         {{#if showingHTML}}
-          <div class='well'>
-            {{#unless sent}}
-              <p>Would you like to submit your results to help the Ember tuning effort? The server is maintained by
-                 by <a href='http://eviltrout.com'>eviltrout</a> and the only identifying information stored is your
-                 browser's user agent.</p>
-
-              <button class='btn btn-primary' {{action "submitResults"}}>Submit my Results</button>
-              {{#if sending}}
-                Sending...
-              {{/if}}
-
-              {{#if error}}
-                <div class='alert alert-danger'><strong>Error Sending Results</strong> perhaps there is a problem with the remote server?</div>
-              {{/if}}
-            {{else}}
-              Thanks for sending your results.
-            {{/unless}}
-          </div>
-
           <table class='table'>
             <thead>
               <tr>
