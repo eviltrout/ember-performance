@@ -12,6 +12,18 @@ the performance of the Ember.js framework. The general strategy is:
 - Record Baseline performance so that we can compare Ember to the
   baseline performance of the platform it's run on.
 
+### Is your custom build crashing Safari during rendering tests?
+
+There is a [known bug](https://bugs.webkit.org/show_bug.cgi?id=138038) with
+Safari and `use strict`. Some versions of Ember (1.8.1 and greater)
+have stripped out `use strict` to prevent it. Unfortunately, that fix
+causes the Ember performance suite to crash after running repeatedly.
+
+In particular the lack of `use strict` shortly after defining `ember-metal/mixin`
+causes the crash. It has been added back in the builds of ember that
+ship with the performance suite, but you might encounter it if you are
+using a custom build.
+
 ### To run in development mode
 
 1. `npm install`
