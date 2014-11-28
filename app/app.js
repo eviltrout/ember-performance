@@ -20,6 +20,7 @@
   var HANDLEBARS_DEFAULT = "/ember/handlebars-v1.3.0.js";
 
   var EMBER_VERSIONS = [
+    {name: '1.10.0-beta.1+canary (htmlbars)', path: "/ember/1.10.0-beta.1.canary.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
     {name: '1.9.0-beta.3', path: "/ember/1.9.0-beta.3.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
     {name: '1.8.1', path: "/ember/1.8.1.js", handlebarsPath: HANDLEBARS_DEFAULT},
     {name: '1.7.1', path: "/ember/1.7.1.js", handlebarsPath: HANDLEBARS_DEFAULT}
