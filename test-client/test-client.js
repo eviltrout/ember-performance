@@ -68,6 +68,8 @@
         startTime = new Date().getTime();
 
     var tester = function() {
+      update('progress', "" + samples.length + " samples taken.");
+
       var t1 = new Date().getTime(),
           promise = t.test();
 
