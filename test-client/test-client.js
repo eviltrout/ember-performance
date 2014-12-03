@@ -150,9 +150,11 @@
       var deps = [];
       if (!t.noEmber) {
 
-        // Default to HTMLBars on
-        window.EmberENV = { FEATURES: { "ember-htmlbars": true } };
-
+        if (session && session.featureFlags && session.featureFlags.length) {
+          var features = {};
+          session.featureFlags.forEach(function(f) { features[f] = true; });
+          window.EmberENV = { FEATURES: features };
+        }
         deps = ["/ember/jquery-2.1.1.min.js", handlebarsUrl, emberUrl];
       }
 
