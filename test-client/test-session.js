@@ -30,6 +30,7 @@
       emberUrl: this.emberUrl,
       handlebarsUrl: this.handlebarsUrl,
       emberVersion: this.emberVersion,
+      featureFlags: JSON.stringify(this.featureFlags),
       queue: this._queue.map(function(it) {
         return it.toJSON();
       })
@@ -55,6 +56,7 @@
     this.emberUrl = json.emberUrl;
     this.handlebarsUrl = json.handlebarsUrl;
     this.emberVersion = json.emberVersion;
+    this.featureFlags = JSON.parse(json.featureFlags);
     this.id = json.id;
     if (json.queue) {
       var self = this;
@@ -97,6 +99,7 @@
              emberUrl: this.emberUrl,
              handlebarsUrl: this.handlebarsUrl,
              emberVersion: this.emberVersion,
+             featureFlags: this.featureFlags,
              results: res };
   };
 

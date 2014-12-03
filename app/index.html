@@ -96,37 +96,55 @@
         {{/each}}
       </div>
 
-        {{#if customEmber}}
-          <label>Custom Ember URL</label>
-          <div class="form-group">
-            {{input value=customEmberUrl}}
-          </div>
+      {{#if customEmber}}
+        <label>Custom Ember URL</label>
+        <div class="form-group">
+          {{input value=customEmberUrl}}
+        </div>
 
-          <label>Custom Handlebars URL</label>
-          <div class="form-group">
-            {{input value=customHandlebarsUrl}}
-          </div>
+        <label>Custom Handlebars URL</label>
+        <div class="form-group">
+          {{input value=customHandlebarsUrl}}
+        </div>
 
-          <p><a href {{action "toggleCustom"}}>Cancel</a></p>
-        {{else}}
-          <div class='form-group'>
-            <label>
-              <p>Ember Version</p>
-              {{view "select" content=emberVersions
-                              value=emberVersion
-                              optionValuePath="content.path"
-                              optionLabelPath="content.name"}}
-            </label>
-            {{#if handlebarsUrl}}
-              <p>Using {{handlebarsUrl}}</p>
-            {{/if}}
+        <p><a href {{action "toggleCustom"}}>Cancel</a></p>
+      {{else}}
+        <div class='form-group'>
+          <label>
+            <p>Ember Version</p>
+            {{view "select" content=emberVersions
+                            value=emberVersion
+                            optionValuePath="content.path"
+                            optionLabelPath="content.name"}}
+          </label>
+          {{#if handlebarsUrl}}
+            <p>Using {{handlebarsUrl}}</p>
+          {{/if}}
 
-            <p><a href {{action "toggleCustom"}}>Use Custom Ember</a></p>
-          </div>
-        {{/if}}
+          <p><a href {{action "toggleCustom"}}>Use Custom Ember</a></p>
+        </div>
+      {{/if}}
+
+      <label>Feature Flags</label>
+      {{#if featureFlags}}
+        <table class='table'>
+          <tbody>
+            {{#each f in featureFlags}}
+              <tr>
+                <td style='width: 20%'>{{f}}</td>
+                <td><button class='btn btn-danger btn-xs' {{action "removeFeature" f}}>remove</button></td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{/if}}
+      <div class='form-group'>
+        {{input value=newFlagName placeholder="Flag Name"}}
+        <button {{bind-attr class=":btn :btn-default :btn-xs addFeatureDisabled:disabled"}} {{action "addFeature"}}>Add Feature</button>
+      </div>
 
       <div class='footer'>
-        <button class='btn btn-primary' {{action "start"}} {{bind-attr disabled=cantStart}}>Start Tests</button>
+        <button class='btn btn-primary' {{action "start"}} {{bind-attr disabled=cantStart}}>Run Tests</button>
       </div>
     </script>
 

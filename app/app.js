@@ -2,7 +2,7 @@
 (function() {
 
   // TODO: get from package.json
-  var EMBER_PERF_VERSION = "0.9.0";
+  var EMBER_PERF_VERSION = "0.9.1";
 
   // TODO: Populate this automatically from the test definitions
   var TEST_LIST = [
@@ -20,7 +20,7 @@
   var HANDLEBARS_DEFAULT = "/ember/handlebars-v1.3.0.js";
 
   var EMBER_VERSIONS = [
-    {name: '1.10.0-beta.1+canary (htmlbars)', path: "/ember/1.10.0-beta.1.canary.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
+    {name: '1.10.0-beta.1+canary', path: "/ember/1.10.0-beta.1.canary.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
     {name: '1.9.0-beta.3', path: "/ember/1.9.0-beta.3.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
     {name: '1.8.1', path: "/ember/1.8.1.js", handlebarsPath: HANDLEBARS_DEFAULT},
     {name: '1.7.1', path: "/ember/1.7.1.js", handlebarsPath: HANDLEBARS_DEFAULT}
@@ -40,10 +40,21 @@
     sending: false,
     error: false,
     sent: false,
+    featureFlags: null,
+    newFlagName: null,
+
+    addFeatureDisabled: Ember.computed.empty('newFlagName'),
 
     asciiTable: function() {
       var result = "Ember Version: " + this.get('report.emberVersion') + "\n";
-      result += "User Agent: " + navigator.userAgent + "\n\n";
+      result += "User Agent: " + navigator.userAgent + "\n";
+
+      var featureFlags = this.get('report.featureFlags');
+      if (featureFlags && featureFlags.length) {
+        result += "Feature Flags: " + featureFlags.join(', ') + "\n";
+      }
+
+      result += "\n";
 
       var table = new AsciiTable('Ember Performance Suite - Results');
       table.setHeading('Name', 'Speed', 'Error', 'Samples', 'Mean');
@@ -141,9 +152,12 @@
           localStorage.removeItem('ember-perf-handlebars-url');
         }
 
+        localStorage.setItem('ember-perf-flags', JSON.stringify(this.get('featureFlags')));
+
         var testSession = new TestSession();
         testSession.emberUrl = this.get('emberUrl');
         testSession.handlebarsUrl = this.get('handlebarsUrl');
+        testSession.featureFlags = this.get('featureFlags');
 
         testSession.enqueuePaths(enabledTests.map(function(t) {
           return t.get('path');
@@ -171,6 +185,18 @@
         this.get('model').forEach(function(t) {
           t.set('enabled', true);
         });
+      },
+
+      addFeature: function() {
+        var f = this.get('newFlagName');
+        if (f && f.length) {
+          this.get('featureFlags').addObject(this.get('newFlagName'));
+          this.set('newFlagName', '');
+        }
+      },
+
+      removeFeature: function(f) {
+        this.get('featureFlags').removeObject(f);
       }
     }
   });
@@ -211,10 +237,18 @@
         }
       }
 
+      var featureFlags = [],
+          flagsJson = localStorage.getItem('ember-perf-flags');
+
+      if (flagsJson && flagsJson.length) {
+        featureFlags = JSON.parse(flagsJson);
+      }
+
       controller.setProperties({
         emberVersion: version,
         emberVersions: EMBER_VERSIONS,
         model: model.tests,
+        featureFlags: featureFlags,
         showingHTML: localStorage.getItem('ember-perf-mode') !== 'text',
         customEmber: localStorage.getItem('ember-perf-custom') === 'true',
         customEmberUrl: localStorage.getItem('ember-perf-ember-url'),
