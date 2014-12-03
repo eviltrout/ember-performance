@@ -130,6 +130,17 @@
       start: function() {
         var enabledTests = this.get('enabledTests');
 
+        // Remember any custom urls we set for another run
+        if (this.get('customEmber')) {
+          localStorage.setItem('ember-perf-custom', 'true');
+          localStorage.setItem('ember-perf-ember-url', this.get('emberUrl'));
+          localStorage.setItem('ember-perf-handlebars-url', this.get('handlebarsUrl'));
+        } else {
+          localStorage.removeItem('ember-perf-custom');
+          localStorage.removeItem('ember-perf-ember-url');
+          localStorage.removeItem('ember-perf-handlebars-url');
+        }
+
         var testSession = new TestSession();
         testSession.emberUrl = this.get('emberUrl');
         testSession.handlebarsUrl = this.get('handlebarsUrl');
@@ -204,7 +215,10 @@
         emberVersion: version,
         emberVersions: EMBER_VERSIONS,
         model: model.tests,
-        showingHTML: localStorage.getItem('ember-perf-mode') !== 'text'
+        showingHTML: localStorage.getItem('ember-perf-mode') !== 'text',
+        customEmber: localStorage.getItem('ember-perf-custom') === 'true',
+        customEmberUrl: localStorage.getItem('ember-perf-ember-url'),
+        customHandlebarsUrl: localStorage.getItem('ember-perf-handlebars-url')
       });
     }
   });
