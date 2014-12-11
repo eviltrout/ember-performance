@@ -27,8 +27,9 @@ using a custom build.
 ### To run in development mode
 
 1. `npm install`
-2. `bower install`
-3. `broccoli serve`
+2. `npm install --global broccoli-cli`
+3. `bower install`
+4. `broccoli serve`
 
 And open a browser to http://localhost:4200
 
@@ -36,7 +37,7 @@ And open a browser to http://localhost:4200
 
 1. `npm install`
 2. `bower install`
-3. `brocolli build dist`
+3. `broccoli build dist`
 
 The compiled version will be in your `dist` folder
 
