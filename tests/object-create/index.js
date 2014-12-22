@@ -6,9 +6,7 @@
     microBench: true,
 
     test: function() {
-      TestClient.PEOPLE_JSON.forEach(function(p) {
-        Ember.Object.create(p);
-      });
+      Ember.Object.create();
     }
   });
 
