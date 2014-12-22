@@ -51,20 +51,20 @@
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Speed</th>
-                <th>Error</th>
-                <th>Samples</th>
-                <th>Mean</th>
+                <th class="numeric">Speed</th>
+                <th class="numeric">Error</th>
+                <th class="numeric">Samples</th>
+                <th class="numeric">Mean</th>
               </tr>
             </thead>
             <tbody>
               {{#each result in report.results}}
                 <tr>
                   <td>{{result.name}}</td>
-                  <td>{{fmt-number result.hz}} / sec</td>
-                  <td>&#x2213; {{fmt-number result.rme}}%</td>
-                  <td>{{result.samples}}</td>
-                  <td>{{fmt-number result.mean}} ms</td>
+                  <td class="numeric">{{fmt-number result.hz}} / sec</td>
+                  <td class="numeric">&#x2213; {{fmt-number result.rme}}%</td>
+                  <td class="numeric">{{result.samples}}</td>
+                  <td class="numeric">{{fmt-number result.mean}} ms</td>
                 </tr>
               {{/each}}
             </tbody>
