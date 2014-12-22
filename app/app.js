@@ -11,7 +11,7 @@
     { name: 'Baseline: Handlebars List', path: '/baseline-handlebars-list' },
     { name: 'Ember.get',                 path: '/ember-get' },
     { name: 'Ember.set',                 path: '/ember-set' },
-    { name: 'Ember.get (primed)',        path: '/ember-getprimed' },
+    { name: 'Ember.get (primed)',        path: '/ember-get-primed' },
     { name: 'Ember.Object.Create',       path: '/object-create' },
     { name: 'Render List',               path: '/render-list'   },
     { name: 'Ember.View.Create',         path: '/view-create'   },
