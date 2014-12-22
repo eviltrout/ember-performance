@@ -4,7 +4,7 @@
   MicroTestClient.run({
     name: 'Ember.get',
 
-    test: function() {
+    setup: function() {
       var obj = Ember.Object.create({
         thingId: 1234,
         person: Ember.Object.create({
@@ -14,11 +14,12 @@
           })
         })
       });
+    },
 
+    test: function() {
       obj.get('thingId');
       obj.get('person.name');
       obj.get('person.pet.name');
     }
   });
-
 })();

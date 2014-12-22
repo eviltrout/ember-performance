@@ -32,7 +32,10 @@
     setTimeout(function() {
       var suite = new Benchmark.Suite();
 
-      suite.add(test.name, test.test);
+      suite.add(test.name, test.test, {
+        setup: test.setup,
+        distribution: test.distribution
+      });
 
       suite.on('cycle', function(evt) {
         test.reset();
