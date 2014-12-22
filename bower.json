@@ -18,6 +18,7 @@
     "benchmark": "git@github.com:bestiejs/benchmark.js.git",
     "headjs": "~1.0.3",
     "rsvp": "~3.0.13",
-    "ascii-table": "~0.0.4"
+    "ascii-table": "~0.0.4",
+    "numeraljs": "~1.5.3"
   }
 }
