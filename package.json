@@ -3,6 +3,10 @@
   "version": "0.9.0",
   "author": "Robin Ward",
   "license": "MIT",
+  "scripts": {
+    "start": "broccoli serve",
+    "postinstall": "bower install"
+  },
   "devDependencies": {
     "broccoli": "^0.13.3",
     "broccoli-bower": "^0.2.1",
