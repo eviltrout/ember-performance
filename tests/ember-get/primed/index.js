@@ -1,6 +1,6 @@
 /* global TestClient */
 MicroTestClient.run({
-  name: 'Ember.get',
+  name: 'Ember.get (primed)',
 
   setup: function() {
     var obj = Ember.Object.create({
