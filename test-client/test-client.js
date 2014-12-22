@@ -222,7 +222,7 @@
           document.location.href = nextTest.path;
         } else {
           // When we're done go back to the root.
-          //document.location.href = "/";
+          document.location.href = "/";
         }
       };
 
