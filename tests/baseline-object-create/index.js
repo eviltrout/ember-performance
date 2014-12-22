@@ -2,12 +2,17 @@
 (function() {
 
   MicroTestClient.run({
-    name: 'Baseline: Object Create',
+    name: 'Baseline: Object initialization',
     noEmber: true,
 
+    setup: function() {
+      function Klass() {
+
+      }
+    },
+
     test: function() {
-      Object.create();
+      return new Klass();
     }
   });
-
 })();
