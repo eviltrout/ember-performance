@@ -1,10 +1,10 @@
 /* global head, Benchmark, TestSession, RSVP */
 (function() {
 
-  var MACRO_MAX_TIME = 15000,
-      MACRO_MIN_TIME = 2000,
-      MACRO_STOP_RME = 3.0,
-      MIN_SAMPLES = 5;
+  var MACRO_MAX_TIME = 15000;
+  var MACRO_MIN_TIME = 2000;
+  var MACRO_STOP_RME = 3.0;
+  var MIN_SAMPLES    = 5;
 
   /**
    * T-Distribution two-tailed critical values for 95% confidence
@@ -26,14 +26,17 @@
   }
 
   // Use benchmark.js to run a microbenchmark
-  function microBenchmark(t, testItem, complete) {
+  function microBenchmark(test, complete) {
     update('status-text', "Running Micro Benchmark...");
 
     setTimeout(function() {
       var suite = new Benchmark.Suite();
-      suite.add(t.name, t.test);
+
+      suite.add(test.name, test.test);
+
       suite.on('cycle', function(evt) {
-        t.reset();
+        test.reset();
+
         var r = evt.target;
         complete({
           name: r.name,
@@ -46,11 +49,13 @@
           createdAt: new Date()
         });
       });
+
       suite.on('error', function(evt) {
         var err = evt.target.error;
         update('status-text', "Error: " + err.message);
         throw err;
       });
+
       suite.run();
     }, 100);
   }
@@ -60,15 +65,15 @@
   function macroBenchmark(t, testItem, complete) {
     update('status-text', "Running Benchmark...");
 
-    var samples = [],
-        sum = 0;
+    var samples = [];
+    var sum = 0;
 
-    var resetPromise = t.reset(),
-        result = { name: t.name },
-        startTime = new Date().getTime();
+    var resetPromise = t.reset();
+    var result = { name: t.name };
+    var startTime = new Date().getTime();
 
     var tester = function() {
-      update('progress', "" + samples.length + " samples taken.");
+      update('progress', '' + samples.length + ' samples taken.');
 
       var t1 = new Date().getTime(),
           promise = t.test();
@@ -126,78 +131,107 @@
     }
   }
 
-  var TestClient = {
-    run: function(t) {
-      document.title = t.name;
-      update('test-title', t.name);
-      update('status-text', 'Loading...');
+  function TestClient(test) {
+    this.name = test.name;
+    this.options = test;
 
-      // Recover our Test Session
-      var session = TestSession.recover(),
-          testItem,
-          handlebarsUrl = "/ember/handlebars-v1.3.0.js",
-          emberUrl = "/ember/1.8.1.js";
+    this.setup = test.setup || function() { };
+    this.reset = test.reset || function() { };
+    this.test  = test.test  || function() { };
+
+    this.noEmber = test.noEmber;
+  }
+
+  TestClient.run = function(test) {
+    new this(test).start();
+  };
+
+  TestClient.prototype = {
+    updateTitle: function() {
+      document.title = this.name;
+      update('test-title', this.name);
+    },
+
+    run: function(complete) {
+      macroBenchmark(this, this.testItem, complete);
+    },
+
+    recoverSession: function() {
+  // Recover our Test Session
+      var session = this.session = TestSession.recover();
 
       if (session) {
-        testItem = session.findItem(document.location.pathname);
-        update('remaining-text', "" + session.remainingCount(testItem) + " test(s) remaining");
-        handlebarsUrl = session.handlebarsUrl;
-        emberUrl = session.emberUrl;
-      }
+        this.testItem = session.findItem(document.location.pathname);
 
-      if (!t.reset) { t.reset = K; }
+        update('remaining-text', "" + session.remainingCount(this.testItem) + " test(s) remaining");
+
+        this.handlebarsUrl = session.handlebarsUrl;
+        this.emberUrl = session.emberUrl;
+      } else {
+        this.handlebarsUrl = "/ember/handlebars-v1.3.0.js";
+        this.emberUrl = "/ember/1.8.1.js";
+      }
+    },
+
+    start: function() {
+      update('status-text', 'Loading...');
+
+      this.recoverSession();
 
       var deps = [];
-      if (!t.noEmber) {
 
-        if (session && session.featureFlags && session.featureFlags.length) {
+      if (!this.noEmber) {
+        if (this.session && this.session.featureFlags && this.session.featureFlags.length) {
           var features = {};
-          session.featureFlags.forEach(function(f) { features[f] = true; });
-          window.EmberENV = { FEATURES: features };
+          this.session.featureFlags.forEach(function(f) {
+            features[f] = true;
+          });
+          window.EmberENV = {
+            FEATURES: features
+          };
         }
-        deps = ["/ember/jquery-2.1.1.min.js", handlebarsUrl, emberUrl];
+
+        deps = [
+          '/ember/jquery-2.1.1.min.js',
+          this.handlebarsUrl,
+          this.emberUrl
+        ];
       }
+
+      var test  = this;
 
       // Once the test completes
       var complete = function(result) {
+        var testItem = test.testItem;
         if (testItem) {
-          result.name = t.name;
+          result.name = test.name;
           testItem.addResult(result);
         } else {
           update('status-text', JSON.stringify(result));
         }
 
+        update('status-text', JSON.stringify(result));
+
+        var session = test.session;
         if (!session) { return; }
         var nextTest = session.nextTest();
         if (nextTest) {
           document.location.href = nextTest.path;
         } else {
           // When we're done go back to the root.
-          document.location.href = "/";
+          //document.location.href = "/";
         }
       };
 
       // What to run when our dependencies have loaded
       var runner = function() {
         // Record the ember version used
-        if (session && !t.noEmber) {
-          session.emberVersion = Ember.VERSION;
+        if (test.session && !test.noEmber) {
+          test.session.emberVersion = Ember.VERSION;
         }
 
-        var promise;
-        if (t.setup) {
-          promise = t.setup();
-        }
-        if (!promise || !promise.then) {
-          promise = RSVP.resolve();
-        }
-
-        promise.then(function() {
-          if (t.microBench) {
-            microBenchmark(t, testItem, complete);
-          } else {
-            macroBenchmark(t, testItem, complete);
-          }
+        RSVP.Promise.resolve(test.setup()).then(function() {
+          return test.run(complete);
         });
       };
 
@@ -210,4 +244,18 @@
   };
 
   window.TestClient = TestClient;
+
+  function MicroTestClient(test) {
+    TestClient.call(this, test);
+  }
+
+  MicroTestClient.run = TestClient.run;
+
+  MicroTestClient.prototype = Object.create(TestClient.prototype);
+  MicroTestClient.prototype.run = function(complete) {
+    microBenchmark(this, complete);
+  }
+
+  window.MicroTestClient = MicroTestClient;
+
 })();

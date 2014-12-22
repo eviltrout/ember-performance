@@ -1,10 +1,8 @@
 /* global TestClient */
 (function() {
 
-  TestClient.run({
+  MicroTestClient.run({
     name: 'Ember.Object.create',
-    microBench: true,
-
     test: function() {
       Ember.Object.create();
     }
