@@ -33,7 +33,7 @@ var testClient = concat(clientTree, {
 var testTree = copyIndex('tests', { extensions: ['js'] });
 
 var vendorJs = concat(mergeTrees(findBowerTrees()), {
-  inputFiles: ['jquery.js'],
+  inputFiles: ['jquery.js', 'numeral.js'],
   outputFile: '/assets/vendor.js'
 });
 

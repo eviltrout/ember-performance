@@ -208,8 +208,7 @@
   });
 
   Ember.Handlebars.registerBoundHelper('fmt-number', function(num) {
-    num = roundedNumber(num);
-    return typeof num !== "undefined" ? num : new Ember.Handlebars.SafeString("&mdash;");
+    return window.numeral(num).format('0,0.00')
   });
 
   App.IndexRoute = Ember.Route.extend({
