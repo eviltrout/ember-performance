@@ -81,14 +81,9 @@
       var tester = function() {
         update('progress', '' + samples.length + ' samples taken.');
 
-        var t1 = new Date().getTime(),
-        promise = t.test();
+        var t1 = new Date().getTime();
 
-        if (!promise || !promise.then) {
-          promise = new RSVP.resolve();
-        }
-
-        promise.then(function() {
+        RSVP.Promise.resolve(t.test()).then(function() {
           var elapsed = new Date().getTime() - t1,
           nextPromise = t.reset();
 
