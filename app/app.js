@@ -13,6 +13,7 @@
     {name: 'Ember.set', path: '/ember-set'},
     {name: 'Ember.Object.Create', path: '/object-create'},
     {name: 'Render List', path: '/render-list'},
+    {name: 'Ember.View.Create', path: '/view-create'},
     {name: 'Render List (Unbound)', path: '/render-list-unbound'},
     {name: 'Render Complex List', path: '/render-complex-list'}
   ];
