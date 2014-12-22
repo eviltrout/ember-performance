@@ -26,112 +26,116 @@
   }
 
   // Use benchmark.js to run a microbenchmark
-  function microBenchmark(test, complete) {
-    update('status-text', "Running Micro Benchmark...");
+  function microBenchmark(test) {
+    return new RSVP.Promise(function(resolve) {
+      update('status-text', "Running Micro Benchmark...");
 
-    setTimeout(function() {
-      var suite = new Benchmark.Suite();
+      setTimeout(function() {
+        var suite = new Benchmark.Suite();
 
-      suite.add(test.name, test.test, {
-        setup: test.setup,
-        distribution: test.distribution
-      });
-
-      suite.on('cycle', function(evt) {
-        test.reset();
-
-        var r = evt.target;
-        complete({
-          name: r.name,
-          hz: r.hz,
-          rme: r.stats.rme,
-          deviation: r.stats.deviation,
-          mean: r.stats.mean,
-          samples: r.stats.sample.length,
-          emberVersion: r.emberVersion,
-          createdAt: new Date()
+        suite.add(test.name, test.test, {
+          setup: test.setup,
+          distribution: test.distribution
         });
-      });
 
-      suite.on('error', function(evt) {
-        var err = evt.target.error;
-        update('status-text', "Error: " + err.message);
-        throw err;
-      });
+        suite.on('cycle', function(evt) {
+          test.reset();
 
-      suite.run();
-    }, 100);
+          var r = evt.target;
+          resolve({
+            name: r.name,
+            hz: r.hz,
+            rme: r.stats.rme,
+            deviation: r.stats.deviation,
+            mean: r.stats.mean,
+            samples: r.stats.sample.length,
+            emberVersion: r.emberVersion,
+            createdAt: new Date()
+          });
+        });
+
+        suite.on('error', function(evt) {
+          var err = evt.target.error;
+          update('status-text', "Error: " + err.message);
+          throw err;
+        });
+
+        suite.run();
+      }, 100);
+    });
   }
 
   // Run a macro benchmark until our error threshold is low or our
   // MACRO_MAX_TIME expires
-  function macroBenchmark(t, testItem, complete) {
-    update('status-text', "Running Benchmark...");
+  function macroBenchmark(t, testItem) {
+    return new RSVP.Promise(function(resolve) {
+      update('status-text', "Running Benchmark...");
 
-    var samples = [];
-    var sum = 0;
+      var samples = [];
+      var sum = 0;
 
-    var resetPromise = t.reset();
-    var result = { name: t.name };
-    var startTime = new Date().getTime();
+      var resetPromise = t.reset();
+      var result = { name: t.name };
+      var startTime = new Date().getTime();
 
-    var tester = function() {
-      update('progress', '' + samples.length + ' samples taken.');
+      var tester = function() {
+        update('progress', '' + samples.length + ' samples taken.');
 
-      var t1 = new Date().getTime(),
-          promise = t.test();
+        var t1 = new Date().getTime(),
+        promise = t.test();
 
-      if (!promise || !promise.then) {
-        promise = new RSVP.resolve();
-      }
-
-      promise.then(function() {
-        var elapsed = new Date().getTime() - t1,
-            nextPromise = t.reset();
-
-        sum += elapsed;
-        samples.push(elapsed);
-
-        result.mean = (sum / samples.length);
-        var squareSum = 0;
-        for (var j=0; j<samples.length; j++) {
-          var diff = samples[j] - result.mean;
-          squareSum += (diff * diff);
+        if (!promise || !promise.then) {
+          promise = new RSVP.resolve();
         }
-        result.deviation = (squareSum / samples.length);
-        var standardErr = result.deviation / Math.sqrt(samples.length),
-            critical = tTable[Math.round(result.samples - 1) || 1] || tTable.infinity;
 
-        result.rme = ((standardErr * critical) / result.mean) * 100 || 0;
-        result.samples = samples.length;
-        result.hz = (1000.0 / result.mean);
+        promise.then(function() {
+          var elapsed = new Date().getTime() - t1,
+          nextPromise = t.reset();
 
-        var totalEllapsed = (new Date().getTime() - startTime);
+          sum += elapsed;
+          samples.push(elapsed);
 
-        var next = function() {
-          // Loop until the min time is passed and the rme is low, or the max time ellapsed
-          if ((samples.length < MIN_SAMPLES) || ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) && (totalEllapsed < MACRO_MAX_TIME))) {
-            setTimeout(tester, 10);
-          } else {
-            complete(result);
+          result.mean = (sum / samples.length);
+          var squareSum = 0;
+          for (var j=0; j<samples.length; j++) {
+            var diff = samples[j] - result.mean;
+            squareSum += (diff * diff);
           }
-        };
+          result.deviation = (squareSum / samples.length);
+          var standardErr = result.deviation / Math.sqrt(samples.length),
+          critical = tTable[Math.round(result.samples - 1) || 1] || tTable.infinity;
 
-        if (nextPromise && nextPromise.then) {
-          nextPromise.then(next);
-        } else {
-          next();
-        }
-      });
-    };
+          result.rme = ((standardErr * critical) / result.mean) * 100 || 0;
+          result.samples = samples.length;
+          result.hz = (1000.0 / result.mean);
 
-    if (resetPromise && resetPromise.then) {
-      resetPromise.then(function() {
+          var totalEllapsed = (new Date().getTime() - startTime);
+
+          var next = function() {
+            // Loop until the min time is passed and the rme is low, or the max time ellapsed
+            if ((samples.length < MIN_SAMPLES) || ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) && (totalEllapsed < MACRO_MAX_TIME))) {
+              setTimeout(tester, 10);
+            } else {
+              resolve(result);
+            }
+          };
+
+          if (nextPromise && nextPromise.then) {
+            nextPromise.then(next);
+          } else {
+            next();
+          }
+        });
+      };
+
+      if (resetPromise && resetPromise.then) {
+        resetPromise.then(function() {
+          setTimeout(tester, 10);
+        });
+      } else {
         setTimeout(tester, 10);
-      });
-    } else {
-      setTimeout(tester, 10);
-    }
+      }
+    });
   }
 
   function TestClient(test) {
@@ -155,8 +159,8 @@
       update('test-title', this.name);
     },
 
-    run: function(complete) {
-      macroBenchmark(this, this.testItem, complete);
+    run: function() {
+      return macroBenchmark(this, this.testItem);
     },
 
     recoverSession: function() {
@@ -201,7 +205,7 @@
         ];
       }
 
-      var test  = this;
+      var test = this;
 
       // Once the test completes
       var complete = function(result) {
@@ -234,7 +238,9 @@
         }
 
         RSVP.Promise.resolve(test.setup()).then(function() {
-          return test.run(complete);
+          return test.run();
+        }).then(complete).catch(function(error) {
+          console.error(error);
         });
       };
 
@@ -255,8 +261,8 @@
   MicroTestClient.run = TestClient.run;
 
   MicroTestClient.prototype = Object.create(TestClient.prototype);
-  MicroTestClient.prototype.run = function(complete) {
-    microBenchmark(this, complete);
+  MicroTestClient.prototype.run = function() {
+    return microBenchmark(this);
   }
 
   window.MicroTestClient = MicroTestClient;
