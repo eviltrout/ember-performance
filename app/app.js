@@ -38,17 +38,21 @@
   var App = Ember.Application.create();
 
   App.IndexController = Ember.ArrayController.extend({
-    report: null,
-    emberVersion: null,
-    enabledTests: Ember.computed.filterBy('model', 'enabled', true),
-    customEmber: false,
-    showingHTML: true,
-    sending: false,
-    error: false,
-    sent: false,
-    featureFlags: null,
-    newFlagName: null,
+    init: function() {
+      this.report = null;
+      this.emberVersion = null;
+      this.customEmber = false;
+      this.showingHTML = true;
+      this.sending = false;
+      this.error = false;
+      this.sent = false;
+      this.featureFlags = null;
+      this.newFlagName = null;
 
+      this._super.apply(this, arguments);
+    },
+
+    enabledTests: Ember.computed.filterBy('model', 'enabled', true),
     addFeatureDisabled: Ember.computed.empty('newFlagName'),
 
     asciiTable: function() {
