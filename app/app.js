@@ -11,6 +11,7 @@
 
     { name: 'Ember.get',                 path: '/ember-get' },
     { name: 'Ember.set',                 path: '/ember-set' },
+    { name: 'Ember.set (primed)',        path: '/ember-set/primed' },
     { name: 'Ember.get (primed)',        path: '/ember-get/primed' },
 
     { name: 'object-create/view',        path: '/object-create/view'   },
