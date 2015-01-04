@@ -20,7 +20,9 @@
 
     { name: 'Render List',               path: '/render-list'   },
     { name: 'Render List (Unbound)',     path: '/render-list-unbound' },
-    { name: 'Render Complex List',       path: '/render-complex-list' }
+    { name: 'Render Complex List',       path: '/render-complex-list' },
+
+    { name: 'Render link-to',            path: '/render-link-to' }
   ];
 
   var EMBER_VERSIONS = [
