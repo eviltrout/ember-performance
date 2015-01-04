@@ -1,4 +1,11 @@
 /* global TestClient */
+
+function assert(assertion, message) {
+  if (assert) return;
+
+  throw new Error(message);
+}
+
 MicroTestClient.run({
   name: 'Ember.get (primed)',
 
@@ -19,8 +26,14 @@ MicroTestClient.run({
   },
 
   test: function() {
-    obj.get('thingId');
-    obj.get('person.name');
-    obj.get('person.pet.name');
+    var thingId  = obj.get('thingId');
+    var personName = obj.get('person.name');
+    var petName = obj.get('person.pet.name');
+  },
+
+  teardown: function() {
+    assert(thingId, 1234);
+    assert(personName, 'Evil Trout');
+    assert(pet, 'Rover');
   }
 });

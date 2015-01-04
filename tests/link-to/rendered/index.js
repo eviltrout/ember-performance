@@ -41,11 +41,14 @@ MicroTestClient.run({
   },
 
   test: function() {
-    link.get('active');
+    // render it.
   },
 
   teardown: function() {
+    assert((link._state || link.state) === 'inDOM', 'link was created');
     assert(link, 'link was created');
     assert(!link.get('active'), 'should not be active');
+
+    // teardown
   }
 });
