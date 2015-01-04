@@ -33,10 +33,10 @@
 
   var EMBER_VERSIONS = [
     { name: '1.9.1',                     path: '/ember/ember.prod-1.9.1.js',       compilerPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.10.0-beta.3',             path: "/ember/1.10.0-beta.3.js",          compilerPath: "/ember/ember-template-compiler-1.10.0-beta.3.js" },
+    { name: '1.10.0-beta.3',             path: '/ember/1.10.0-beta.3.js',          compilerPath: '/ember/ember-template-compiler-1.10.0-beta.3.js' },
     { name: '1.9.0-beta.3',              path: '/ember/1.9.0-beta.3.js',           compilerPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.8.1',                     path: '/ember/1.8.1.js',                  compilerPath: "/ember/handlebars-v1.3.0.js"},
-    { name: '1.7.1',                     path: "/ember/1.7.1.js",                  compilerPath: "/ember/handlebars-v1.3.0.js"}
+    { name: '1.8.1',                     path: '/ember/1.8.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'},
+    { name: '1.7.1',                     path: '/ember/1.7.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'}
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to
