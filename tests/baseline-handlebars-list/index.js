@@ -22,7 +22,9 @@
     name: 'Baseline: Handlebars List',
 
     setup: function() {
-      compiled = Handlebars.compile(template);
+      return $.getScript('http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v2.0.0.js').then(function() {
+        compiled = Handlebars.compile(template);
+      });
     },
 
     reset: function() {
