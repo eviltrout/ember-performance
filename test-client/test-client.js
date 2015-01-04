@@ -292,10 +292,18 @@
 
       var tester = function() {
         console.profile(test.name);
-        RSVP.Promise.resolve(test.test()).then(function() {
-          console.profileEnd();
-          update('status-text', "Profiling of \""+test.name+"\" complete.");
-        });
+
+        var result = test.test();
+
+        if (typeof result === 'object' && typeof result.then === 'function') {
+          RSVP.Promise.resolve(result).then(function() {
+            console.profileEnd(test.name);
+            update('status-text', "Profiling of \""+test.name+"\" complete.");
+          });
+        } else {
+          console.profileEnd(test.name);
+        }
+
       };
 
       if (resetPromise && resetPromise.then) {
