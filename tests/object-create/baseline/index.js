@@ -12,7 +12,7 @@
     },
 
     test: function() {
-      return new Klass();
+      klass = new Klass();
     }
   });
 })();
