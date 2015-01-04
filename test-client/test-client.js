@@ -153,13 +153,11 @@
 
   TestClient.run = function(test) {
     var profile = getParameterByName('profile');
-    var Runner;
     if (profile !== '') {
-      Runner = ProfileClient;
+      buildProfileClient(this, test).start();
     } else {
-      Runner = this;
+      new this(test).start();
     }
-    new Runner(test).start();
   };
 
   TestClient.prototype = {
@@ -170,6 +168,30 @@
 
     run: function() {
       return macroBenchmark(this, this.testItem);
+    },
+
+    profile: function() {
+      var test = this;
+
+      return new RSVP.Promise(function(resolve) {
+        var resetPromise = test.reset();
+
+        var tester = function() {
+          console.profile(test.name);
+          RSVP.Promise.resolve(test.test()).then(function() {
+            console.profileEnd();
+            resolve({ skipRedirect: true });
+          });
+        };
+
+        if (resetPromise && resetPromise.then) {
+          resetPromise.then(function() {
+            setTimeout(tester, 10);
+          });
+        } else {
+          setTimeout(tester, 10);
+        }
+      });
     },
 
     recoverSession: function() {
@@ -235,7 +257,9 @@
           document.location.href = nextTest.path;
         } else {
           // When we're done go back to the root.
-          document.location.href = "/";
+          if (!result.skipRedirect) {
+            document.location.href = "/";
+          }
         }
       };
 
@@ -274,40 +298,32 @@
     return microBenchmark(this);
   }
 
+  MicroTestClient.prototype.profile = function() {
+    var setup = functionToString(this.setup);
+    var test = functionToString(this.test);
+    var functionSpec = '' +
+      setup + '\n' +
+      'console.profile("'+this.name+'");\n' +
+      test + '\n' +
+      'console.profileEnd();\n';
+    var run = new Function(functionSpec);
+    run();
+    return { skipRedirect: true };
+  }
+
   window.MicroTestClient = MicroTestClient;
 
-  function ProfileClient(test) {
-    TestClient.call(this, test);
+  function buildProfileClient(klass, test) {
+    var runner = new klass(test);
+    runner.run = runner.profile;
+    return runner;
   }
 
-  ProfileClient.run = TestClient.run;
-
-  ProfileClient.prototype = Object.create(TestClient.prototype);
-  ProfileClient.prototype.run = function() {
-    var test = this;
-    return new RSVP.Promise(function(resolve) {
-      update('status-text', "Starting Profiler...");
-
-      var resetPromise = test.reset();
-
-      var tester = function() {
-        console.profile(test.name);
-        RSVP.Promise.resolve(test.test()).then(function() {
-          console.profileEnd();
-          update('status-text', "Profiling of \""+test.name+"\" complete.");
-        });
-      };
-
-      if (resetPromise && resetPromise.then) {
-        resetPromise.then(function() {
-          setTimeout(tester, 10);
-        });
-      } else {
-        setTimeout(tester, 10);
-      }
-    });
+  function functionToString(fn) {
+    var string = fn.toString();
+    string = (/^[^{]+\{([\s\S]*)}\s*$/.exec(string) || 0)[1];
+    string = (string || '').replace(/^\s+|\s+$/g, '');
+    return string;
   }
-
-  window.ProfileClient = ProfileClient;
 
 })();
