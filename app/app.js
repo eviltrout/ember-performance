@@ -14,21 +14,29 @@
     { name: 'Ember.set (primed)',        path: '/ember-set/primed' },
     { name: 'Ember.get (primed)',        path: '/ember-get/primed' },
 
+    { name: 'link-to get(\'active\')',   path: '/link-to/active' },
+    { name: 'link-to get(\'create\')',   path: '/link-to/create' },
+
     { name: 'object-create/view',        path: '/object-create/view'   },
     { name: 'object-create/baseline',    path: '/object-create/baseline'   },
     { name: 'object-create/index',       path: '/object-create' },
 
     { name: 'Render List',               path: '/render-list'   },
     { name: 'Render List (Unbound)',     path: '/render-list-unbound' },
-    { name: 'Render Complex List',       path: '/render-complex-list' }
+    { name: 'Render Complex List',       path: '/render-complex-list' },
+
+    { name: 'Render Simple Ember List',  path: '/render-simple-ember-list' },
+    { name: 'Render List with link-to',  path: '/render-list-with-link-to' },
+
+    { name: 'Render link-to',            path: '/render-link-to' }
   ];
 
   var EMBER_VERSIONS = [
     { name: '1.9.1',                     path: '/ember/ember.prod-1.9.1.js',       compilerPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.10.0-beta.3',             path: "/ember/1.10.0-beta.3.js",          compilerPath: "/ember/ember-template-compiler-1.10.0-beta.3.js" },
+    { name: '1.10.0-beta.3',             path: '/ember/1.10.0-beta.3.js',          compilerPath: '/ember/ember-template-compiler-1.10.0-beta.3.js' },
     { name: '1.9.0-beta.3',              path: '/ember/1.9.0-beta.3.js',           compilerPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.8.1',                     path: '/ember/1.8.1.js',                  compilerPath: "/ember/handlebars-v1.3.0.js"},
-    { name: '1.7.1',                     path: "/ember/1.7.1.js",                  compilerPath: "/ember/handlebars-v1.3.0.js"}
+    { name: '1.8.1',                     path: '/ember/1.8.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'},
+    { name: '1.7.1',                     path: '/ember/1.7.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'}
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to

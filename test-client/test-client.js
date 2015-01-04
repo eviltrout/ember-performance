@@ -42,7 +42,8 @@
 
         suite.add(test.name, test.test, {
           setup: test.setup,
-          distribution: test.distribution
+          distribution: test.distribution,
+          teardown: test.teardown
         });
 
         suite.on('cycle', function(evt) {
@@ -145,8 +146,9 @@
     this.options = test;
 
     this.setup = test.setup || function() { };
-    this.reset = test.reset || function() { };
+    this.reset = test.reset || function() { }; // remove this in-favour of teardown
     this.test  = test.test  || function() { };
+    this.teardown = test.teardown || function() { };
 
     this.noEmber = test.noEmber;
   }
