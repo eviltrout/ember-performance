@@ -176,15 +176,23 @@
       var test = this;
 
       return new RSVP.Promise(function(resolve) {
+        // Why on earth do we reset before we run?, must be a mistake?
         var resetPromise = test.reset();
 
         var tester = function() {
-          console.profile(test.name);
-          RSVP.Promise.resolve(test.test()).then(function() {
-            console.profileEnd();
+          var result = test.test();
+
+          if (typeof result === 'object' && typeof result.then === 'function') {
+            // we should chain these promises correctly
+            RSVP.Promise.resolve(result).then(function() {
+              console.profileEnd();
+              resolve({ skipRedirect: true });
+            });
+          }  else {
+            console.profile(test.name);
             resolve({ skipRedirect: true });
-          });
-        };
+          };
+        }
 
         if (resetPromise && resetPromise.then) {
           resetPromise.then(function() {
