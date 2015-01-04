@@ -34,6 +34,6 @@ MicroTestClient.run({
   teardown: function() {
     assert(thingId, 1234);
     assert(personName, 'Evil Trout');
-    assert(pet, 'Rover');
+    assert(petName, 'Rover');
   }
 });
