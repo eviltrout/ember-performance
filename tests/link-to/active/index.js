@@ -27,7 +27,7 @@ MicroTestClient.run({
     var router = Router.create();
 
     var link = Ember.LinkView.create({
-      router: router
+      router: router,
       params: ['foo','bar', 'baz']
     });
 
