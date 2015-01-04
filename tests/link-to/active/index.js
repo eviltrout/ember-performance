@@ -31,7 +31,7 @@ MicroTestClient.run({
       params: ['foo','bar', 'baz']
     });
 
-    window.link = link; // hack
+    window.link = link; // hack until the profileRunner is fixed
   },
 
   test: function() {
