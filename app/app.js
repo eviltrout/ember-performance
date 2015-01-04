@@ -22,6 +22,9 @@
     { name: 'Render List (Unbound)',     path: '/render-list-unbound' },
     { name: 'Render Complex List',       path: '/render-complex-list' },
 
+    { name: 'Render Simple Ember List',  path: '/render-simple-ember-list' },
+    { name: 'Render List with link-to',  path: '/render-list-with-link-to' },
+
     { name: 'Render link-to',            path: '/render-link-to' }
   ];
 
