@@ -104,6 +104,46 @@
               Ember.empty(this.get('compilerUrl'));
     }.property('emberUrl', 'compilerUrl', 'enabledTests.length'),
 
+    cantProfile: function() {
+      return (this.get('enabledTests.length') !== 1) ||
+              Ember.empty(this.get('emberUrl')) ||
+              Ember.empty(this.get('compilerUrl'));
+    }.property('emberUrl', 'compilerUrl', 'enabledTests.length'),
+
+    run: function(options) {
+      var enabledTests = this.get('enabledTests');
+
+      // Remember any custom urls we set for another run
+      if (this.get('customEmber')) {
+        localStorage.setItem('ember-perf-custom', 'true');
+        localStorage.setItem('ember-perf-ember-url', this.get('emberUrl'));
+        localStorage.setItem('ember-perf-compiler-url', this.get('compilerUrl'));
+      } else {
+        localStorage.removeItem('ember-perf-custom');
+        localStorage.removeItem('ember-perf-ember-url');
+        localStorage.removeItem('ember-perf-compiler-url');
+      }
+
+      localStorage.setItem('ember-perf-flags', JSON.stringify(this.get('featureFlags')));
+
+      var testSession = new TestSession();
+
+      testSession.emberUrl = this.get('emberUrl');
+      testSession.compilerUrl = this.get('compilerUrl');
+      testSession.featureFlags = this.get('featureFlags');
+
+      testSession.enqueuePaths(enabledTests.map(function(t) {
+        return t.get('path');
+      }));
+
+      TestSession.persist(testSession);
+      var t = testSession.nextTest();
+      if (t) {
+        var queryParams = options ? jQuery.param(options) : '';
+        document.location.href = t.path+(queryParams !== '' ? '?'+queryParams : '');
+      }
+    },
+
     actions: {
       submitResults: function() {
         var controller = this;
@@ -150,37 +190,12 @@
         localStorage.setItem('ember-perf-mode', 'text');
       },
 
+      profile: function() {
+        this.run({ profile: true });
+      },
+
       start: function() {
-        var enabledTests = this.get('enabledTests');
-
-        // Remember any custom urls we set for another run
-        if (this.get('customEmber')) {
-          localStorage.setItem('ember-perf-custom', 'true');
-          localStorage.setItem('ember-perf-ember-url', this.get('emberUrl'));
-          localStorage.setItem('ember-perf-compiler-url', this.get('compilerUrl'));
-        } else {
-          localStorage.removeItem('ember-perf-custom');
-          localStorage.removeItem('ember-perf-ember-url');
-          localStorage.removeItem('ember-perf-compiler-url');
-        }
-
-        localStorage.setItem('ember-perf-flags', JSON.stringify(this.get('featureFlags')));
-
-        var testSession = new TestSession();
-
-        testSession.emberUrl = this.get('emberUrl');
-        testSession.compilerUrl = this.get('compilerUrl');
-        testSession.featureFlags = this.get('featureFlags');
-
-        testSession.enqueuePaths(enabledTests.map(function(t) {
-          return t.get('path');
-        }));
-
-        TestSession.persist(testSession);
-        var t = testSession.nextTest();
-        if (t) {
-          document.location.href = t.path;
-        }
+        this.run();
       },
 
       clear: function() {

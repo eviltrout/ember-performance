@@ -25,6 +25,13 @@
     document.getElementById(id).innerText = txt;
   }
 
+  function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+    var results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  };
+
   // Use benchmark.js to run a microbenchmark
   function microBenchmark(test) {
     return new RSVP.Promise(function(resolve) {
@@ -145,7 +152,14 @@
   }
 
   TestClient.run = function(test) {
-    new this(test).start();
+    var profile = getParameterByName('profile');
+    var Runner;
+    if (profile !== '') {
+      Runner = ProfileClient;
+    } else {
+      Runner = this;
+    }
+    new Runner(test).start();
   };
 
   TestClient.prototype = {
@@ -261,5 +275,39 @@
   }
 
   window.MicroTestClient = MicroTestClient;
+
+  function ProfileClient(test) {
+    TestClient.call(this, test);
+  }
+
+  ProfileClient.run = TestClient.run;
+
+  ProfileClient.prototype = Object.create(TestClient.prototype);
+  ProfileClient.prototype.run = function() {
+    var test = this;
+    return new RSVP.Promise(function(resolve) {
+      update('status-text', "Starting Profiler...");
+
+      var resetPromise = test.reset();
+
+      var tester = function() {
+        console.profile(test.name);
+        RSVP.Promise.resolve(test.test()).then(function() {
+          console.profileEnd();
+          update('status-text', "Profiling of \""+test.name+"\" complete.");
+        });
+      };
+
+      if (resetPromise && resetPromise.then) {
+        resetPromise.then(function() {
+          setTimeout(tester, 10);
+        });
+      } else {
+        setTimeout(tester, 10);
+      }
+    });
+  }
+
+  window.ProfileClient = ProfileClient;
 
 })();
