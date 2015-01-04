@@ -167,10 +167,10 @@
 
         update('remaining-text', "" + session.remainingCount(this.testItem) + " test(s) remaining");
 
-        this.handlebarsUrl = session.handlebarsUrl;
+        this.compilerUrl = session.compilerUrl;
         this.emberUrl = session.emberUrl;
       } else {
-        this.handlebarsUrl = "/ember/handlebars-v1.3.0.js";
+        this.compilerUrl = "/ember/handlebars-v1.3.0.js";
         this.emberUrl = "/ember/1.8.1.js";
       }
     },
@@ -195,7 +195,7 @@
 
         deps = [
           '/ember/jquery-2.1.1.min.js',
-          this.handlebarsUrl,
+          this.compilerUrl,
           this.emberUrl
         ];
       }
