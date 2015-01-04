@@ -26,10 +26,12 @@
   var HANDLEBARS_DEFAULT = "/ember/handlebars-v1.3.0.js";
 
   var EMBER_VERSIONS = [
-    {name: '1.10.0-beta.1+canary', path: "/ember/1.10.0-beta.1.canary.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
-    {name: '1.9.0-beta.3', path: "/ember/1.9.0-beta.3.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
-    {name: '1.8.1', path: "/ember/1.8.1.js", handlebarsPath: HANDLEBARS_DEFAULT},
-    {name: '1.7.1', path: "/ember/1.7.1.js", handlebarsPath: HANDLEBARS_DEFAULT}
+    { name: 'master.prod',          path: "/ember/ember.prod.js",           handlebarsPath: '/ember/handlebars-v2.0.0.js'},
+    { name: 'master.prod-next',     path: "/ember/ember.prod-next.js",      handlebarsPath: '/ember/handlebars-v2.0.0.js'},
+    { name: '1.10.0-beta.1+canary', path: "/ember/1.10.0-beta.1.canary.js", handlebarsPath: '/ember/handlebars-v2.0.0.js'},
+    { name: '1.9.0-beta.3',         path: "/ember/1.9.0-beta.3.js",         handlebarsPath: '/ember/handlebars-v2.0.0.js'},
+    { name: '1.8.1',                path: "/ember/1.8.1.js",                handlebarsPath: HANDLEBARS_DEFAULT},
+    { name: '1.7.1',                path: "/ember/1.7.1.js",                handlebarsPath: HANDLEBARS_DEFAULT}
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to
@@ -39,6 +41,8 @@
 
   App.IndexController = Ember.ArrayController.extend({
     init: function() {
+      this._super.apply(this, arguments);
+
       this.report = null;
       this.emberVersion = null;
       this.customEmber = false;
@@ -48,23 +52,22 @@
       this.sent = false;
       this.featureFlags = null;
       this.newFlagName = null;
-
-      this._super.apply(this, arguments);
     },
 
     enabledTests: Ember.computed.filterBy('model', 'enabled', true),
     addFeatureDisabled: Ember.computed.empty('newFlagName'),
 
     asciiTable: function() {
-      var result = "Ember Version: " + this.get('report.emberVersion') + "\n";
-      result += "User Agent: " + navigator.userAgent + "\n";
+      var result = 'Ember Version: ' + this.get('report.emberVersion') + "\n";
+
+      result += 'User Agent: ' + navigator.userAgent + "\n";
 
       var featureFlags = this.get('report.featureFlags');
       if (featureFlags && featureFlags.length) {
-        result += "Feature Flags: " + featureFlags.join(', ') + "\n";
+        result += 'Feature Flags: ' + featureFlags.join(', ') + "\n";
       }
 
-      result += "\n";
+      result += '\n';
 
       var table = new AsciiTable('Ember Performance Suite - Results');
       table.setHeading('Name', 'Speed', 'Error', 'Samples', 'Mean');
@@ -106,17 +109,19 @@
 
     actions: {
       submitResults: function() {
+        var controller = this;
 
-        var self = this;
         this.set('sending', true);
         this.set('error', false);
 
         var reportJson = this.get('report');
+
         reportJson.emberPerfVersion = EMBER_PERF_VERSION;
+
         new Ember.RSVP.Promise(function (resolve, reject) {
           Ember.$.ajax({
-            url: "http://perflogger.eviltrout.com/api/results",
-            type: "POST",
+            url: 'http://perflogger.eviltrout.com/api/results',
+            type: 'POST',
             data: { results: JSON.stringify(reportJson) },
             success: function(result) {
               Ember.run(null, resolve, result);
@@ -126,11 +131,11 @@
             }
           });
         }).then(function() {
-          self.set('sent', true);
+          controller.set('sent', true);
         }).catch(function() {
-          self.set('error', true);
+          controller.set('error', true);
         }).finally(function() {
-          self.set('sending', false);
+          controller.set('sending', false);
         });
       },
 
@@ -165,6 +170,7 @@
         localStorage.setItem('ember-perf-flags', JSON.stringify(this.get('featureFlags')));
 
         var testSession = new TestSession();
+
         testSession.emberUrl = this.get('emberUrl');
         testSession.handlebarsUrl = this.get('handlebarsUrl');
         testSession.featureFlags = this.get('featureFlags');
@@ -235,8 +241,8 @@
     },
 
     setupController: function(controller, model) {
-      var session = model.session,
-          version = EMBER_VERSIONS[0].path;
+      var session = model.session;
+      var version = EMBER_VERSIONS[0].path;
 
       if (session) {
         var report = session.report();
@@ -246,8 +252,8 @@
         }
       }
 
-      var featureFlags = [],
-          flagsJson = localStorage.getItem('ember-perf-flags');
+      var featureFlags = [];
+      var flagsJson = localStorage.getItem('ember-perf-flags');
 
       if (flagsJson && flagsJson.length) {
         featureFlags = JSON.parse(flagsJson);
