@@ -23,14 +23,12 @@
     { name: 'Render Complex List',       path: '/render-complex-list' }
   ];
 
-  var HANDLEBARS_DEFAULT = "/ember/handlebars-v1.3.0.js";
-
   var EMBER_VERSIONS = [
-    { name: '1.9.1',                     path: '/ember/ember.prod-1.9.1.js',       handlebarsPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.10.0-beta.1+canary',      path: '/ember/1.10.0-beta.1.canary.js',   handlebarsPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.9.0-beta.3',              path: '/ember/1.9.0-beta.3.js',           handlebarsPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.8.1',                     path: '/ember/1.8.1.js',                  handlebarsPath: HANDLEBARS_DEFAULT},
-    { name: '1.7.1',                     path: "/ember/1.7.1.js",                  handlebarsPath: HANDLEBARS_DEFAULT}
+    { name: '1.9.1',                     path: '/ember/ember.prod-1.9.1.js',       compilerPath: '/ember/handlebars-v2.0.0.js'},
+    { name: '1.10.0-beta.3',             path: "/ember/1.10.0-beta.3.js",          compilerPath: "/ember/ember-template-compiler-1.10.0-beta.3.js" },
+    { name: '1.9.0-beta.3',              path: '/ember/1.9.0-beta.3.js',           compilerPath: '/ember/handlebars-v2.0.0.js'},
+    { name: '1.8.1',                     path: '/ember/1.8.1.js',                  compilerPath: "/ember/handlebars-v1.3.0.js"},
+    { name: '1.7.1',                     path: "/ember/1.7.1.js",                  compilerPath: "/ember/handlebars-v1.3.0.js"}
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to
@@ -89,22 +87,22 @@
       }
     }.property('customEmber', 'emberVersion', 'customEmberUrl'),
 
-    handlebarsUrl: function() {
+    compilerUrl: function() {
       if (this.get('customEmber')) {
-        return this.get('customHandlebarsUrl');
+        return this.get('customCompilerUrl');
       } else {
         var v = EMBER_VERSIONS.findProperty('path', this.get('emberVersion'));
-        if (v && v.handlebarsPath) {
-          return v.handlebarsPath;
+        if (v && v.compilerPath) {
+          return v.compilerPath;
         }
       }
-    }.property('customEmber', 'emberVersion', 'customHandlebarsUrl'),
+    }.property('customEmber', 'emberVersion', 'customCompilerUrl'),
 
     cantStart: function() {
       return (this.get('enabledTests.length') === 0) ||
               Ember.empty(this.get('emberUrl')) ||
-              Ember.empty(this.get('handlebarsUrl'));
-    }.property('emberUrl', 'handlebarsUrl', 'enabledTests.length'),
+              Ember.empty(this.get('compilerUrl'));
+    }.property('emberUrl', 'compilerUrl', 'enabledTests.length'),
 
     actions: {
       submitResults: function() {
@@ -159,11 +157,11 @@
         if (this.get('customEmber')) {
           localStorage.setItem('ember-perf-custom', 'true');
           localStorage.setItem('ember-perf-ember-url', this.get('emberUrl'));
-          localStorage.setItem('ember-perf-handlebars-url', this.get('handlebarsUrl'));
+          localStorage.setItem('ember-perf-compiler-url', this.get('compilerUrl'));
         } else {
           localStorage.removeItem('ember-perf-custom');
           localStorage.removeItem('ember-perf-ember-url');
-          localStorage.removeItem('ember-perf-handlebars-url');
+          localStorage.removeItem('ember-perf-compiler-url');
         }
 
         localStorage.setItem('ember-perf-flags', JSON.stringify(this.get('featureFlags')));
@@ -171,7 +169,7 @@
         var testSession = new TestSession();
 
         testSession.emberUrl = this.get('emberUrl');
-        testSession.handlebarsUrl = this.get('handlebarsUrl');
+        testSession.compilerUrl = this.get('compilerUrl');
         testSession.featureFlags = this.get('featureFlags');
 
         testSession.enqueuePaths(enabledTests.map(function(t) {
@@ -266,7 +264,7 @@
         showingHTML: localStorage.getItem('ember-perf-mode') !== 'text',
         customEmber: localStorage.getItem('ember-perf-custom') === 'true',
         customEmberUrl: localStorage.getItem('ember-perf-ember-url'),
-        customHandlebarsUrl: localStorage.getItem('ember-perf-handlebars-url')
+        customCompilerUrl: localStorage.getItem('ember-perf-compiler-url')
       });
     }
   });

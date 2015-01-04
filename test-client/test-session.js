@@ -28,7 +28,7 @@
   TestSession.prototype.toJSON = function() {
     var result = {
       emberUrl: this.emberUrl,
-      handlebarsUrl: this.handlebarsUrl,
+      compilerUrl: this.compilerUrl,
       emberVersion: this.emberVersion,
       featureFlags: JSON.stringify(this.featureFlags),
       queue: this._queue.map(function(it) {
@@ -54,7 +54,7 @@
 
   TestSession.prototype.fromJSON = function(json) {
     this.emberUrl = json.emberUrl;
-    this.handlebarsUrl = json.handlebarsUrl;
+    this.compilerUrl = json.compilerUrl;
     this.emberVersion = json.emberVersion;
     this.featureFlags = JSON.parse(json.featureFlags);
     this.id = json.id;
@@ -97,7 +97,7 @@
     });
     return { id: this.id,
              emberUrl: this.emberUrl,
-             handlebarsUrl: this.handlebarsUrl,
+             compilerUrl: this.compilerUrl,
              emberVersion: this.emberVersion,
              featureFlags: this.featureFlags,
              results: res };

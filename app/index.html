@@ -102,9 +102,9 @@
           {{input value=customEmberUrl}}
         </div>
 
-        <label>Custom Handlebars URL</label>
+        <label>Custom Compiler URL</label>
         <div class="form-group">
-          {{input value=customHandlebarsUrl}}
+          {{input value=customCompilerUrl}}
         </div>
 
         <p><a href {{action "toggleCustom"}}>Cancel</a></p>
@@ -117,8 +117,8 @@
                             optionValuePath="content.path"
                             optionLabelPath="content.name"}}
           </label>
-          {{#if handlebarsUrl}}
-            <p>Using {{handlebarsUrl}}</p>
+          {{#if compilerUrl}}
+            <p>Using {{compilerUrl}}</p>
           {{/if}}
 
           <p><a href {{action "toggleCustom"}}>Use Custom Ember</a></p>
