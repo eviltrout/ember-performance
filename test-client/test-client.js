@@ -303,14 +303,25 @@
   MicroTestClient.prototype.profile = function() {
     var setup = functionToString(this.setup);
     var test = functionToString(this.test);
+    var teardown = functionToString(this.teardown);
+
     var functionSpec = '' +
       setup + '\n' +
       'console.profile("'+this.name+'");\n' +
       test + '\n' +
-      'console.profileEnd();\n';
+      'console.profileEnd();\n' +
+      teardown +  '\n';
+
     var run = new Function(functionSpec);
-    run();
-    return { skipRedirect: true };
+
+    return new RSVP.Promise(function(resolve) {
+      setTimeout(function() {
+        run();
+        resolve({
+          skipRedirect: true
+        });
+      }, 10);
+    });
   }
 
   window.MicroTestClient = MicroTestClient;
