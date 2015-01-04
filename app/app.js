@@ -14,7 +14,8 @@
     { name: 'Ember.set (primed)',        path: '/ember-set/primed' },
     { name: 'Ember.get (primed)',        path: '/ember-get/primed' },
 
-    { name: 'link-to',                   path: '/link-to' },
+    { name: 'link-to get(\'active\')',   path: '/link-to/active' },
+    { name: 'link-to get(\'create\')',   path: '/link-to/create' },
 
     { name: 'object-create/view',        path: '/object-create/view'   },
     { name: 'object-create/baseline',    path: '/object-create/baseline'   },
