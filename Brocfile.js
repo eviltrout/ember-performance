@@ -1,32 +1,38 @@
 /* global require, module */
-var pickFiles = require('broccoli-static-compiler'),
-    mergeTrees = require('broccoli-merge-trees'),
-    concat = require('broccoli-concat'),
-    findBowerTrees = require('broccoli-bower'),
-    compileSass = require('broccoli-sass'),
-    uglifyJavaScript = require('broccoli-uglify-js'),
-    cleanCSS = require('broccoli-clean-css'),
-    copyIndex = require('./lib/copy-index'),
-    env = require('broccoli-env').getEnv();
+var pickFiles = require('broccoli-static-compiler');
+var mergeTrees = require('broccoli-merge-trees');
+var concat = require('broccoli-concat');
+var findBowerTrees = require('broccoli-bower');
+var compileSass = require('broccoli-sass');
+var uglifyJavaScript = require('broccoli-uglify-js');
+var cleanCSS = require('broccoli-clean-css');
+var copyIndex = require('./lib/copy-index');
+var env = require('broccoli-env').getEnv();
+var stew = require('broccoli-stew');
+var find = stew.find;
+var rename = stew.rename;
 
+var appAndDependencies = rename(find('app/*.html'), 'app/', '');
+var emberTree = find('ember/**/*.js');
 
-var appAndDependencies = pickFiles('app', {
-  srcDir: '/',
-  destDir: '/',
-  files: ['*.html'],
-});
+appAndDependencies = mergeTrees([
+  appAndDependencies,
+  'tests'
+]);
 
-var emberTree = pickFiles('ember', {
-  srcDir: '/',
-  destDir: '/ember',
-  files: ['*.js'],
-});
+var clientTree = mergeTrees([
+  'test-client', mergeTrees(findBowerTrees())
+]);
 
-appAndDependencies = mergeTrees([appAndDependencies, 'tests']);
-
-var clientTree = mergeTrees(['test-client', mergeTrees(findBowerTrees())]);
 var testClient = concat(clientTree, {
-  inputFiles: ['test-client.js', 'test-session.js', 'head.min.js', 'benchmark.js', 'rsvp.js', 'people.js'],
+  inputFiles: [
+    'test-client.js',
+    'test-session.js',
+    'head.min.js',
+    'benchmark.js',
+    'rsvp.js',
+    'people.js'
+  ],
   outputFile: '/assets/test-client.js'
 });
 
@@ -37,9 +43,20 @@ var vendorJs = concat(mergeTrees(findBowerTrees()), {
   outputFile: '/assets/vendor.js'
 });
 
-var appJs = concat(mergeTrees(['app', 'ember', 'test-client', mergeTrees(findBowerTrees())]), {
-  inputFiles: ['jquery-2.1.1.min.js', 'handlebars-v1.3.0.js', '1.8.1.js', 'ascii-table.js', 'app.js', 'test-session.js'],
-  outputFile: '/assets/app.js'
+var appJs = concat(mergeTrees([
+  'app',
+  'ember',
+  'test-client',
+  mergeTrees(findBowerTrees())]), {
+    inputFiles: [
+      'jquery-2.1.1.min.js',
+      'handlebars-v1.3.0.js',
+      '1.8.1.js',
+      'ascii-table.js',
+      'app.js',
+      'test-session.js'
+    ],
+    outputFile: '/assets/app.js'
 });
 
 var appCss = compileSass(['app/styles'], 'app.scss', 'assets/app.css');
@@ -56,4 +73,13 @@ if (env === 'production') {
   appCss = cleanCSS(appCss);
 }
 
-module.exports = mergeTrees([appAndDependencies, appJs, appCss, vendorJs, vendorCss, testClient, testTree, emberTree]);
+module.exports = mergeTrees([
+  appAndDependencies,
+  appJs,
+  appCss,
+  vendorJs,
+  vendorCss,
+  testClient,
+  testTree,
+  emberTree
+]);
