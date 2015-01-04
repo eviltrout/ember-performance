@@ -58,7 +58,7 @@
       }
 
       // We can start once the index is rendered
-      return new Ember.RSVP.Promise(function(resolve) {
+      return new RSVP.Promise(function(resolve) {
         App.IndexView = Ember.ContainerView.extend({
           _triggerStart: function() {
             ContainerView = this;
@@ -71,16 +71,18 @@
     reset: function() {
       if (view) { ContainerView.removeObject(view); }
 
-      return new Ember.RSVP.Promise(function(resolve) {
-        Ember.run.next(resolve);
+      return new RSVP.Promise(function(resolve) {
+        setTimeout(resolve, 10);
       });
     },
 
     test: function() {
-      return new Ember.RSVP.Promise(function(resolve) {
-        view = ViewClass.create({ listItems: listItems });
-        view.on('didInsertElement', resolve);
-        ContainerView.addObject(view);
+      return new RSVP.Promise(function(resolve) {
+        Ember.run(function() {
+          view = ViewClass.create({ listItems: listItems });
+          view.on('didInsertElement', resolve);
+          ContainerView.addObject(view);
+        });
       });
     }
   });

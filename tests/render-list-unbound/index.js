@@ -27,7 +27,7 @@
         template: Ember.Handlebars.compile(template)
       });
 
-      return new Ember.RSVP.Promise(function(resolve) {
+      return new RSVP.Promise(function(resolve) {
         App.IndexView = Ember.ContainerView.extend({
           _triggerStart: function() {
             ContainerView = this;
@@ -46,10 +46,12 @@
     },
 
     test: function() {
-      return new Ember.RSVP.Promise(function(resolve) {
-        view = ViewClass.create({ people: TestClient.PEOPLE_JSON });
-        view.on('didInsertElement', resolve);
-        ContainerView.addObject(view);
+      return new RSVP.Promise(function(resolve) {
+        Ember.run(function() {
+          view = ViewClass.create({ people: TestClient.PEOPLE_JSON });
+          view.on('didInsertElement', resolve);
+          ContainerView.addObject(view);
+        });
       });
     }
   });
