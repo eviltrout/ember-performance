@@ -4,11 +4,10 @@
   "author": "Robin Ward",
   "license": "MIT",
   "scripts": {
-    "start": "broccoli serve",
+    "start": "ember server",
     "postinstall": "bower install"
   },
   "devDependencies": {
-    "broccoli": "^0.13.3",
     "broccoli-bower": "^0.2.1",
     "broccoli-clean-css": "^0.3.0",
     "broccoli-concat": "0.0.12",
