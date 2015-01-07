@@ -11,6 +11,7 @@ var env = require('broccoli-env').getEnv();
 var stew = require('broccoli-stew');
 var find = stew.find;
 var rename = stew.rename;
+var env = stew.env;
 
 var appAndDependencies = rename(find('app/*.html'), 'app/', '');
 var emberTree = find('ember/**/*.js');
@@ -66,12 +67,12 @@ var vendorCss = concat(mergeTrees(findBowerTrees()), {
   outputFile: '/assets/vendor.css'
 });
 
-if (env === 'production') {
+env('production', function() {
   vendorJs = uglifyJavaScript(vendorJs);
   testClient = uglifyJavaScript(testClient);
   vendorCss = cleanCSS(vendorCss);
   appCss = cleanCSS(appCss);
-}
+});
 
 module.exports = mergeTrees([
   appAndDependencies,
