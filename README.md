@@ -27,15 +27,18 @@ using a custom build.
 ### To run in development mode
 
 1. `npm install`
-2. `npm start`
+2. `npm install -g bower`
+3. `bower install`
+4. `npm start`
 
 And open a browser to http://localhost:4200
 
 ### To build for production mode
 
 1. `npm install`
-2. `bower install`
-3. `broccoli build dist`
+2. `npm install -g bower`
+3. `bower install`
+4. `broccoli build dist`
 
 The compiled version will be in your `dist` folder
 
