@@ -20,7 +20,7 @@ function assert(assertion, message) {
   throw new Error(message);
 }
 
-MicroTestClient.run({
+TestClient.run({
   name: 'link-to get(\'active\')',
 
   setup: function() {

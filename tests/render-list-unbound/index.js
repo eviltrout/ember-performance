@@ -1,4 +1,4 @@
-/* global TestClient */
+/* global TestClient, RSVP */
 (function() {
 
   var ContainerView, ViewClass, view;
@@ -24,7 +24,7 @@
       var App = Ember.Application.create({ rootElement: '#scratch' });
 
       ViewClass = Ember.View.extend({
-        template: Ember.Handlebars.compile(template)
+        template: this.compile(template)
       });
 
       return new RSVP.Promise(function(resolve) {

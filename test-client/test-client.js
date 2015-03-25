@@ -30,7 +30,7 @@
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
     var results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-  };
+  }
 
   // Use benchmark.js to run a microbenchmark
   function microBenchmark(test) {
@@ -75,7 +75,7 @@
 
   // Run a macro benchmark until our error threshold is low or our
   // MACRO_MAX_TIME expires
-  function macroBenchmark(t, testItem) {
+  function macroBenchmark(t) {
     return new RSVP.Promise(function(resolve) {
       update('status-text', "Running Benchmark...");
 
@@ -145,9 +145,9 @@
     this.name = test.name;
     this.options = test;
 
-    this.setup = test.setup || function() { };
-    this.reset = test.reset || function() { }; // remove this in-favour of teardown
-    this.test  = test.test  || function() { };
+    this.setup = test.setup || K;
+    this.reset = test.reset || K; // remove this in-favour of teardown
+    this.test  = test.test  || K;
     this.teardown = test.teardown || function() { };
 
     this.noEmber = test.noEmber;
@@ -188,11 +188,11 @@
               console.profileEnd();
               resolve({ skipRedirect: true });
             });
-          }  else {
+          } else {
             console.profile(test.name);
             resolve({ skipRedirect: true });
-          };
-        }
+          }
+        };
 
         if (resetPromise && resetPromise.then) {
           resetPromise.then(function() {
@@ -280,6 +280,10 @@
           test.session.emberVersion = Ember.VERSION;
         }
 
+        if (window.Ember) {
+          test.compile = Ember.HTMLBars ? Ember.HTMLBars.compile : Ember.Handlebars.compile;
+        }
+
         RSVP.Promise.resolve(test.setup()).then(function() {
           return test.run();
         }).then(complete).catch(function(error) {
@@ -306,7 +310,7 @@
   MicroTestClient.prototype = Object.create(TestClient.prototype);
   MicroTestClient.prototype.run = function() {
     return microBenchmark(this);
-  }
+  };
 
   MicroTestClient.prototype.profile = function() {
     var setup = functionToString(this.setup);
@@ -330,12 +334,12 @@
         });
       }, 10);
     });
-  }
+  };
 
   window.MicroTestClient = MicroTestClient;
 
-  function buildProfileClient(klass, test) {
-    var runner = new klass(test);
+  function buildProfileClient(Klass, test) {
+    var runner = new Klass(test);
     runner.run = runner.profile;
     return runner;
   }

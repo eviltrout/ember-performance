@@ -1,4 +1,4 @@
-/* globals TestSession, AsciiTable */
+/* globals TestSession, AsciiTable, jQuery */
 (function() {
 
   // TODO: get from package.json
@@ -16,7 +16,9 @@
 
     { name: 'Ember.run',                 path: '/ember-run' },
 
-    { name: 'link-to get(\'active\')',   path: '/link-to/active' },
+    // this test is broken in 1.11 beta
+    // { name: 'link-to get(\'active\')',   path: '/link-to/active' },
+
     { name: 'link-to get(\'create\')',   path: '/link-to/create' },
 
     { name: 'object-create/view',        path: '/object-create/view'   },
@@ -34,9 +36,9 @@
   ];
 
   var EMBER_VERSIONS = [
+    { name: '1.11.0-beta.5',             path: '/ember/1.11.0-beta.5.js',          compilerPath: '/ember/ember-template-compiler-1.11.0-beta.5.js' },
+    { name: '1.10.0',                    path: '/ember/1.10.0.js',                 compilerPath: '/ember/ember-template-compiler-1.10.0.js' },
     { name: '1.9.1',                     path: '/ember/ember.prod-1.9.1.js',       compilerPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.10.0-beta.3',             path: '/ember/1.10.0-beta.3.js',          compilerPath: '/ember/ember-template-compiler-1.10.0-beta.3.js' },
-    { name: '1.9.0-beta.3',              path: '/ember/1.9.0-beta.3.js',           compilerPath: '/ember/handlebars-v2.0.0.js'},
     { name: '1.8.1',                     path: '/ember/1.8.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'},
     { name: '1.7.1',                     path: '/ember/1.7.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'}
   ];
@@ -240,7 +242,7 @@
   });
 
   Ember.Handlebars.registerBoundHelper('fmt-number', function(num) {
-    return window.numeral(num).format('0,0.00')
+    return window.numeral(num).format('0,0.00');
   });
 
   App.IndexRoute = Ember.Route.extend({

@@ -1,4 +1,4 @@
-/* global TestClient */
+/* global TestClient, RSVP */
 (function() {
 
   // TODO: Make these load from .hbs files
@@ -21,6 +21,7 @@
 
   var nestedComponent = "a: {{a}}";
 
+
   var ContainerView, ViewClass, view, listItems;
   TestClient.run({
     name: 'Render Complex List',
@@ -28,9 +29,9 @@
     setup: function() {
       var App = Ember.Application.create({ rootElement: '#scratch' });
 
-      Ember.TEMPLATES['complexItems'] = Ember.Handlebars.compile(complexTemplate);
-      Ember.TEMPLATES['components/component-render'] = Ember.Handlebars.compile(component);
-      Ember.TEMPLATES['components/nested-component'] = Ember.Handlebars.compile(nestedComponent);
+      Ember.TEMPLATES['complexItems'] = this.compile(complexTemplate);
+      Ember.TEMPLATES['components/component-render'] = this.compile(component);
+      Ember.TEMPLATES['components/nested-component'] = this.compile(nestedComponent);
 
       ViewClass = Ember.View.extend({
         templateName: 'complexItems'

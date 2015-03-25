@@ -26,7 +26,7 @@
       var App = Ember.Application.create({ rootElement: '#scratch' });
 
       ViewClass = Ember.View.extend({
-        template: Ember.Handlebars.compile(template)
+        template: this.compile(template)
       });
 
       return new Ember.RSVP.Promise(function(resolve) {
