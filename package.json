@@ -15,7 +15,7 @@
     "broccoli-filter": "^0.1.10",
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-sane-watcher": "^0.1.0",
-    "broccoli-sass": "^0.3.3",
+    "broccoli-sass": "^0.6.2",
     "broccoli-static-compiler": "^0.2.1",
     "broccoli-uglify-js": "^0.1.3",
     "ember-cli": "^0.1.5",
