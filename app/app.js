@@ -2,7 +2,7 @@
 (function() {
 
   // TODO: get from package.json
-  var EMBER_PERF_VERSION = "0.9.1";
+  var EMBER_PERF_VERSION = "0.9.2";
 
   // TODO: Populate this automatically from the test definitions
   var TEST_LIST = [
