@@ -5,11 +5,7 @@
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
-<<<<<<< HEAD
- * @version   1.11.0-beta.5.9e711066
-=======
- * @version   1.11.0-beta.5.56704cfc
->>>>>>> Update ember builds, add render-bind-attr
+ * @version   1.11.0-beta.1+canary.04ce7a14
  */
 
 (function() {
@@ -137,11 +133,7 @@ enifed('ember-metal/core', ['exports'], function (exports) {
 
     @class Ember
     @static
-<<<<<<< HEAD
-    @version 1.11.0-beta.5.9e711066
-=======
-    @version 1.11.0-beta.5.56704cfc
->>>>>>> Update ember builds, add render-bind-attr
+    @version 1.11.0-beta.1+canary.04ce7a14
   */
 
   if ('undefined' === typeof Ember) {
@@ -169,17 +161,10 @@ enifed('ember-metal/core', ['exports'], function (exports) {
   /**
     @property VERSION
     @type String
-<<<<<<< HEAD
-    @default '1.11.0-beta.5.9e711066'
+    @default '1.11.0-beta.1+canary.04ce7a14'
     @static
   */
-  Ember.VERSION = '1.11.0-beta.5.9e711066';
-=======
-    @default '1.11.0-beta.5.56704cfc'
-    @static
-  */
-  Ember.VERSION = '1.11.0-beta.5.56704cfc';
->>>>>>> Update ember builds, add render-bind-attr
+  Ember.VERSION = '1.11.0-beta.1+canary.04ce7a14';
 
   /**
     Standard environmental variables. You can define these in a global `EmberENV`
@@ -224,7 +209,7 @@ enifed('ember-metal/core', ['exports'], function (exports) {
   Ember.FEATURES = Ember.ENV.FEATURES;
 
   if (!Ember.FEATURES) {
-    Ember.FEATURES = {"features-stripped-test":false,"ember-routing-named-substates":true,"mandatory-setter":true,"ember-htmlbars-component-generation":false,"ember-htmlbars-component-helper":true,"ember-htmlbars-inline-if-helper":true,"ember-htmlbars-attribute-syntax":true,"ember-routing-transitioning-classes":true,"new-computed-syntax":false,"ember-testing-checkbox-helpers":false,"ember-metal-stream":false,"ember-htmlbars-each-with-index":true,"ember-application-instance-initializers":false,"ember-application-initializer-context":false,"ember-router-willtransition":true,"ember-application-visit":false}; //jshint ignore:line
+    Ember.FEATURES = {"features-stripped-test":null,"ember-routing-named-substates":true,"ember-metal-injected-properties":true,"mandatory-setter":true,"ember-htmlbars":true,"ember-htmlbars-block-params":true,"ember-htmlbars-component-generation":null,"ember-htmlbars-component-helper":true,"ember-htmlbars-inline-if-helper":true,"ember-htmlbars-attribute-syntax":true,"ember-routing-transitioning-classes":true,"new-computed-syntax":null,"ember-testing-checkbox-helpers":null,"ember-metal-stream":null,"ember-htmlbars-each-with-index":true,"ember-application-instance-initializers":null,"ember-application-initializer-context":null,"ember-router-willtransition":true,"ember-application-visit":null}; //jshint ignore:line
   }
 
   /**
@@ -360,7 +345,7 @@ enifed('ember-template-compiler/compat', ['ember-metal/core', 'ember-template-co
 	EmberHandlebars.template = template['default'];
 
 });
-enifed('ember-template-compiler/compat/precompile', ['exports', 'ember-template-compiler/system/compile_options'], function (exports, compileOptions) {
+enifed('ember-template-compiler/compat/precompile', ['exports'], function (exports) {
 
   'use strict';
 
@@ -368,6 +353,7 @@ enifed('ember-template-compiler/compat/precompile', ['exports', 'ember-template-
   @module ember
   @submodule ember-template-compiler
   */
+
   var compile, compileSpec;
 
   exports['default'] = function(string) {
@@ -385,7 +371,7 @@ enifed('ember-template-compiler/compat/precompile', ['exports', 'ember-template-
     var asObject = arguments[1] === undefined ? true : arguments[1];
     var compileFunc = asObject ? compile : compileSpec;
 
-    return compileFunc(string, compileOptions['default']());
+    return compileFunc(string);
   }
 
 });
@@ -608,14 +594,11 @@ enifed('ember-template-compiler/system/compile_options', ['exports', 'ember-meta
 
   exports['default'] = function() {
     var disableComponentGeneration = true;
-    
-    return {
-<<<<<<< HEAD
-      revision: 'Ember@1.11.0-beta.5.9e711066',
-=======
-      revision: 'Ember@1.11.0-beta.5.56704cfc',
->>>>>>> Update ember builds, add render-bind-attr
+    if (Ember['default'].FEATURES.isEnabled('ember-htmlbars-component-generation')) {
+      disableComponentGeneration = false;
+    }
 
+    return {
       disableComponentGeneration: disableComponentGeneration,
 
       plugins: plugins['default']
@@ -688,12 +671,10 @@ enifed("htmlbars-compiler",
   function(__dependency1__, __exports__) {
     "use strict";
     var compile = __dependency1__.compile;
-    var compileSpec = __dependency1__.compileSpec;
-    var template = __dependency1__.template;
+    var compilerSpec = __dependency1__.compilerSpec;
 
     __exports__.compile = compile;
-    __exports__.compileSpec = compileSpec;
-    __exports__.template = template;
+    __exports__.compilerSpec = compilerSpec;
   });
 enifed("htmlbars-compiler/compiler",
   ["../htmlbars-syntax/parser","./template-compiler","exports"],
@@ -704,37 +685,6 @@ enifed("htmlbars-compiler/compiler",
     var TemplateCompiler = __dependency2__["default"];
 
     /*
-     * Compile a string into a template spec string. The template spec is a string
-     * representation of a template. Usually, you would use compileSpec for
-     * pre-compilation of a template on the server.
-     *
-     * Example usage:
-     *
-     *     var templateSpec = compileSpec("Howdy {{name}}");
-     *     // This next step is basically what plain compile does
-     *     var template = new Function("return " + templateSpec)();
-     *
-     * @method compileSpec
-     * @param {String} string An HTMLBars template string
-     * @return {TemplateSpec} A template spec string
-     */
-    function compileSpec(string, options) {
-      var ast = preprocess(string, options);
-      var compiler = new TemplateCompiler(options);
-      var program = compiler.compile(ast);
-      return program;
-    }
-
-    __exports__.compileSpec = compileSpec;/*
-     * @method template
-     * @param {TemplateSpec} templateSpec A precompiled template
-     * @return {Template} A template spec string
-     */
-    function template(templateSpec) {
-      return new Function("return " + templateSpec)();
-    }
-
-    __exports__.template = template;/*
      * Compile a string into a template rendering function
      *
      * Example usage:
@@ -761,12 +711,13 @@ enifed("htmlbars-compiler/compiler",
      *     var domFragment = template(context, env, contextualElement);
      *
      * @method compile
-     * @param {String} string An HTMLBars template string
+     * @param {String} string An htmlbars template string
      * @param {Object} options A set of options to provide to the compiler
-     * @return {Template} A function for rendering the template
+     * @return {Function} A function for rendering the template
      */
     function compile(string, options) {
-      return template(compileSpec(string, options));
+      var program = compileSpec(string, options);
+      return new Function("return " + program)();
     }
 
     __exports__.compile = compile;/*
@@ -791,11 +742,7 @@ enifed("htmlbars-compiler/compiler",
       return program;
     }
 
-    __exports__.compileSpec = compileSpec;function template(program) {
-      return new Function("return " + program)();
-    }
-
-    __exports__.template = template;
+    __exports__.compileSpec = compileSpec;
   });
 enifed("htmlbars-compiler/fragment-javascript-compiler",
   ["./utils","../htmlbars-util/quoting","exports"],
@@ -928,14 +875,14 @@ enifed("htmlbars-compiler/fragment-opcode-compiler",
       this.opcodes.push([type, params]);
     };
 
-    FragmentOpcodeCompiler.prototype.text = function(text) {
+    FragmentOpcodeCompiler.prototype.text = function(text, childIndex, childCount, isSingleRoot) {
       this.opcode('createText', [text.chars]);
-      this.opcode('appendChild');
+      if (!isSingleRoot) { this.opcode('appendChild'); }
     };
 
-    FragmentOpcodeCompiler.prototype.comment = function(comment) {
+    FragmentOpcodeCompiler.prototype.comment = function(comment, childIndex, childCount, isSingleRoot) {
       this.opcode('createComment', [comment.value]);
-      this.opcode('appendChild');
+      if (!isSingleRoot) { this.opcode('appendChild'); }
     };
 
     FragmentOpcodeCompiler.prototype.openElement = function(element) {
@@ -943,39 +890,32 @@ enifed("htmlbars-compiler/fragment-opcode-compiler",
       forEach(element.attributes, this.attribute, this);
     };
 
-    FragmentOpcodeCompiler.prototype.closeElement = function() {
-      this.opcode('appendChild');
+    FragmentOpcodeCompiler.prototype.closeElement = function(element, childIndex, childCount, isSingleRoot) {
+      if (!isSingleRoot) { this.opcode('appendChild'); }
     };
 
-    FragmentOpcodeCompiler.prototype.startProgram = function() {
+    FragmentOpcodeCompiler.prototype.startProgram = function(program) {
       this.opcodes.length = 0;
-      this.opcode('createFragment');
+      if (program.body.length !== 1) {
+        this.opcode('createFragment');
+      }
     };
 
-    FragmentOpcodeCompiler.prototype.endProgram = function() {
+    FragmentOpcodeCompiler.prototype.endProgram = function(/* program */) {
       this.opcode('returnNode');
     };
 
-    FragmentOpcodeCompiler.prototype.mustache = function() {
-      this.pushMorphPlaceholderNode();
-    };
+    FragmentOpcodeCompiler.prototype.mustache = function () {};
 
-    FragmentOpcodeCompiler.prototype.component = function() {
-      this.pushMorphPlaceholderNode();
-    };
+    FragmentOpcodeCompiler.prototype.component = function () {};
 
-    FragmentOpcodeCompiler.prototype.block = function() {
-      this.pushMorphPlaceholderNode();
-    };
-
-    FragmentOpcodeCompiler.prototype.pushMorphPlaceholderNode = function() {
-      this.opcode('createComment', [""]);
-      this.opcode('appendChild');
-    };
+    FragmentOpcodeCompiler.prototype.block = function () {};
 
     FragmentOpcodeCompiler.prototype.attribute = function(attr) {
       if (attr.value.type === 'TextNode') {
+
         var namespace = getAttrNamespace(attr.name);
+
         this.opcode('setAttribute', [attr.name, attr.value.chars, namespace]);
       }
     };
@@ -1018,18 +958,8 @@ enifed("htmlbars-compiler/hydration-javascript-compiler",
       this.parentCount = 0;
       this.indent = (options && options.indent) || "";
       this.hooks = {};
-      this.hasOpenBoundary = false;
-      this.hasCloseBoundary = false;
 
       processOpcodes(this, opcodes);
-
-      if (this.hasOpenBoundary) {
-        this.source.unshift(this.indent+"  dom.insertBoundary(fragment, 0);\n");
-      }
-
-      if (this.hasCloseBoundary) {
-        this.source.unshift(this.indent+"  dom.insertBoundary(fragment, null);\n");
-      }
 
       var i, l;
       if (this.morphs.length) {
@@ -1074,14 +1004,6 @@ enifed("htmlbars-compiler/hydration-javascript-compiler",
 
     prototype.pushRaw = function(value) {
       this.stack.push(value);
-    };
-
-    prototype.openBoundary = function() {
-      this.hasOpenBoundary = true;
-    };
-
-    prototype.closeBoundary = function() {
-      this.hasCloseBoundary = true;
     };
 
     prototype.pushLiteral = function(value) {
@@ -1342,32 +1264,33 @@ enifed("htmlbars-compiler/hydration-opcode-compiler",
       }
     };
 
-    HydrationOpcodeCompiler.prototype.endProgram = function() {
+    HydrationOpcodeCompiler.prototype.endProgram = function(/* program */) {
       distributeMorphs(this.morphs, this.opcodes);
     };
 
-    HydrationOpcodeCompiler.prototype.text = function() {
+    HydrationOpcodeCompiler.prototype.text = function(/* string, pos, len */) {
       ++this.currentDOMChildIndex;
     };
 
-    HydrationOpcodeCompiler.prototype.comment = function() {
+    HydrationOpcodeCompiler.prototype.comment = function(/* string, pos, len */) {
       ++this.currentDOMChildIndex;
     };
 
-    HydrationOpcodeCompiler.prototype.openElement = function(element, pos, len, mustacheCount, blankChildTextNodes) {
+    HydrationOpcodeCompiler.prototype.openElement = function(element, pos, len, isSingleRoot, mustacheCount, blankChildTextNodes) {
       distributeMorphs(this.morphs, this.opcodes);
       ++this.currentDOMChildIndex;
 
       this.element = this.currentDOMChildIndex;
 
-      this.opcode('consumeParent', this.currentDOMChildIndex);
+      if (!isSingleRoot) {
+        this.opcode('consumeParent', this.currentDOMChildIndex);
 
-      // If our parent reference will be used more than once, cache its reference.
-      if (mustacheCount > 1) {
-        this.opcode('shareElement', ++this.elementNum);
-        this.element = null; // Set element to null so we don't cache it twice
+        // If our parent reference will be used more than once, cache its reference.
+        if (mustacheCount > 1) {
+          this.opcode('shareElement', ++this.elementNum);
+          this.element = null; // Set element to null so we don't cache it twice
+        }
       }
-
       var isElementChecked = detectIsElementChecked(element);
       if (blankChildTextNodes.length > 0 || isElementChecked) {
         this.opcode( 'repairClonedNode',
@@ -1382,39 +1305,20 @@ enifed("htmlbars-compiler/hydration-opcode-compiler",
       forEach(element.helpers, this.elementHelper, this);
     };
 
-    HydrationOpcodeCompiler.prototype.closeElement = function() {
+    HydrationOpcodeCompiler.prototype.closeElement = function(element, pos, len, isSingleRoot) {
       distributeMorphs(this.morphs, this.opcodes);
-      this.opcode('popParent');
+      if (!isSingleRoot) { this.opcode('popParent'); }
       this.currentDOMChildIndex = this.paths.pop();
     };
 
-    HydrationOpcodeCompiler.prototype.mustache = function(mustache, childIndex, childCount) {
-      this.pushMorphPlaceholderNode(childIndex, childCount);
-      
-      var sexpr = mustache.sexpr;
-
-      var morphNum = this.morphNum++;
-      var start = this.currentDOMChildIndex;
-      var end = this.currentDOMChildIndex;
-      this.morphs.push([morphNum, this.paths.slice(), start, end, mustache.escaped]);
-
-      if (isHelper(sexpr)) {
-        prepareSexpr(this, sexpr);
-        this.opcode('printInlineHook', morphNum);
-      } else {
-        preparePath(this, sexpr.path);
-        this.opcode('printContentHook', morphNum);
-      }
-    };
-
-    HydrationOpcodeCompiler.prototype.block = function(block, childIndex, childCount) {
-      this.pushMorphPlaceholderNode(childIndex, childCount);
-
+    HydrationOpcodeCompiler.prototype.block = function(block, childIndex, childrenLength) {
       var sexpr = block.sexpr;
 
+      var currentDOMChildIndex = this.currentDOMChildIndex;
+      var start = (currentDOMChildIndex < 0) ? null : currentDOMChildIndex;
+      var end = (childIndex === childrenLength - 1) ? null : currentDOMChildIndex + 1;
+
       var morphNum = this.morphNum++;
-      var start = this.currentDOMChildIndex;
-      var end = this.currentDOMChildIndex;
       this.morphs.push([morphNum, this.paths.slice(), start, end, true]);
 
       var templateId = this.templateId++;
@@ -1424,15 +1328,15 @@ enifed("htmlbars-compiler/hydration-opcode-compiler",
       this.opcode('printBlockHook', morphNum, templateId, inverseId);
     };
 
-    HydrationOpcodeCompiler.prototype.component = function(component, childIndex, childCount) {
-      this.pushMorphPlaceholderNode(childIndex, childCount);
-
+    HydrationOpcodeCompiler.prototype.component = function(component, childIndex, childrenLength) {
+      var currentDOMChildIndex = this.currentDOMChildIndex;
       var program = component.program || {};
       var blockParams = program.blockParams || [];
 
+      var start = (currentDOMChildIndex < 0 ? null : currentDOMChildIndex),
+          end = (childIndex === childrenLength - 1 ? null : currentDOMChildIndex + 1);
+
       var morphNum = this.morphNum++;
-      var start = this.currentDOMChildIndex;
-      var end = this.currentDOMChildIndex;
       this.morphs.push([morphNum, this.paths.slice(), start, end, true]);
 
       var attrs = component.attributes;
@@ -1498,16 +1402,23 @@ enifed("htmlbars-compiler/hydration-opcode-compiler",
       this.opcode('printElementHook', this.elementNum);
     };
 
-    HydrationOpcodeCompiler.prototype.pushMorphPlaceholderNode = function(childIndex, childCount) {
-      if (this.paths.length === 0) {
-        if (childIndex === 0) {
-          this.opcode('openBoundary');
-        }
-        if (childIndex === childCount - 1) {
-          this.opcode('closeBoundary');
-        }
+    HydrationOpcodeCompiler.prototype.mustache = function(mustache, childIndex, childrenLength) {
+      var sexpr = mustache.sexpr;
+      var currentDOMChildIndex = this.currentDOMChildIndex;
+
+      var start = currentDOMChildIndex,
+          end = (childIndex === childrenLength - 1 ? -1 : currentDOMChildIndex + 1);
+
+      var morphNum = this.morphNum++;
+      this.morphs.push([morphNum, this.paths.slice(), start, end, mustache.escaped]);
+
+      if (isHelper(sexpr)) {
+        prepareSexpr(this, sexpr);
+        this.opcode('printInlineHook', morphNum);
+      } else {
+        preparePath(this, sexpr.path);
+        this.opcode('printContentHook', morphNum);
       }
-      this.comment();
     };
 
     HydrationOpcodeCompiler.prototype.SubExpression = function(sexpr) {
@@ -1600,7 +1511,6 @@ enifed("htmlbars-compiler/template-compiler",
 
     function TemplateCompiler(options) {
       this.options = options || {};
-      this.revision = this.options.revision || "HTMLBars@v0.11.1";
       this.fragmentOpcodeCompiler = new FragmentOpcodeCompiler();
       this.fragmentCompiler = new FragmentJavaScriptCompiler();
       this.hydrationOpcodeCompiler = new HydrationOpcodeCompiler();
@@ -1686,7 +1596,6 @@ enifed("htmlbars-compiler/template-compiler",
         this.getChildTemplateVars(indent + '  ') +
         indent+'  return {\n' +
         indent+'    isHTMLBars: true,\n' +
-        indent+'    revision: "' + this.revision + '",\n' +
         indent+'    blockParams: ' + blockParams.length + ',\n' +
         indent+'    cachedFragment: null,\n' +
         indent+'    hasRendered: false,\n' +
@@ -1730,14 +1639,14 @@ enifed("htmlbars-compiler/template-compiler",
       this.hydrationOpcodeCompiler.closeElement(element, i, l, r);
     };
 
-    TemplateCompiler.prototype.component = function(component, i, l, s) {
-      this.fragmentOpcodeCompiler.component(component, i, l, s);
-      this.hydrationOpcodeCompiler.component(component, i, l, s);
+    TemplateCompiler.prototype.component = function(component, i, l) {
+      this.fragmentOpcodeCompiler.component(component, i, l);
+      this.hydrationOpcodeCompiler.component(component, i, l);
     };
 
-    TemplateCompiler.prototype.block = function(block, i, l, s) {
-      this.fragmentOpcodeCompiler.block(block, i, l, s);
-      this.hydrationOpcodeCompiler.block(block, i, l, s);
+    TemplateCompiler.prototype.block = function(block, i, l) {
+      this.fragmentOpcodeCompiler.block(block, i, l);
+      this.hydrationOpcodeCompiler.block(block, i, l);
     };
 
     TemplateCompiler.prototype.text = function(string, i, l, r) {
@@ -1750,9 +1659,9 @@ enifed("htmlbars-compiler/template-compiler",
       this.hydrationOpcodeCompiler.comment(string, i, l, r);
     };
 
-    TemplateCompiler.prototype.mustache = function (mustache, i, l, s) {
-      this.fragmentOpcodeCompiler.mustache(mustache, i, l, s);
-      this.hydrationOpcodeCompiler.mustache(mustache, i, l, s);
+    TemplateCompiler.prototype.mustache = function (mustache, i, l) {
+      this.fragmentOpcodeCompiler.mustache(mustache, i, l);
+      this.hydrationOpcodeCompiler.mustache(mustache, i, l);
     };
 
     TemplateCompiler.prototype.setNamespace = function(namespace) {
@@ -1870,6 +1779,7 @@ enifed("htmlbars-compiler/template-visitor",
     TemplateVisitor.prototype.ElementNode = function(element) {
       var parentFrame = this.getCurrentFrame();
       var elementFrame = this.pushFrame();
+      var parentNode = parentFrame.parentNode;
 
       elementFrame.parentNode = element;
       elementFrame.children = element.children;
@@ -1880,7 +1790,8 @@ enifed("htmlbars-compiler/template-visitor",
       var actionArgs = [
         element,
         parentFrame.childIndex,
-        parentFrame.childCount
+        parentFrame.childCount,
+        parentNode.type === 'Program' && parentFrame.childCount === 1
       ];
 
       elementFrame.actions.push(['closeElement', actionArgs]);
@@ -1912,10 +1823,11 @@ enifed("htmlbars-compiler/template-visitor",
 
     TemplateVisitor.prototype.TextNode = function(text) {
       var frame = this.getCurrentFrame();
+      var isSingleRoot = frame.parentNode.type === 'Program' && frame.childCount === 1;
       if (text.chars === '') {
         frame.blankChildTextNodes.push(domIndexOf(frame.children, text));
       }
-      frame.actions.push(['text', [text, frame.childIndex, frame.childCount]]);
+      frame.actions.push(['text', [text, frame.childIndex, frame.childCount, isSingleRoot]]);
     };
 
     TemplateVisitor.prototype.BlockStatement = function(node) {
@@ -1946,7 +1858,9 @@ enifed("htmlbars-compiler/template-visitor",
 
     TemplateVisitor.prototype.CommentStatement = function(text) {
       var frame = this.getCurrentFrame();
-      frame.actions.push(['comment', [text, frame.childIndex, frame.childCount]]);
+      var isSingleRoot = frame.parentNode.type === 'Program' && frame.childCount === 1;
+
+      frame.actions.push(['comment', [text, frame.childIndex, frame.childCount, isSingleRoot]]);
     };
 
     TemplateVisitor.prototype.MustacheStatement = function(mustache) {
@@ -2013,159 +1927,6 @@ enifed("htmlbars-compiler/utils",
     }
 
     __exports__.processOpcodes = processOpcodes;
-  });
-enifed("htmlbars-runtime",
-  ["htmlbars-runtime/hooks","htmlbars-runtime/helpers","exports"],
-  function(__dependency1__, __dependency2__, __exports__) {
-    "use strict";
-    var hooks = __dependency1__["default"];
-    var helpers = __dependency2__["default"];
-
-    __exports__.hooks = hooks;
-    __exports__.helpers = helpers;
-  });
-enifed("htmlbars-runtime/helpers",
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    function partial(params, hash, options, env) {
-      var template = env.partials[params[0]];
-      return template.render(this, env, options.morph.contextualElement);
-    }
-
-    __exports__.partial = partial;__exports__["default"] = {
-      partial: partial
-    };
-  });
-enifed("htmlbars-runtime/hooks",
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    function block(env, morph, context, path, params, hash, template, inverse) {
-      var options = {
-        morph: morph,
-        template: template,
-        inverse: inverse
-      };
-
-      var helper = lookupHelper(env, context, path);
-      var value = helper.call(context, params, hash, options, env);
-
-      morph.setContent(value);
-    }
-
-    __exports__.block = block;function inline(env, morph, context, path, params, hash) {
-      var helper = lookupHelper(env, context, path);
-      var value = helper.call(context, params, hash, { morph: morph }, env);
-
-      morph.setContent(value);
-    }
-
-    __exports__.inline = inline;function content(env, morph, context, path) {
-      var helper = lookupHelper(env, context, path);
-
-      var value;
-      if (helper) {
-        value = helper.call(context, [], {}, { morph: morph }, env);
-      } else {
-        value = get(env, context, path);
-      }
-
-      morph.setContent(value);
-    }
-
-    __exports__.content = content;function element(env, domElement, context, path, params, hash) {
-      var helper = lookupHelper(env, context, path);
-      if (helper) {
-        helper.call(context, params, hash, { element: domElement }, env);
-      }
-    }
-
-    __exports__.element = element;function attribute(env, attrMorph, domElement, name, value) {
-      attrMorph.setContent(value);
-    }
-
-    __exports__.attribute = attribute;function subexpr(env, context, helperName, params, hash) {
-      var helper = lookupHelper(env, context, helperName);
-      if (helper) {
-        return helper.call(context, params, hash, {}, env);
-      } else {
-        return get(env, context, helperName);
-      }
-    }
-
-    __exports__.subexpr = subexpr;function get(env, context, path) {
-      if (path === '') {
-        return context;
-      }
-
-      var keys = path.split('.');
-      var value = context;
-      for (var i = 0; i < keys.length; i++) {
-        if (value) {
-          value = value[keys[i]];
-        } else {
-          break;
-        }
-      }
-      return value;
-    }
-
-    __exports__.get = get;function set(env, context, name, value) {
-      context[name] = value;
-    }
-
-    __exports__.set = set;function component(env, morph, context, tagName, attrs, template) {
-      var helper = lookupHelper(env, context, tagName);
-
-      var value;
-      if (helper) {
-        var options = {
-          morph: morph,
-          template: template
-        };
-
-        value = helper.call(context, [], attrs, options, env);
-      } else {
-        value = componentFallback(env, morph, context, tagName, attrs, template);
-      }
-
-      morph.setContent(value);
-    }
-
-    __exports__.component = component;function concat(env, params) {
-      var value = "";
-      for (var i = 0, l = params.length; i < l; i++) {
-        value += params[i];
-      }
-      return value;
-    }
-
-    __exports__.concat = concat;function componentFallback(env, morph, context, tagName, attrs, template) {
-      var element = env.dom.createElement(tagName);
-      for (var name in attrs) {
-        element.setAttribute(name, attrs[name]);
-      }
-      element.appendChild(template.render(context, env, morph.contextualElement));
-      return element;
-    }
-
-    function lookupHelper(env, context, helperName) {
-      return env.helpers[helperName];
-    }
-
-    __exports__["default"] = {
-      content: content,
-      block: block,
-      inline: inline,
-      component: component,
-      element: element,
-      attribute: attribute,
-      subexpr: subexpr,
-      concat: concat,
-      get: get,
-      set: set
-    };
   });
 enifed("htmlbars-syntax",
   ["./htmlbars-syntax/walker","./htmlbars-syntax/builders","./htmlbars-syntax/parser","exports"],
@@ -3595,6 +3356,7 @@ enifed("htmlbars-syntax/node-handlers",
     var buildHash = __dependency1__.buildHash;
     var forEach = __dependency2__.forEach;
     var appendChild = __dependency3__.appendChild;
+    var postprocessProgram = __dependency3__.postprocessProgram;
 
     var nodeHandlers = {
 
@@ -3612,6 +3374,8 @@ enifed("htmlbars-syntax/node-handlers",
         }
 
         this.acceptToken(this.tokenizer.tokenizeEOF());
+
+        postprocessProgram(node);
 
         // Ensure that that the element stack is balanced properly.
         var poppedNode = this.elementStack.pop();
@@ -3868,6 +3632,7 @@ enifed("htmlbars-syntax/token-handlers",
     var buildText = __dependency2__.buildText;
     var appendChild = __dependency3__.appendChild;
     var parseComponentBlockParams = __dependency3__.parseComponentBlockParams;
+    var postprocessProgram = __dependency3__.postprocessProgram;
 
     // The HTML elements in this list are speced by
     // http://www.w3.org/TR/html-markup/syntax.html#syntax-elements,
@@ -3970,6 +3735,7 @@ enifed("htmlbars-syntax/token-handlers",
         } else {
           var program = buildProgram(element.children);
           parseComponentBlockParams(element, program);
+          postprocessProgram(program);
           var component = buildComponent(element.tag, element.attributes, program);
           appendChild(parent, component);
         }
@@ -4106,10 +3872,11 @@ enifed("htmlbars-syntax/tokenizer",
     __exports__.unwrapMustache = unwrapMustache;__exports__.Tokenizer = Tokenizer;
   });
 enifed("htmlbars-syntax/utils",
-  ["../htmlbars-util/array-utils","exports"],
-  function(__dependency1__, __exports__) {
+  ["./builders","../htmlbars-util/array-utils","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
-    var indexOfArray = __dependency1__.indexOfArray;
+    var buildText = __dependency1__.buildText;
+    var indexOfArray = __dependency2__.indexOfArray;
     // Regex to validate the identifier for block parameters. 
     // Based on the ID validation regex in Handlebars.
 
@@ -4156,7 +3923,26 @@ enifed("htmlbars-syntax/utils",
       }
     }
 
-    __exports__.parseComponentBlockParams = parseComponentBlockParams;function childrenFor(node) {
+    __exports__.parseComponentBlockParams = parseComponentBlockParams;// Adds an empty text node at the beginning and end of a program.
+    // The empty text nodes *between* nodes are handled elsewhere.
+
+    function postprocessProgram(program) {
+      var body = program.body;
+
+      if (body.length === 0) {
+        return;
+      }
+
+      if (usesMorph(body[0])) {
+        body.unshift(buildText(''));
+      }
+
+      if (usesMorph(body[body.length-1])) {
+        body.push(buildText(''));
+      }
+    }
+
+    __exports__.postprocessProgram = postprocessProgram;function childrenFor(node) {
       if (node.type === 'Program') {
         return node.body;
       }
@@ -4165,8 +3951,23 @@ enifed("htmlbars-syntax/utils",
       }
     }
 
-    __exports__.childrenFor = childrenFor;function appendChild(parent, node) {
-      childrenFor(parent).push(node);
+    __exports__.childrenFor = childrenFor;function usesMorph(node) {
+      return node.type === 'MustacheStatement' ||
+             node.type === 'BlockStatement' ||
+             node.type === 'ComponentNode';
+    }
+
+    __exports__.usesMorph = usesMorph;function appendChild(parent, node) {
+      var children = childrenFor(parent);
+
+      var len = children.length, last;
+      if (len > 0) {
+        last = children[len-1];
+        if (usesMorph(last) && usesMorph(node)) {
+          children.push(buildText(''));
+        }
+      }
+      children.push(node);
     }
 
     __exports__.appendChild = appendChild;function isHelper(sexpr) {

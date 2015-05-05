@@ -36,11 +36,39 @@
   ];
 
   var EMBER_VERSIONS = [
-    { name: '1.11.0-beta.5',             path: '/ember/1.11.0-beta.5.js',          compilerPath: '/ember/ember-template-compiler-1.11.0-beta.5.js' },
-    { name: '1.10.0',                    path: '/ember/1.10.0.js',                 compilerPath: '/ember/ember-template-compiler-1.10.0.js' },
-    { name: '1.9.1',                     path: '/ember/ember.prod-1.9.1.js',       compilerPath: '/ember/handlebars-v2.0.0.js'},
-    { name: '1.8.1',                     path: '/ember/1.8.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'},
-    { name: '1.7.1',                     path: '/ember/1.7.1.js',                  compilerPath: '/ember/handlebars-v1.3.0.js'}
+    { name: '1.9.1',
+      path: '/ember/ember.prod-1.9.1.js',
+      compilerPath: '/ember/handlebars-v2.0.0.js' },
+    { name: '1.10.0-beta.3',
+      path: '/ember/ember.prod-1.10-beta-3.js',
+      compilerPath: '/ember/ember-template-compiler-1.10.0-beta.3.js' },
+    { name: '1.10.0-beta.5',
+      path: '/ember/ember.prod-1.10-beta-5.js',
+      compilerPath: '/ember/ember-template-compiler-1.10.0-beta.5.js' },
+    { name: '1.10.0',
+      path: '/ember/ember.prod-1.10.js',
+      compilerPath: '/ember/ember-template-compiler-1.10.js' },
+    { name: '1.11.0-beta.1',
+      path: '/ember/ember.prod-1.11-beta-1.js',
+      compilerPath: '/ember/ember-template-compiler-1.11.0-beta.1.js' },
+    { name: '1.11.0-beta.1-attrnode',
+      path: '/ember/ember.prod-1.11-beta-1-attrnode.js',
+      compilerPath: '/ember/ember-template-compiler-1.11.0-beta.1-attrnode.js' },
+    { name: '1.11.0-beta.5',
+      path: '/ember/ember.prod-1.11-beta-5.js',
+      compilerPath: '/ember/ember-template-compiler-1.11.0-beta.5.js' },
+    { name: '1.13.0-alpha',
+      path: '/ember/ember.prod-1.13-alpha.js',
+      compilerPath: '/ember/ember-template-compiler-1.13.0-alpha.js' },
+    { name: '1.9.0-beta.3',
+      path: '/ember/1.9.0-beta.3.js',
+      compilerPath: '/ember/handlebars-v2.0.0.js' },
+    { name: '1.8.1',
+      path: '/ember/1.8.1.js',
+      compilerPath: '/ember/handlebars-v1.3.0.js' },
+    { name: '1.7.1',
+      path: '/ember/1.7.1.js',
+      compilerPath: '/ember/handlebars-v1.3.0.js' }
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to
