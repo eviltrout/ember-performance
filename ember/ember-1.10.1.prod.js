@@ -5,7 +5,7 @@
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
- * @version   1.10.0
+ * @version   1.10.1
  */
 
 (function() {
@@ -7336,7 +7336,7 @@ enifed("ember-htmlbars/helpers/yield",
       }
 
       
-      return view._yield(this, env, options.morph, params);
+      return view._yield(null, env, options.morph, params);
     }
 
     __exports__.yieldHelper = yieldHelper;
@@ -7968,7 +7968,7 @@ enifed("ember-htmlbars/templates/component",
     }());
      __exports__["default"] = template(t);
   });
-enifed("ember-htmlbars/templates/link-to-escaped",
+enifed("ember-htmlbars/templates/select-option",
   ["ember-template-compiler/system/template","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
@@ -8009,55 +8009,7 @@ enifed("ember-htmlbars/templates/link-to-escaped",
           }
           if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
           var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
-          content(env, morph0, context, "linkTitle");
-          return fragment;
-        }
-      };
-    }());
-     __exports__["default"] = template(t);
-  });
-enifed("ember-htmlbars/templates/link-to-unescaped",
-  ["ember-template-compiler/system/template","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var template = __dependency1__["default"];
-    var t = (function() {
-      return {
-        isHTMLBars: true,
-        blockParams: 0,
-        cachedFragment: null,
-        hasRendered: false,
-        build: function build(dom) {
-          var el0 = dom.createDocumentFragment();
-          var el1 = dom.createTextNode("");
-          dom.appendChild(el0, el1);
-          var el1 = dom.createTextNode("");
-          dom.appendChild(el0, el1);
-          return el0;
-        },
-        render: function render(context, env, contextualElement) {
-          var dom = env.dom;
-          var hooks = env.hooks, content = hooks.content;
-          dom.detectNamespace(contextualElement);
-          var fragment;
-          if (env.useFragmentCache && dom.canClone) {
-            if (this.cachedFragment === null) {
-              fragment = this.build(dom);
-              if (this.hasRendered) {
-                this.cachedFragment = fragment;
-              } else {
-                this.hasRendered = true;
-              }
-            }
-            if (this.cachedFragment) {
-              fragment = dom.cloneNode(this.cachedFragment, true);
-            }
-          } else {
-            fragment = this.build(dom);
-          }
-          if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
-          var morph0 = dom.createUnsafeMorphAt(fragment,0,1,contextualElement);
-          content(env, morph0, context, "linkTitle");
+          content(env, morph0, context, "view.label");
           return fragment;
         }
       };
@@ -10711,10 +10663,8 @@ enifed("ember-metal/computed",
       }.property('firstName', 'lastName')
       ```
 
-      @class computed
-      @namespace Ember
-      @constructor
-      @static
+      @method computed
+      @for Ember
       @param {String} [dependentKeys*] Optional dependent keys that trigger this computed property.
       @param {Function} func The computed property function.
       @return {Ember.ComputedProperty} property descriptor instance
@@ -10856,8 +10806,8 @@ enifed("ember-metal/computed_macros",
       ```
 
       @since 1.6.0
-      @method empty
-      @for Ember.computed
+      @method computed.empty
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which negate
       the original value for property
@@ -10886,8 +10836,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('hasStuff');         // false
       ```
 
-      @method notEmpty
-      @for Ember.computed
+      @method computed.notEmpty
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which returns true if
       original value for property is not empty.
@@ -10919,8 +10869,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('isHungry'); // true
       ```
 
-      @method none
-      @for Ember.computed
+      @method computed.none
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which
       returns true if original value for property is null or undefined.
@@ -10947,8 +10897,8 @@ enifed("ember-metal/computed_macros",
       user.get('isAnonymous'); // false
       ```
 
-      @method not
-      @for Ember.computed
+      @method computed.not
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which returns
       inverse of the original value for property
@@ -10977,8 +10927,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('hasBananas'); // false
       ```
 
-      @method bool
-      @for Ember.computed
+      @method computed.bool
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which converts
       to boolean the original value for property
@@ -11008,8 +10958,8 @@ enifed("ember-metal/computed_macros",
       user.get('hasValidEmail'); // true
       ```
 
-      @method match
-      @for Ember.computed
+      @method computed.match
+      @for Ember
       @param {String} dependentKey
       @param {RegExp} regexp
       @return {Ember.ComputedProperty} computed property which match
@@ -11040,8 +10990,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('napTime'); // false
       ```
 
-      @method equal
-      @for Ember.computed
+      @method computed.equal
+      @for Ember
       @param {String} dependentKey
       @param {String|Number|Object} value
       @return {Ember.ComputedProperty} computed property which returns true if
@@ -11071,8 +11021,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('hasTooManyBananas'); // true
       ```
 
-      @method gt
-      @for Ember.computed
+      @method computed.gt
+      @for Ember
       @param {String} dependentKey
       @param {Number} value
       @return {Ember.ComputedProperty} computed property which returns true if
@@ -11102,8 +11052,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('hasTooManyBananas'); // true
       ```
 
-      @method gte
-      @for Ember.computed
+      @method computed.gte
+      @for Ember
       @param {String} dependentKey
       @param {Number} value
       @return {Ember.ComputedProperty} computed property which returns true if
@@ -11133,8 +11083,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('needsMoreBananas'); // true
       ```
 
-      @method lt
-      @for Ember.computed
+      @method computed.lt
+      @for Ember
       @param {String} dependentKey
       @param {Number} value
       @return {Ember.ComputedProperty} computed property which returns true if
@@ -11164,8 +11114,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('needsMoreBananas'); // true
       ```
 
-      @method lte
-      @for Ember.computed
+      @method computed.lte
+      @for Ember
       @param {String} dependentKey
       @param {Number} value
       @return {Ember.ComputedProperty} computed property which returns true if
@@ -11195,8 +11145,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('readyForCamp'); // true
       ```
 
-      @method and
-      @for Ember.computed
+      @method computed.and
+      @for Ember
       @param {String} dependentKey*
       @return {Ember.ComputedProperty} computed property which performs
       a logical `and` on the values of all the original values for properties.
@@ -11228,8 +11178,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('readyForRain'); // true
       ```
 
-      @method or
-      @for Ember.computed
+      @method computed.or
+      @for Ember
       @param {String} dependentKey*
       @return {Ember.ComputedProperty} computed property which performs
       a logical `or` on the values of all the original values for properties.
@@ -11261,8 +11211,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('hasClothes'); // 'Hawaiian Shirt'
       ```
 
-      @method any
-      @for Ember.computed
+      @method computed.any
+      @for Ember
       @param {String} dependentKey*
       @return {Ember.ComputedProperty} computed property which returns
       the first truthy value of given list of properties.
@@ -11295,8 +11245,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('clothes'); // ['Camp Hat', 'Camp Shirt']
       ```
 
-      @method collect
-      @for Ember.computed
+      @method computed.collect
+      @for Ember
       @param {String} dependentKey*
       @return {Ember.ComputedProperty} computed property which maps
       values of all passed in properties to an array.
@@ -11335,8 +11285,8 @@ enifed("ember-metal/computed_macros",
       alex.get('name');  // '@machty'
       ```
 
-      @method alias
-      @for Ember.computed
+      @method computed.alias
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which creates an
       alias to the original value for property.
@@ -11369,8 +11319,8 @@ enifed("ember-metal/computed_macros",
       teddy.get('firstName');             // 'Teddy'
       ```
 
-      @method oneWay
-      @for Ember.computed
+      @method computed.oneWay
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which creates a
       one way computed property to the original value for property.
@@ -11418,8 +11368,8 @@ enifed("ember-metal/computed_macros",
       teddy.get('firstName');             // 'Teddy'
       ```
 
-      @method readOnly
-      @for Ember.computed
+      @method computed.readOnly
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which creates a
       one way computed property to the original value for property.
@@ -11448,8 +11398,8 @@ enifed("ember-metal/computed_macros",
       hamster.get('favoriteFood');                 // 'Banana'
       ```
 
-      @method defaultTo
-      @for Ember.computed
+      @method computed.defaultTo
+      @for Ember
       @param {String} defaultPath
       @return {Ember.ComputedProperty} computed property which acts like
       a standard getter and setter, but defaults to the value from `defaultPath`.
@@ -11472,8 +11422,8 @@ enifed("ember-metal/computed_macros",
       though they were called on the original property, but also
       print a deprecation warning.
 
-      @method deprecatingAlias
-      @for Ember.computed
+      @method computed.deprecatingAlias
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computed property which creates an
       alias with a deprecation to the original value for property.
@@ -11519,7 +11469,7 @@ enifed("ember-metal/core",
 
       @class Ember
       @static
-      @version 1.10.0
+      @version 1.10.1
     */
 
     if ('undefined' === typeof Ember) {
@@ -11546,10 +11496,10 @@ enifed("ember-metal/core",
     /**
       @property VERSION
       @type String
-      @default '1.10.0'
+      @default '1.10.1'
       @static
     */
-    Ember.VERSION = '1.10.0';
+    Ember.VERSION = '1.10.1';
 
     /**
       Standard environmental variables. You can define these in a global `EmberENV`
@@ -18821,8 +18771,8 @@ enifed("ember-routing-htmlbars/helpers/action",
     __exports__.actionHelper = actionHelper;
   });
 enifed("ember-routing-htmlbars/helpers/link-to",
-  ["ember-metal/core","ember-routing-views/views/link","ember-metal/streams/utils","ember-runtime/mixins/controller","ember-htmlbars/templates/link-to-escaped","ember-htmlbars/templates/link-to-unescaped","ember-htmlbars","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __exports__) {
+  ["ember-metal/core","ember-routing-views/views/link","ember-metal/streams/utils","ember-runtime/mixins/controller","ember-htmlbars/utils/string","ember-htmlbars","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __exports__) {
     "use strict";
     /**
     @module ember
@@ -18832,10 +18782,10 @@ enifed("ember-routing-htmlbars/helpers/link-to",
     var Ember = __dependency1__["default"];
     // assert
     var LinkView = __dependency2__.LinkView;
+    var read = __dependency3__.read;
     var isStream = __dependency3__.isStream;
     var ControllerMixin = __dependency4__["default"];
-    var inlineEscapedLinkTo = __dependency5__["default"];
-    var inlineUnescapedLinkTo = __dependency6__["default"];
+    var escapeExpression = __dependency5__.escapeExpression;
 
     // We need the HTMLBars view helper from ensure ember-htmlbars.
     // This ensures it is loaded first:
@@ -19131,13 +19081,21 @@ enifed("ember-routing-htmlbars/helpers/link-to",
       if (!options.template) {
         var linkTitle = params.shift();
 
-        if (shouldEscape) {
-          hash.layout = inlineEscapedLinkTo;
-        } else {
-          hash.layout = inlineUnescapedLinkTo;
+        if (isStream(linkTitle)) {
+          hash.linkTitle = { stream: linkTitle };
         }
 
-        hash.linkTitle = linkTitle;
+        options.template = {
+          isHTMLBars: true,
+          render: function() {
+            var value = read(linkTitle);
+            if (value) {
+              return shouldEscape ? escapeExpression(value) : value;
+            } else {
+              return "";
+            }
+          }
+        };
       }
 
       for (var i = 0; i < params.length; i++) {
@@ -19750,7 +19708,13 @@ enifed("ember-routing-views/views/link",
       _setupPathObservers: function(){
         var params = this.params;
 
+        var scheduledRerender = this._wrapAsScheduled(this.rerender);
         var scheduledParamsChanged = this._wrapAsScheduled(this._paramsChanged);
+
+        if (this.linkTitle) {
+          var linkTitle = this.linkTitle.stream || this.linkTitle;
+          subscribe(linkTitle, scheduledRerender, this);
+        }
 
         for (var i = 0; i < params.length; i++) {
           subscribe(params[i], scheduledParamsChanged, this);
@@ -26430,8 +26394,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
      A computed property that returns the sum of the value
      in the dependent array.
 
-     @method sum
-     @for Ember.computed
+     @method computed.sum
+     @for Ember
      @param {String} dependentKey
      @return {Ember.ComputedProperty} computes the sum of all values in the dependentKey's array
      @since 1.4.0
@@ -26479,8 +26443,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       lordByron.get('maxChildAge'); // 8
       ```
 
-      @method max
-      @for Ember.computed
+      @method computed.max
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computes the largest value in the dependentKey's array
     */
@@ -26528,8 +26492,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       lordByron.get('minChildAge'); // 5
       ```
 
-      @method min
-      @for Ember.computed
+      @method computed.min
+      @for Ember
       @param {String} dependentKey
       @return {Ember.ComputedProperty} computes the smallest value in the dependentKey's array
     */
@@ -26576,8 +26540,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       hamster.get('excitingChores'); // ['CLEAN!', 'WRITE MORE UNIT TESTS!']
       ```
 
-      @method map
-      @for Ember.computed
+      @method computed.map
+      @for Ember
       @param {String} dependentKey
       @param {Function} callback
       @return {Ember.ComputedProperty} an array mapped via the callback
@@ -26621,8 +26585,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       lordByron.get('childAges'); // [7, 5, 8]
       ```
 
-      @method mapBy
-      @for Ember.computed
+      @method computed.mapBy
+      @for Ember
       @param {String} dependentKey
       @param {String} propertyKey
       @return {Ember.ComputedProperty} an array mapped to the specified key
@@ -26633,8 +26597,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
     }
 
     __exports__.mapBy = mapBy;/**
-      @method mapProperty
-      @for Ember.computed
+      @method computed.mapProperty
+      @for Ember
       @deprecated Use `Ember.computed.mapBy` instead
       @param dependentKey
       @param propertyKey
@@ -26671,8 +26635,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       hamster.get('remainingChores'); // [{name: 'write more unit tests', done: false}]
       ```
 
-      @method filter
-      @for Ember.computed
+      @method computed.filter
+      @for Ember
       @param {String} dependentKey
       @param {Function} callback
       @return {Ember.ComputedProperty} the filtered array
@@ -26727,8 +26691,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       hamster.get('remainingChores'); // [{ name: 'write more unit tests', done: false }]
       ```
 
-      @method filterBy
-      @for Ember.computed
+      @method computed.filterBy
+      @for Ember
       @param {String} dependentKey
       @param {String} propertyKey
       @param {*} value
@@ -26751,8 +26715,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
     }
 
     __exports__.filterBy = filterBy;/**
-      @method filterProperty
-      @for Ember.computed
+      @method computed.filterProperty
+      @for Ember
       @param dependentKey
       @param propertyKey
       @param value
@@ -26783,8 +26747,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       hamster.get('uniqueFruits'); // ['banana', 'grape', 'kale']
       ```
 
-      @method uniq
-      @for Ember.computed
+      @method computed.uniq
+      @for Ember
       @param {String} propertyKey*
       @return {Ember.ComputedProperty} computes a new array with all the
       unique elements from the dependent array
@@ -26827,8 +26791,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
     __exports__.uniq = uniq;/**
       Alias for [Ember.computed.uniq](/api/#method_computed_uniq).
 
-      @method union
-      @for Ember.computed
+      @method computed.union
+      @for Ember
       @param {String} propertyKey*
       @return {Ember.ComputedProperty} computes a new array with all the
       unique elements from the dependent array
@@ -26851,8 +26815,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       obj.get('friendsInCommon'); // ['William King', 'Mary Somerville']
       ```
 
-      @method intersect
-      @for Ember.computed
+      @method computed.intersect
+      @for Ember
       @param {String} propertyKey*
       @return {Ember.ComputedProperty} computes a new array with all the
       duplicated elements from the dependent arrays
@@ -26938,8 +26902,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       hamster.get('wants'); // ['banana']
       ```
 
-      @method setDiff
-      @for Ember.computed
+      @method computed.setDiff
+      @for Ember
       @param {String} setAProperty
       @param {String} setBProperty
       @return {Ember.ComputedProperty} computes a new array with all the
@@ -27082,8 +27046,8 @@ enifed("ember-runtime/computed/reduce_computed_macros",
       todoList.get('priorityTodos');    // [{ name:'Release', priority:1 }, { name:'Unit Test', priority:2 }, { name:'Documentation', priority:3 }]
       ```
 
-      @method sort
-      @for Ember.computed
+      @method computed.sort
+      @for Ember
       @param {String} dependentKey
       @param {String or Function} sortDefinition a dependent key to an
       array of sort properties (add `:desc` to the arrays sort properties to sort descending) or a function to use when sorting
@@ -36427,8 +36391,9 @@ enifed("ember-views/attr_nodes/attr_node",
     AttrNode.prototype.init = function init(attrName, simpleAttrValue){
       this.isView = true;
 
+      // That these semantics are used is very unfortunate.
       this.tagName = '';
-      this.isVirtual = true;
+      this.classNameBindings = [];
 
       this.attrName = attrName;
       this.attrValue = simpleAttrValue;
@@ -36471,15 +36436,6 @@ enifed("ember-views/attr_nodes/attr_node",
       if (parent) { parent.removeChild(this); }
     };
 
-    AttrNode.prototype.propertyDidChange = function render() {
-    };
-
-    AttrNode.prototype._notifyBecameHidden = function render() {
-    };
-
-    AttrNode.prototype._notifyBecameVisible = function render() {
-    };
-
     __exports__["default"] = AttrNode;
   });
 enifed("ember-views/attr_nodes/legacy_bind",
@@ -36507,14 +36463,6 @@ enifed("ember-views/attr_nodes/legacy_bind",
       this.isDirty = false;
       var value = read(this.attrValue);
       var type = typeOf(value);
-
-      if (value === undefined) {
-        value = null;
-      }
-
-      if (this.attrName === 'value' && value === null) {
-        value = '';
-      }
 
       
       this._morph.setContent(value);
@@ -39435,13 +39383,6 @@ enifed("ember-views/views/component",
       @extends Ember.View
     */
     var Component = View.extend(TargetActionSupport, ComponentTemplateDeprecation, {
-      /*
-        This is set so that the proto inspection in appendTemplatedView does not
-        think that it should set the components `context` to that of the parent view.
-      */
-      controller: null,
-      context: null,
-
       instrumentName: 'component',
       instrumentDisplay: computed(function() {
         if (this._debugContainerKey) {
@@ -40359,7 +40300,7 @@ enifed("ember-views/views/metamorph_view",
     __exports__._SimpleMetamorphView = _SimpleMetamorphView;
   });
 enifed("ember-views/views/select",
-  ["ember-metal/enumerable_utils","ember-metal/property_get","ember-metal/property_set","ember-views/views/view","ember-views/views/collection_view","ember-metal/utils","ember-metal/is_none","ember-metal/computed","ember-runtime/system/native_array","ember-metal/mixin","ember-metal/properties","ember-metal/run_loop","ember-htmlbars/templates/select","exports"],
+  ["ember-metal/enumerable_utils","ember-metal/property_get","ember-metal/property_set","ember-views/views/view","ember-views/views/collection_view","ember-metal/utils","ember-metal/is_none","ember-metal/computed","ember-runtime/system/native_array","ember-metal/mixin","ember-metal/properties","ember-htmlbars/templates/select","ember-htmlbars/templates/select-option","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __exports__) {
     "use strict";
     /**
@@ -40382,24 +40323,11 @@ enifed("ember-views/views/select",
     var emberA = __dependency9__.A;
     var observer = __dependency10__.observer;
     var defineProperty = __dependency11__.defineProperty;
-    var run = __dependency12__["default"];
 
-    var htmlbarsTemplate = __dependency13__["default"];
+    var htmlbarsTemplate = __dependency12__["default"];
+    var selectOptionDefaultTemplate = __dependency13__["default"];
 
     var defaultTemplate = htmlbarsTemplate;
-
-    var selectOptionDefaultTemplate = {
-      isHTMLBars: true,
-      render: function(context, env, contextualElement) {
-        var lazyValue = context.getStream('view.label');
-
-        lazyValue.subscribe(context._wrapAsScheduled(function() {
-          run.scheduleOnce('render', context, 'rerender');
-        }));
-
-        return lazyValue.value();
-      }
-    };
 
     var SelectOption = View.extend({
       instrumentDisplay: 'Ember.SelectOption',
@@ -42439,7 +42367,7 @@ enifed("ember-views/views/view",
           
 
           if (useHTMLBars) {
-            return template.render(context, options, morph.contextualElement);
+            return template.render(this, options, morph.contextualElement);
           } else {
             return template(context, options);
           }
@@ -46005,7 +45933,7 @@ enifed("route-recognizer",
 
     RouteRecognizer.prototype.map = map;
 
-    RouteRecognizer.VERSION = '1.10.0';
+    RouteRecognizer.VERSION = '1.10.1';
 
     __exports__["default"] = RouteRecognizer;
   });

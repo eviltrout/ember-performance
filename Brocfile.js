@@ -52,7 +52,7 @@ var appJs = concat(mergeTrees([
     inputFiles: [
       'jquery-2.1.1.min.js',
       'handlebars-v1.3.0.js',
-      '1.8.1.js',
+      'ember-1.8.1.prod.js',
       'ascii-table.js',
       'app.js',
       'test-session.js'

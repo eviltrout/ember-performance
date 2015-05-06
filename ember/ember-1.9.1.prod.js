@@ -5,7 +5,7 @@
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
- * @version   1.9.2+pre.7666db94
+ * @version   1.9.1
  */
 
 (function() {
@@ -8100,6 +8100,7 @@ enifed("ember-handlebars/helpers/each",
       }
 
       
+      options.hash.emptyViewClass = Ember._MetamorphView;
       options.hash.dataSourceBinding = path;
       options.hashTypes.dataSourceBinding = 'STRING';
       options.helperName = options.helperName || helperName;
@@ -12779,7 +12780,7 @@ enifed("ember-metal/core",
 
       @class Ember
       @static
-      @version 1.9.2+pre.7666db94
+      @version 1.9.1
     */
 
     if ('undefined' === typeof Ember) {
@@ -12806,10 +12807,10 @@ enifed("ember-metal/core",
     /**
       @property VERSION
       @type String
-      @default '1.9.2+pre.7666db94'
+      @default '1.9.1'
       @static
     */
-    Ember.VERSION = '1.9.2+pre.7666db94';
+    Ember.VERSION = '1.9.1';
 
     /**
       Standard environmental variables. You can define these in a global `EmberENV`
@@ -16326,7 +16327,7 @@ enifed("ember-metal/path_cache",
 
     var isGlobalCache       = new Cache(1000, function(key) { return IS_GLOBAL.test(key);          });
     var isGlobalPathCache   = new Cache(1000, function(key) { return IS_GLOBAL_PATH.test(key);     });
-    var hasThisCache        = new Cache(1000, function(key) { return key.lastIndexOf(HAS_THIS, 0) === 0; });
+    var hasThisCache        = new Cache(1000, function(key) { return key.indexOf(HAS_THIS) !== -1; });
     var firstDotIndexCache  = new Cache(1000, function(key) { return key.indexOf('.');             });
 
     var firstKeyCache = new Cache(1000, function(path) {
