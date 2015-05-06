@@ -5,7 +5,7 @@
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
- * @version   1.10.0-beta.4
+ * @version   1.10.1
  */
 
 (function() {
@@ -3695,12 +3695,13 @@ enifed("ember-application/system/resolver",
       */
       lookupDescription: function(fullName) {
         var parsedName = this.parseName(fullName);
+        var description;
 
         if (parsedName.type === 'template') {
           return 'template at ' + parsedName.fullNameWithoutType.replace(/\./g, '/');
         }
 
-        var description = parsedName.root + '.' + classify(parsedName.name);
+        description = parsedName.root + '.' + classify(parsedName.name).replace(/\./g, '');
 
         if (parsedName.type !== 'model') {
           description += classify(parsedName.type);
@@ -4556,8 +4557,7 @@ enifed("ember-htmlbars",
 
     
       Ember.HTMLBars = {
-        helpers: helpers,
-        registerHelper: registerHelper,
+        _registerHelper: registerHelper,
         template: template,
         compile: compile,
         precompile: precompile,
@@ -4584,7 +4584,8 @@ enifed("ember-htmlbars",
         concat: concat
       },
 
-      helpers: helpers
+      helpers: helpers,
+      useFragmentCache: true
     };
     __exports__.defaultEnv = defaultEnv;
   });
@@ -4667,6 +4668,16 @@ enifed("ember-htmlbars/compat/helper",
 
     var slice = [].slice;
 
+    function calculateCompatType(item) {
+      if (isStream(item)) {
+        return 'ID';
+      } else {
+        var itemType = typeof item;
+
+        return itemType.toUpperCase();
+      }
+    }
+
     /**
       Wraps an Handlebars helper with an HTMLBars helper for backwards compatibility.
 
@@ -4678,7 +4689,11 @@ enifed("ember-htmlbars/compat/helper",
       this.helperFunction = function helperFunc(params, hash, options, env) {
         var param, blockResult, fnResult;
         var context = this;
-        var handlebarsOptions = {};
+        var handlebarsOptions = {
+          hash: { },
+          types: new Array(params.length),
+          hashTypes: { }
+        };
 
         merge(handlebarsOptions, options);
         merge(handlebarsOptions, env);
@@ -4694,6 +4709,8 @@ enifed("ember-htmlbars/compat/helper",
         for (var prop in hash) {
           param = hash[prop];
 
+          handlebarsOptions.hashTypes[prop] = calculateCompatType(param);
+
           if (isStream(param)) {
             handlebarsOptions.hash[prop] = param._label;
           } else {
@@ -4704,6 +4721,8 @@ enifed("ember-htmlbars/compat/helper",
         var args = new Array(params.length);
         for (var i = 0, l = params.length; i < l; i++) {
           param = params[i];
+
+          handlebarsOptions.types[i] = calculateCompatType(param);
 
           if (isStream(param)) {
             args[i] = param._label;
@@ -5039,8 +5058,8 @@ enifed("ember-htmlbars/helpers",
     var Helper = __dependency2__["default"];
 
     /**
-      @public
-      @method registerHelper
+      @private
+      @method _registerHelper
       @for Ember.HTMLBars
       @param {String} name
       @param {Object|Function} helperFunc the helper function to add
@@ -7370,6 +7389,7 @@ enifed("ember-htmlbars/hooks/block",
     __exports__["default"] = function block(env, morph, view, path, params, hash, template, inverse) {
       var helper = lookupHelper(path, view, env);
 
+      
       var options = {
         morph: morph,
         template: template,
@@ -7924,20 +7944,72 @@ enifed("ember-htmlbars/templates/component",
           var hooks = env.hooks, content = hooks.content;
           dom.detectNamespace(contextualElement);
           var fragment;
-          if (this.cachedFragment === null) {
-            fragment = this.build(dom);
-            if (this.hasRendered) {
-              this.cachedFragment = fragment;
-            } else {
-              this.hasRendered = true;
+          if (env.useFragmentCache && dom.canClone) {
+            if (this.cachedFragment === null) {
+              fragment = this.build(dom);
+              if (this.hasRendered) {
+                this.cachedFragment = fragment;
+              } else {
+                this.hasRendered = true;
+              }
             }
-          }
-          if (this.cachedFragment) {
-            fragment = dom.cloneNode(this.cachedFragment, true);
+            if (this.cachedFragment) {
+              fragment = dom.cloneNode(this.cachedFragment, true);
+            }
+          } else {
+            fragment = this.build(dom);
           }
           if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
           var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
           content(env, morph0, context, "yield");
+          return fragment;
+        }
+      };
+    }());
+     __exports__["default"] = template(t);
+  });
+enifed("ember-htmlbars/templates/select-option",
+  ["ember-template-compiler/system/template","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var template = __dependency1__["default"];
+    var t = (function() {
+      return {
+        isHTMLBars: true,
+        blockParams: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        build: function build(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode("");
+          dom.appendChild(el0, el1);
+          var el1 = dom.createTextNode("");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        render: function render(context, env, contextualElement) {
+          var dom = env.dom;
+          var hooks = env.hooks, content = hooks.content;
+          dom.detectNamespace(contextualElement);
+          var fragment;
+          if (env.useFragmentCache && dom.canClone) {
+            if (this.cachedFragment === null) {
+              fragment = this.build(dom);
+              if (this.hasRendered) {
+                this.cachedFragment = fragment;
+              } else {
+                this.hasRendered = true;
+              }
+            }
+            if (this.cachedFragment) {
+              fragment = dom.cloneNode(this.cachedFragment, true);
+            }
+          } else {
+            fragment = this.build(dom);
+          }
+          if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
+          var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
+          content(env, morph0, context, "view.label");
           return fragment;
         }
       };
@@ -7966,16 +8038,20 @@ enifed("ember-htmlbars/templates/select",
             var hooks = env.hooks, content = hooks.content;
             dom.detectNamespace(contextualElement);
             var fragment;
-            if (this.cachedFragment === null) {
-              fragment = this.build(dom);
-              if (this.hasRendered) {
-                this.cachedFragment = fragment;
-              } else {
-                this.hasRendered = true;
+            if (env.useFragmentCache && dom.canClone) {
+              if (this.cachedFragment === null) {
+                fragment = this.build(dom);
+                if (this.hasRendered) {
+                  this.cachedFragment = fragment;
+                } else {
+                  this.hasRendered = true;
+                }
               }
-            }
-            if (this.cachedFragment) {
-              fragment = dom.cloneNode(this.cachedFragment, true);
+              if (this.cachedFragment) {
+                fragment = dom.cloneNode(this.cachedFragment, true);
+              }
+            } else {
+              fragment = this.build(dom);
             }
             var morph0 = dom.createMorphAt(fragment,-1,-1);
             content(env, morph0, context, "view.prompt");
@@ -8003,16 +8079,20 @@ enifed("ember-htmlbars/templates/select",
               var hooks = env.hooks, get = hooks.get, inline = hooks.inline;
               dom.detectNamespace(contextualElement);
               var fragment;
-              if (this.cachedFragment === null) {
-                fragment = this.build(dom);
-                if (this.hasRendered) {
-                  this.cachedFragment = fragment;
-                } else {
-                  this.hasRendered = true;
+              if (env.useFragmentCache && dom.canClone) {
+                if (this.cachedFragment === null) {
+                  fragment = this.build(dom);
+                  if (this.hasRendered) {
+                    this.cachedFragment = fragment;
+                  } else {
+                    this.hasRendered = true;
+                  }
                 }
-              }
-              if (this.cachedFragment) {
-                fragment = dom.cloneNode(this.cachedFragment, true);
+                if (this.cachedFragment) {
+                  fragment = dom.cloneNode(this.cachedFragment, true);
+                }
+              } else {
+                fragment = this.build(dom);
               }
               if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
               var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
@@ -8039,16 +8119,20 @@ enifed("ember-htmlbars/templates/select",
             var hooks = env.hooks, get = hooks.get, block = hooks.block;
             dom.detectNamespace(contextualElement);
             var fragment;
-            if (this.cachedFragment === null) {
-              fragment = this.build(dom);
-              if (this.hasRendered) {
-                this.cachedFragment = fragment;
-              } else {
-                this.hasRendered = true;
+            if (env.useFragmentCache && dom.canClone) {
+              if (this.cachedFragment === null) {
+                fragment = this.build(dom);
+                if (this.hasRendered) {
+                  this.cachedFragment = fragment;
+                } else {
+                  this.hasRendered = true;
+                }
               }
-            }
-            if (this.cachedFragment) {
-              fragment = dom.cloneNode(this.cachedFragment, true);
+              if (this.cachedFragment) {
+                fragment = dom.cloneNode(this.cachedFragment, true);
+              }
+            } else {
+              fragment = this.build(dom);
             }
             if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
             var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
@@ -8077,16 +8161,20 @@ enifed("ember-htmlbars/templates/select",
               var hooks = env.hooks, get = hooks.get, inline = hooks.inline;
               dom.detectNamespace(contextualElement);
               var fragment;
-              if (this.cachedFragment === null) {
-                fragment = this.build(dom);
-                if (this.hasRendered) {
-                  this.cachedFragment = fragment;
-                } else {
-                  this.hasRendered = true;
+              if (env.useFragmentCache && dom.canClone) {
+                if (this.cachedFragment === null) {
+                  fragment = this.build(dom);
+                  if (this.hasRendered) {
+                    this.cachedFragment = fragment;
+                  } else {
+                    this.hasRendered = true;
+                  }
                 }
-              }
-              if (this.cachedFragment) {
-                fragment = dom.cloneNode(this.cachedFragment, true);
+                if (this.cachedFragment) {
+                  fragment = dom.cloneNode(this.cachedFragment, true);
+                }
+              } else {
+                fragment = this.build(dom);
               }
               if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
               var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
@@ -8113,16 +8201,20 @@ enifed("ember-htmlbars/templates/select",
             var hooks = env.hooks, get = hooks.get, block = hooks.block;
             dom.detectNamespace(contextualElement);
             var fragment;
-            if (this.cachedFragment === null) {
-              fragment = this.build(dom);
-              if (this.hasRendered) {
-                this.cachedFragment = fragment;
-              } else {
-                this.hasRendered = true;
+            if (env.useFragmentCache && dom.canClone) {
+              if (this.cachedFragment === null) {
+                fragment = this.build(dom);
+                if (this.hasRendered) {
+                  this.cachedFragment = fragment;
+                } else {
+                  this.hasRendered = true;
+                }
               }
-            }
-            if (this.cachedFragment) {
-              fragment = dom.cloneNode(this.cachedFragment, true);
+              if (this.cachedFragment) {
+                fragment = dom.cloneNode(this.cachedFragment, true);
+              }
+            } else {
+              fragment = this.build(dom);
             }
             if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
             var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
@@ -8151,16 +8243,20 @@ enifed("ember-htmlbars/templates/select",
           var hooks = env.hooks, get = hooks.get, block = hooks.block;
           dom.detectNamespace(contextualElement);
           var fragment;
-          if (this.cachedFragment === null) {
-            fragment = this.build(dom);
-            if (this.hasRendered) {
-              this.cachedFragment = fragment;
-            } else {
-              this.hasRendered = true;
+          if (env.useFragmentCache && dom.canClone) {
+            if (this.cachedFragment === null) {
+              fragment = this.build(dom);
+              if (this.hasRendered) {
+                this.cachedFragment = fragment;
+              } else {
+                this.hasRendered = true;
+              }
             }
-          }
-          if (this.cachedFragment) {
-            fragment = dom.cloneNode(this.cachedFragment, true);
+            if (this.cachedFragment) {
+              fragment = dom.cloneNode(this.cachedFragment, true);
+            }
+          } else {
+            fragment = this.build(dom);
           }
           if (this.cachedFragment) { dom.repairClonedNode(fragment,[0,1]); }
           var morph0 = dom.createMorphAt(fragment,0,1,contextualElement);
@@ -11373,7 +11469,7 @@ enifed("ember-metal/core",
 
       @class Ember
       @static
-      @version 1.10.0-beta.4
+      @version 1.10.1
     */
 
     if ('undefined' === typeof Ember) {
@@ -11400,10 +11496,10 @@ enifed("ember-metal/core",
     /**
       @property VERSION
       @type String
-      @default '1.10.0-beta.4'
+      @default '1.10.1'
       @static
     */
-    Ember.VERSION = '1.10.0-beta.4';
+    Ember.VERSION = '1.10.1';
 
     /**
       Standard environmental variables. You can define these in a global `EmberENV`
@@ -11442,7 +11538,7 @@ enifed("ember-metal/core",
     /**
       Hash of enabled Canary features. Add to this before creating your application.
 
-      You can also define `ENV.FEATURES` if you need to enable features flagged at runtime.
+      You can also define `EmberENV.FEATURES` if you need to enable features flagged at runtime.
 
       @class FEATURES
       @namespace Ember
@@ -11458,8 +11554,8 @@ enifed("ember-metal/core",
 
       You can define the following configuration options:
 
-      * `ENV.ENABLE_ALL_FEATURES` - force all features to be enabled.
-      * `ENV.ENABLE_OPTIONAL_FEATURES` - enable any features that have not been explicitly
+      * `EmberENV.ENABLE_ALL_FEATURES` - force all features to be enabled.
+      * `EmberENV.ENABLE_OPTIONAL_FEATURES` - enable any features that have not been explicitly
         enabled/disabled.
 
       @method isEnabled
@@ -11495,7 +11591,7 @@ enifed("ember-metal/core",
 
       In general we recommend leaving this option set to true since it rarely
       conflicts with other code. If you need to turn it off however, you can
-      define an `ENV.EXTEND_PROTOTYPES` config to disable it.
+      define an `EmberENV.EXTEND_PROTOTYPES` config to disable it.
 
       @property EXTEND_PROTOTYPES
       @type Boolean
@@ -36343,8 +36439,8 @@ enifed("ember-views/attr_nodes/attr_node",
     __exports__["default"] = AttrNode;
   });
 enifed("ember-views/attr_nodes/legacy_bind",
-  ["./attr_node","ember-runtime/system/string","ember-metal/utils","ember-metal/streams/utils","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __exports__) {
+  ["./attr_node","ember-runtime/system/string","ember-metal/utils","ember-metal/streams/utils","ember-metal/platform/create","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __exports__) {
     "use strict";
     /**
     @module ember
@@ -36355,12 +36451,13 @@ enifed("ember-views/attr_nodes/legacy_bind",
     var fmt = __dependency2__.fmt;
     var typeOf = __dependency3__.typeOf;
     var read = __dependency4__.read;
+    var create = __dependency5__["default"];
 
     function LegacyBindAttrNode(attrName, attrValue) {
       this.init(attrName, attrValue);
     }
 
-    LegacyBindAttrNode.prototype = AttrNode.prototype;
+    LegacyBindAttrNode.prototype = create(AttrNode.prototype);
 
     LegacyBindAttrNode.prototype.render = function render(buffer) {
       this.isDirty = false;
@@ -40203,7 +40300,7 @@ enifed("ember-views/views/metamorph_view",
     __exports__._SimpleMetamorphView = _SimpleMetamorphView;
   });
 enifed("ember-views/views/select",
-  ["ember-metal/enumerable_utils","ember-metal/property_get","ember-metal/property_set","ember-views/views/view","ember-views/views/collection_view","ember-metal/utils","ember-metal/is_none","ember-metal/computed","ember-runtime/system/native_array","ember-metal/mixin","ember-metal/properties","ember-metal/run_loop","ember-htmlbars/templates/select","exports"],
+  ["ember-metal/enumerable_utils","ember-metal/property_get","ember-metal/property_set","ember-views/views/view","ember-views/views/collection_view","ember-metal/utils","ember-metal/is_none","ember-metal/computed","ember-runtime/system/native_array","ember-metal/mixin","ember-metal/properties","ember-htmlbars/templates/select","ember-htmlbars/templates/select-option","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __exports__) {
     "use strict";
     /**
@@ -40226,24 +40323,11 @@ enifed("ember-views/views/select",
     var emberA = __dependency9__.A;
     var observer = __dependency10__.observer;
     var defineProperty = __dependency11__.defineProperty;
-    var run = __dependency12__["default"];
 
-    var htmlbarsTemplate = __dependency13__["default"];
+    var htmlbarsTemplate = __dependency12__["default"];
+    var selectOptionDefaultTemplate = __dependency13__["default"];
 
     var defaultTemplate = htmlbarsTemplate;
-
-    var selectOptionDefaultTemplate = {
-      isHTMLBars: true,
-      render: function(context, env, contextualElement) {
-        var lazyValue = context.getStream('view.label');
-
-        lazyValue.subscribe(context._wrapAsScheduled(function() {
-          run.scheduleOnce('render', context, 'rerender');
-        }));
-
-        return lazyValue.value();
-      }
-    };
 
     var SelectOption = View.extend({
       instrumentDisplay: 'Ember.SelectOption',
@@ -43728,12 +43812,14 @@ enifed("ember-views/views/with_view",
     });
   });
 enifed("ember",
-  ["ember-metal","ember-runtime","ember-views","ember-routing","ember-application","ember-extension-support","ember-htmlbars","ember-routing-htmlbars"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__) {
+  ["ember-metal","ember-runtime","ember-views","ember-routing","ember-application","ember-extension-support","ember-htmlbars","ember-routing-htmlbars","ember-runtime/system/lazy_load"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__) {
     "use strict";
     /* global navigator */
     // require the main entry points for each of these packages
     // this is so that the global exports occur properly
+
+    var runLoadHooks = __dependency9__.runLoadHooks;
 
     if (Ember.__loader.registry['ember-template-compiler']) {
       requireModule('ember-template-compiler');
@@ -43744,6 +43830,8 @@ enifed("ember",
     if (Ember.__loader.registry['ember-testing']) {
       requireModule('ember-testing');
     }
+
+    runLoadHooks('Ember');
 
     /**
     Ember
@@ -44178,6 +44266,14 @@ enifed("morph/dom-helper",
       return !element.getAttribute('viewBox');
     })(doc) : true);
 
+    var canClone = doc && (function(document){
+      var element = document.createElement('div');
+      element.appendChild( document.createTextNode(' '));
+      element.appendChild( document.createTextNode(' '));
+      var clonedElement = element.cloneNode(true);
+      return clonedElement.childNodes[0].nodeValue === ' ';
+    })(doc);
+
     // This is not the namespace of the element, but of
     // the elements inside that elements.
     function interiorNamespace(element){
@@ -44260,6 +44356,7 @@ enifed("morph/dom-helper",
       if (!this.document) {
         throw new Error("A document object must be passed to the DOMHelper, or available on the global scope");
       }
+      this.canClone = canClone;
       this.namespace = null;
     }
 
@@ -44542,6 +44639,18 @@ enifed("morph/dom-helper",
           return nodes;
         }
       }
+    };
+
+    var parsingNode;
+
+    // Used to determine whether a URL needs to be sanitized.
+    prototype.protocolForURL = function(url) {
+      if (!parsingNode) {
+        parsingNode = this.document.createElement('a');
+      }
+
+      parsingNode.href = url;
+      return parsingNode.protocol;
     };
 
     __exports__["default"] = DOMHelper;
@@ -45824,7 +45933,7 @@ enifed("route-recognizer",
 
     RouteRecognizer.prototype.map = map;
 
-    RouteRecognizer.VERSION = '1.10.0-beta.4';
+    RouteRecognizer.VERSION = '1.10.1';
 
     __exports__["default"] = RouteRecognizer;
   });
