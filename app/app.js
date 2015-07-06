@@ -53,16 +53,7 @@
       compilerPath: '/ember/ember-1.11.3.template-compiler.js' },
     { name: '1.12.0',
       path: '/ember/ember-1.12.0.prod.js',
-      compilerPath: '/ember/ember-1.12.0.template-compiler.js' },
-    { name: '1.12.0-beta.3',
-      path: '/ember/ember-1.12.0-beta.3.prod.js',
-      compilerPath: '/ember/ember-1.12.0-beta.3.template-compiler.js' },
-    { name: '1.13.0-beta.1+canary',
-      path: '/ember/ember-1.13.0-beta.1+canary.prod.js',
-      compilerPath: '/ember/ember-1.13.0-beta.1+canary.template-compiler.js' },
-    { name: '1.13.0-beta.2',
-      path: '/ember/ember-1.13.0-beta.2.prod.js',
-      compilerPath: '/ember/ember-1.13.0-beta.2.template-compiler.js' }
+      compilerPath: '/ember/ember-1.12.0.template-compiler.js' }
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to
