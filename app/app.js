@@ -53,7 +53,10 @@
       compilerPath: '/ember/ember-1.11.3.template-compiler.js' },
     { name: '1.12.0',
       path: '/ember/ember-1.12.0.prod.js',
-      compilerPath: '/ember/ember-1.12.0.template-compiler.js' }
+      compilerPath: '/ember/ember-1.12.0.template-compiler.js' },
+    { name: '1.13.3',
+      path: '/ember/ember-1.13.3.prod.js',
+      compilerPath: '/ember/ember-1.13.3.template-compiler.js' }
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to
