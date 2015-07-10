@@ -61,11 +61,7 @@ var appJs = concat(mergeTrees([
 });
 
 var appCss = compileSass(['app/styles'], 'app.scss', 'assets/app.css');
-
-var vendorCss = concat(mergeTrees(findBowerTrees()), {
-  inputFiles: ['bootstrap.css'],
-  outputFile: '/assets/vendor.css'
-});
+var vendorCss = compileSass(['app/styles'], 'vendor.scss', 'assets/vendor.css');
 
 env('production', function() {
   vendorJs = uglifyJavaScript(vendorJs);
