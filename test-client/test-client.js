@@ -301,6 +301,7 @@
 
   window.TestClient = TestClient;
 
+
   function MicroTestClient(test) {
     TestClient.call(this, test);
   }
@@ -350,5 +351,43 @@
     string = (string || '').replace(/^\s+|\s+$/g, '');
     return string;
   }
+
+
+  function RenderTemplateTestClient(test) {
+    TestClient.call(this, test);
+  }
+
+  RenderTemplateTestClient.run = TestClient.run;
+  RenderTemplateTestClient.prototype = Object.create(TestClient.prototype);
+
+  RenderTemplateTestClient.prototype.setupTemplateTest = function(template, data) {
+    this.app = Ember.Application.create({ rootElement: '#scratch' });
+    this.app.deferReadiness();
+
+    this.registry = this.app.__registry__ || this.app.registry;
+
+    this.registry.register('controller:index', Ember.Controller.extend());
+    this.registry.register('template:index', this.compile('{{#if showContents}}{{benchmarked-component data=data}}{{/if}}'));
+    this.registry.register('template:components/benchmarked-component', this.compile(template));
+
+    Ember.run(this.app, 'advanceReadiness');
+
+    this.controller = this.app.__container__.lookup('controller:index');
+    this.controller.set('data', data);
+  }
+
+  RenderTemplateTestClient.prototype.hideComponent = function() {
+    Ember.run(this, function() {
+      this.controller.set('showContents', false);
+    });
+  }
+
+  RenderTemplateTestClient.prototype.showComponent = function() {
+    Ember.run(this, function() {
+      this.controller.set('showContents', true);
+    });
+  }
+
+  window.RenderTemplateTestClient = RenderTemplateTestClient;
 
 })();

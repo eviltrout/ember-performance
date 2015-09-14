@@ -1,8 +1,8 @@
-
 /* global TestClient */
 MicroTestClient.run({
   name: 'Ember.LinkView.create',
   test: function() {
-    Ember.LinkView.create();
+    var LinkView = Ember.LinkView || Ember.LinkComponent;
+    LinkView.create();
   }
 });
