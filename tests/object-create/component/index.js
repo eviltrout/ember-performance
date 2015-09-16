@@ -1,7 +1,7 @@
 /* global TestClient */
 MicroTestClient.run({
-  name: 'Ember.View.create',
+  name: 'Ember.Component.create',
   test: function() {
-    Ember.View.create();
+    Ember.Component.create();
   }
 });

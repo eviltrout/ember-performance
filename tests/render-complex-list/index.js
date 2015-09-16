@@ -1,55 +1,36 @@
-/* global TestClient, RSVP */
-(function() {
+/* global RenderTemplateTestClient */
 
-  // TODO: Make these load from .hbs files
-  var complexTemplate =
+(function() {
+  var template =
     "<ul>" +
-      "{{#each view.listItems}}" +
-        "<li>{{buffer-render data=a}} {{buffer-render data=b}} {{buffer-render data=c}} {{buffer-render data=d}}</li>" +
-        "<li>{{buffer-render data=a}} {{buffer-render data=b}} {{buffer-render data=c}} {{buffer-render data=d}}</li>" +
-        "<li>{{component-render a=a b=b c=c d=d}}</li>" +
-        "<li>{{component-render a=a b=b c=c d=d}}</li>" +
+      "{{#each data.items as |item|}}" +
+        "<li>{{buffer-render data=item.a}} {{buffer-render data=item.b}} {{buffer-render data=item.c}} {{buffer-render data=item.d}}</li>" +
+        "<li>{{buffer-render data=item.a}} {{buffer-render data=item.b}} {{buffer-render data=item.c}} {{buffer-render data=item.d}}</li>" +
+        "<li>{{component-render a=item.a b=item.b c=item.c d=item.d}}</li>" +
+        "<li>{{component-render a=item.a b=item.b c=item.c d=item.d}}</li>" +
       "{{/each}}" +
     "</ul>";
 
-  var component =
-    "a: {{a}}" +
-    "b: {{b}}" +
-    "c: {{c}}" +
-    "d: {{d}}" +
-    "{{nested-component a=a}}";
+  var componentTemplate =
+      "a: {{a}}" +
+      "b: {{b}}" +
+      "c: {{c}}" +
+      "d: {{d}}" +
+      "{{nested-component a=a}}";
 
-  var nestedComponent = "a: {{a}}";
+  var nestedComponentTemplate = "a: {{a}}";
 
-
-  var ContainerView, ViewClass, view, listItems;
-  TestClient.run({
+  RenderTemplateTestClient.run({
     name: 'Render Complex List',
 
     setup: function() {
-      var App = Ember.Application.create({ rootElement: '#scratch' });
-
-      Ember.TEMPLATES['complexItems'] = this.compile(complexTemplate);
-      Ember.TEMPLATES['components/component-render'] = this.compile(component);
-      Ember.TEMPLATES['components/nested-component'] = this.compile(nestedComponent);
-
-      ViewClass = Ember.View.extend({
-        templateName: 'complexItems'
-      });
-
-      App.BufferRenderComponent = Ember.Component.extend({
-        render: function(buffer) {
-          buffer.push(this.get('data'));
-        }
-      });
-
       var MyThing = Ember.Object.extend({
         d: function() {
           return this.get("a") + this.get("b");
         }.property("a", "b")
       });
 
-      listItems = [];
+      var listItems = [];
       for (var i=0; i<50; i++) {
         listItems.pushObject(MyThing.create({
           a: "a" + i,
@@ -58,34 +39,23 @@
         }));
       }
 
-      // We can start once the index is rendered
-      return new RSVP.Promise(function(resolve) {
-        App.IndexView = Ember.ContainerView.extend({
-          _triggerStart: function() {
-            ContainerView = this;
-            resolve();
-          }.on('didInsertElement')
-        });
-      });
+      this.setupTemplateTest(template, { items: listItems });
+
+      this.registry.register('template:components/component-render', this.compile(componentTemplate));
+      this.registry.register('template:components/nested-component', this.compile(nestedComponentTemplate));
+      this.registry.register('component:buffer-render', Ember.Component.extend({
+        render: function(buffer) {
+          buffer.push(this.get('data'));
+        }
+      }));
     },
 
     reset: function() {
-      if (view) { ContainerView.removeObject(view); }
-
-      return new RSVP.Promise(function(resolve) {
-        setTimeout(resolve, 10);
-      });
+      this.hideComponent();
     },
 
     test: function() {
-      return new RSVP.Promise(function(resolve) {
-        Ember.run(function() {
-          view = ViewClass.create({ listItems: listItems });
-          view.on('didInsertElement', resolve);
-          ContainerView.addObject(view);
-        });
-      });
+      this.showComponent();
     }
   });
-
 })();

@@ -1,49 +1,21 @@
-/* global TestClient, RSVP */
+/* global RenderTemplateTestClient */
+
 (function() {
+  var template = "{{link-to 'Howdy!' 'index'}}";
 
-  var ContainerView, ViewClass, view;
-
-  // TODO: Make this load from .hbs files
-  var template =
-    "{{link-to 'Howdy!' 'index'}}";
-
-  TestClient.run({
+  RenderTemplateTestClient.run({
     name: 'Render link-to',
 
     setup: function() {
-      var App = Ember.Application.create({ rootElement: '#scratch' });
-
-      ViewClass = Ember.View.extend({
-        template: this.compile(template)
-      });
-
-      return new RSVP.Promise(function(resolve) {
-        App.IndexView = Ember.ContainerView.extend({
-          _triggerStart: function() {
-            ContainerView = this;
-            resolve();
-          }.on('didInsertElement')
-        });
-      });
+      this.setupTemplateTest(template);
     },
 
     reset: function() {
-      if (view) { ContainerView.removeObject(view); }
-
-      return new RSVP.Promise(function(resolve) {
-        Ember.run.next(resolve);
-      });
+      this.hideComponent();
     },
 
     test: function() {
-      return new RSVP.Promise(function(resolve) {
-        Ember.run(function(){
-          view = ViewClass.create();
-          view.on('didInsertElement', resolve);
-          ContainerView.addObject(view);
-        });
-      });
+      this.showComponent();
     }
   });
-
 })();

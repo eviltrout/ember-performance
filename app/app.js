@@ -21,7 +21,7 @@
 
     { name: 'link-to get(\'create\')',   path: '/link-to/create' },
 
-    { name: 'object-create/view',        path: '/object-create/view'   },
+    { name: 'object-create/component',   path: '/object-create/component'   },
     { name: 'object-create/baseline',    path: '/object-create/baseline'   },
     { name: 'object-create/index',       path: '/object-create' },
 
@@ -36,18 +36,6 @@
   ];
 
   var EMBER_VERSIONS = [
-    { name: '1.7.1',
-      path: '/ember/ember-1.7.1.prod.js',
-      compilerPath: '/ember/handlebars-v1.3.0.js' },
-    { name: '1.8.1',
-      path: '/ember/ember-1.8.1.prod.js',
-      compilerPath: '/ember/handlebars-v1.3.0.js' },
-    { name: '1.9.1',
-      path: '/ember/ember-1.9.1.prod.js',
-      compilerPath: '/ember/handlebars-v2.0.0.js' },
-    { name: '1.10.1',
-      path: '/ember/ember-1.10.1.prod.js',
-      compilerPath: '/ember/ember-1.10.1.template-compiler.js' },
     { name: '1.11.3',
       path: '/ember/ember-1.11.3.prod.js',
       compilerPath: '/ember/ember-1.11.3.template-compiler.js' },
@@ -57,18 +45,12 @@
     { name: '1.13.3',
       path: '/ember/ember-1.13.3.prod.js',
       compilerPath: '/ember/ember-1.13.3.template-compiler.js' },
-    { name: '1.13.4',
-      path: '/ember/ember-1.13.4.prod.js',
-      compilerPath: '/ember/ember-1.13.4.template-compiler.js' },
-    { name: '1.13.5',
-      path: '/ember/ember-1.13.5.prod.js',
-      compilerPath: '/ember/ember-1.13.5.template-compiler.js' },
-    { name: '1.13.6',
-      path: '/ember/ember-1.13.6.prod.js',
-      compilerPath: '/ember/ember-1.13.6.template-compiler.js' },
     { name: '1.13.9',
       path: '/ember/ember-1.13.9.prod.js',
-      compilerPath: '/ember/ember-1.13.9.template-compiler.js' }
+      compilerPath: '/ember/ember-1.13.9.template-compiler.js' },
+    { name: '2.0.2',
+      path: '/ember/ember-2.0.2.prod.js',
+      compilerPath: '/ember/ember-2.0.2.template-compiler.js' }
   ];
 
   // This should probably be ember-cli, it just seemed so complicated to
