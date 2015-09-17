@@ -35,23 +35,42 @@
     { name: 'Render link-to',            path: '/render-link-to' }
   ];
 
-  var EMBER_VERSIONS = [
-    { name: '1.11.3',
-      path: '/ember/ember-1.11.3.prod.js',
-      compilerPath: '/ember/ember-1.11.3.template-compiler.js' },
-    { name: '1.12.0',
-      path: '/ember/ember-1.12.0.prod.js',
-      compilerPath: '/ember/ember-1.12.0.template-compiler.js' },
-    { name: '1.13.3',
-      path: '/ember/ember-1.13.3.prod.js',
-      compilerPath: '/ember/ember-1.13.3.template-compiler.js' },
-    { name: '1.13.9',
-      path: '/ember/ember-1.13.9.prod.js',
-      compilerPath: '/ember/ember-1.13.9.template-compiler.js' },
-    { name: '2.0.2',
-      path: '/ember/ember-2.0.2.prod.js',
-      compilerPath: '/ember/ember-2.0.2.template-compiler.js' }
+  var LOCAL_EMBER_VERSIONS = [
+    '1.11.3',
+    '1.12.0',
+    '1.13.3',
+    '1.13.3',
+    '1.13.9',
+    '2.0.2'
   ];
+
+  var EMBER_VERSIONS = [];
+
+  LOCAL_EMBER_VERSIONS.forEach(function(version) {
+    EMBER_VERSIONS.push({
+      name: version,
+      path: '/ember/ember-%@.prod.js'.fmt(version),
+      compilerPath: '/ember/ember-%@.template-compiler.js'.fmt(version)
+    });
+  });
+
+  EMBER_VERSIONS.push({
+    name: 'latest release',
+    path: 'http://builds.emberjs.com/release/ember.prod.js',
+    compilerPath: 'http://builds.emberjs.com/release/ember-template-compiler.js'
+  });
+
+  EMBER_VERSIONS.push({
+    name: 'latest beta',
+    path: 'http://builds.emberjs.com/beta/ember.prod.js',
+    compilerPath: 'http://builds.emberjs.com/beta/ember-template-compiler.js'
+  });
+
+  EMBER_VERSIONS.push({
+    name: 'latest canary',
+    path: 'http://builds.emberjs.com/canary/ember.prod.js',
+    compilerPath: 'http://builds.emberjs.com/canary/ember-template-compiler.js'
+  });
 
   // This should probably be ember-cli, it just seemed so complicated to
   // include an entire ember-cli app within a custom broccoli app that
