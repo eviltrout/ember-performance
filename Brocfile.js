@@ -61,12 +61,14 @@ var appJs = concat(mergeTrees([
 });
 
 var appCss = compileSass(['app/styles'], 'app.scss', 'assets/app.css');
+var testCss = compileSass(['app/styles'], 'test.scss', 'assets/test.css');
 var vendorCss = compileSass(['app/styles'], 'vendor.scss', 'assets/vendor.css');
 
 env('production', function() {
   vendorJs = uglifyJavaScript(vendorJs);
   testClient = uglifyJavaScript(testClient);
   vendorCss = cleanCSS(vendorCss);
+  testCss = cleanCSS(testCss);
   appCss = cleanCSS(appCss);
 });
 
@@ -76,6 +78,7 @@ module.exports = mergeTrees([
   appCss,
   vendorJs,
   vendorCss,
+  testCss,
   testClient,
   testTree,
   emberTree
