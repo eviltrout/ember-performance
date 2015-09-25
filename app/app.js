@@ -28,6 +28,7 @@
     { name: 'Render List',               path: '/render-list'   },
     { name: 'Render List (Unbound)',     path: '/render-list-unbound' },
     { name: 'Render Complex List',       path: '/render-complex-list' },
+    { name: 'Render Complex List (HTML)',path: '/render-complex-html' },
 
     { name: 'Render Simple Ember List',  path: '/render-simple-ember-list' },
     { name: 'Render List with link-to',  path: '/render-list-with-link-to' },
@@ -179,11 +180,9 @@
       }));
 
       TestSession.persist(testSession);
-      var t = testSession.nextTest();
-      if (t) {
-        var queryParams = options ? jQuery.param(options) : '';
-        document.location.href = t.path+(queryParams !== '' ? '?'+queryParams : '');
-      }
+
+      var queryParams = options ? jQuery.param(options) : '';
+      document.location.href = "/start-tests" + (queryParams !== '' ? '?' + queryParams : '');
     },
 
     actions: {

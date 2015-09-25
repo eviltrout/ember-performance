@@ -33,7 +33,8 @@
       featureFlags: JSON.stringify(this.featureFlags),
       queue: this._queue.map(function(it) {
         return it.toJSON();
-      })
+      }),
+      compiled: this.compiled
     };
 
     if (!result.id) {
@@ -58,6 +59,7 @@
     this.emberVersion = json.emberVersion;
     this.featureFlags = JSON.parse(json.featureFlags);
     this.id = json.id;
+    this.compiled = json.compiled;
     if (json.queue) {
       var self = this;
       json.queue.forEach(function(itJson) {

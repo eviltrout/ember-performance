@@ -1,13 +1,11 @@
 /* global RenderTemplateTestClient */
 
 (function() {
-  var template = "{{link-to 'Howdy!' 'index'}}";
-
   RenderTemplateTestClient.run({
     name: 'Render link-to',
 
     setup: function() {
-      this.setupTemplateTest(template);
+      this.setupTemplateTest('link-template');
     },
 
     reset: function() {

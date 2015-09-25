@@ -1,8 +1,10 @@
 /* global RenderTemplateTestClient */
 
 (function() {
+  var nestedComponentTemplate = "a: {{a}}";
+
   RenderTemplateTestClient.run({
-    name: 'Render Complex List',
+    name: 'Render Complex List (HTML)',
 
     setup: function() {
       var MyThing = Ember.Object.extend({
@@ -24,11 +26,7 @@
 
       this.registry.register('template:components/component-render', this.template('complex-list-component'));
       this.registry.register('template:components/nested-component', this.template('complex-list-nested'));
-      this.registry.register('component:buffer-render', Ember.Component.extend({
-        render: function(buffer) {
-          buffer.push(this.get('data'));
-        }
-      }));
+      this.registry.register('template:components/buffer-render', this.template("complex-list-data"));
     },
 
     reset: function() {

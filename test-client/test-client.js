@@ -163,6 +163,14 @@
   };
 
   TestClient.prototype = {
+    template: function(templateName) {
+      var compiled = this.session.compiled[templateName];
+      if (!compiled) {
+        throw "Missing template " + templateName;
+      }
+      return Ember.Handlebars.template(eval(compiled));
+    },
+
     updateTitle: function() {
       document.title = this.name;
       update('test-title', this.name);
@@ -205,7 +213,7 @@
     },
 
     recoverSession: function() {
-  // Recover our Test Session
+      // Recover our Test Session
       var session = this.session = TestSession.recover();
 
       if (session) {
@@ -213,10 +221,8 @@
 
         update('remaining-text', "" + session.remainingCount(this.testItem) + " test(s) remaining");
 
-        this.compilerUrl = session.compilerUrl;
         this.emberUrl = session.emberUrl;
       } else {
-        this.compilerUrl = "/ember/handlebars-v1.3.0.js";
         this.emberUrl = "/ember/1.8.1.js";
       }
     },
@@ -239,11 +245,7 @@
           };
         }
 
-        deps = [
-          '/ember/jquery-2.1.1.min.js',
-          this.compilerUrl,
-          this.emberUrl
-        ];
+        deps = [ '/ember/jquery-2.1.1.min.js', this.emberUrl ];
       }
 
       var test = this;
@@ -278,10 +280,6 @@
         // Record the ember version used
         if (test.session && !test.noEmber) {
           test.session.emberVersion = Ember.VERSION;
-        }
-
-        if (window.Ember) {
-          test.compile = Ember.HTMLBars ? Ember.HTMLBars.compile : Ember.Handlebars.compile;
         }
 
         RSVP.Promise.resolve(test.setup()).then(function() {
@@ -360,15 +358,15 @@
   RenderTemplateTestClient.run = TestClient.run;
   RenderTemplateTestClient.prototype = Object.create(TestClient.prototype);
 
-  RenderTemplateTestClient.prototype.setupTemplateTest = function(template, data) {
+  RenderTemplateTestClient.prototype.setupTemplateTest = function(templateName, data) {
     this.app = Ember.Application.create({ rootElement: '#scratch' });
     this.app.deferReadiness();
 
     this.registry = this.app.__registry__ || this.app.registry;
 
     this.registry.register('controller:index', Ember.Controller.extend());
-    this.registry.register('template:index', this.compile('{{#if showContents}}{{benchmarked-component data=data}}{{/if}}'));
-    this.registry.register('template:components/benchmarked-component', this.compile(template));
+    this.registry.register('template:index', this.template('base'));
+    this.registry.register('template:components/benchmarked-component', this.template(templateName));
 
     Ember.run(this.app, 'advanceReadiness');
 
