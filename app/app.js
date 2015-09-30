@@ -25,6 +25,13 @@
     { name: 'object-create/baseline',    path: '/object-create/baseline'   },
     { name: 'object-create/index',       path: '/object-create' },
 
+    // Basically, browisers (v8 included have mega slow defineProp ...)
+    // - https://code.google.com/p/v8/issues/detail?id=3649
+    // - there is a FF ticket I opened, but couldn't find it quickly :P
+    // - Jakob is working on it from the v8 side.
+    { name: 'object-create/without-non-enumerable-safety', path: '/object-create/without-non-enumerable-safety' },
+    { name: 'object-create/without-non-enumerable-safety-same-class', path: '/object-create/without-non-enumerable-safety-same-class' },
+
     { name: 'Render List',               path: '/render-list'   },
     { name: 'Render List (Unbound)',     path: '/render-list-unbound' },
     { name: 'Render Complex List',       path: '/render-complex-list' },
