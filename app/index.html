@@ -9,131 +9,76 @@
     <script type="text/x-handlebars">
       <div class="container">
         <h3 class="text-muted">Ember Performance</h3>
-
         {{outlet}}
       </div>
     </script>
 
     <script type="text/x-handlebars" data-template-name="index">
-
       {{#if report}}
-        <h4>Results:
-          {{#if report.emberVersion}}
-            (Ember {{report.emberVersion}})
-          {{/if}}
-        </h4>
+        <h4>Results:</h4>
+        <pre class='text-results'>{{{asciiTable}}}</pre>
 
-        <ul class="nav nav-tabs">
-          <li role="presentation" {{bind-attr class="showingHTML:active"}}><a href {{action "showHTML"}}>HTML Results</a></li>
-          <li role="presentation" {{bind-attr class="showingHTML::active"}}><a href {{action "showText"}}>Text Results</a></li>
-        </ul>
+        {{#if canSubmitStats}}
+          <div class='well'>
+            {{#unless sent}}
+              <p>Would you like to submit your results to help the Ember tuning effort? The server is maintained by
+                 by <a href='http://eviltrout.com'>eviltrout</a> and the only identifying information stored is your
+                 browser's user agent.</p>
 
-        <div class='well'>
-          {{#unless sent}}
-            <p>Would you like to submit your results to help the Ember tuning effort? The server is maintained by
-               by <a href='http://eviltrout.com'>eviltrout</a> and the only identifying information stored is your
-               browser's user agent.</p>
+              <button class='btn btn-primary' {{action "submitResults"}}>Submit my Results</button>
+              {{#if sending}}
+                Sending...
+              {{/if}}
 
-            <button class='btn btn-primary' {{action "submitResults"}}>Submit my Results</button>
-            {{#if sending}}
-              Sending...
-            {{/if}}
-
-            {{#if error}}
-              <div class='alert alert-danger'><strong>Error Sending Results</strong> perhaps there is a problem with the remote server?</div>
-            {{/if}}
-          {{else}}
-            Thanks for sending your results.
-          {{/unless}}
-        </div>
-
-        {{#if showingHTML}}
-          <table class='table'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th class="numeric">Speed</th>
-                <th class="numeric">Error</th>
-                <th class="numeric">Samples</th>
-                <th class="numeric">Mean</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each result in report.results}}
-                <tr>
-                  <td>{{result.name}}</td>
-                  <td class="numeric">{{fmt-number result.hz}} / sec</td>
-                  <td class="numeric">&#x2213; {{fmt-number result.rme}}%</td>
-                  <td class="numeric">{{result.samples}}</td>
-                  <td class="numeric">{{fmt-number result.mean}} ms</td>
-                </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        {{else}}
-          <pre class='text-results'>{{{asciiTable}}}</pre>
+              {{#if error}}
+                <div class='alert alert-danger'><strong>Error Sending Results</strong> perhaps there is a problem with the remote server?</div>
+              {{/if}}
+            {{else}}
+              Thanks for sending your results.
+            {{/unless}}
+          </div>
         {{/if}}
-
-        <button class='btn btn-danger' {{action "clear"}}>Clear Results</button>
-
         <hr>
       {{/if}}
 
-      <h4>Select the tests you'd like to execute:</h4>
-
-      <div class='form-group'>
-        Select:
-        <a href {{action "selectAll"}}>All</a> |
-        <a href {{action "selectNone"}}>None</a>
-      </div>
+      <h4>
+        Tests:
+        <a href {{action "selectAll"}}>All</a> | <a href {{action "selectNone"}}>None</a>
+      </h4>
 
       <div class="form-group">
         {{#each test in model}}
           <div>
+            <label>{{input type="checkbox" checked=test.isEnabled}} {{test.name}}</label>
+          </div>
+        {{/each}}
+      </div>
+
+      <h4>Versions:</h4>
+      <div class="form-group">
+        {{#each emberVersion in emberVersions}}
+          <div>
             <label>
-              {{input type="checkbox" checked=test.enabled}} {{test.name}}
+              {{input type="checkbox" checked=emberVersion.isEnabled}} {{emberVersion.name}}
+              {{#if emberVersion.isCustom}}
+                {{#if emberVersion.isEnabled}}
+                  <br />PATH: {{input value=emberVersion.path}}
+                  <br />COMPILER PATH: {{input value=emberVersion.compilerPath}}
+                {{/if}}
+              {{/if}}
             </label>
           </div>
         {{/each}}
       </div>
 
-      {{#if customEmber}}
-        <label>Custom Ember URL</label>
-        <div class="form-group">
-          {{input value=customEmberUrl}}
-        </div>
-
-        <label>Custom Compiler URL</label>
-        <div class="form-group">
-          {{input value=customCompilerUrl}}
-        </div>
-
-        <p><a href {{action "toggleCustom"}}>Cancel</a></p>
-      {{else}}
-        <div class='form-group'>
-          <label>
-            <p>Ember Version</p>
-            {{view "select" content=emberVersions
-                            value=emberVersion
-                            optionValuePath="content.path"
-                            optionLabelPath="content.name"}}
-          </label>
-          {{#if compilerUrl}}
-            <p>Using {{compilerUrl}}</p>
-          {{/if}}
-
-          <p><a href {{action "toggleCustom"}}>Use Custom Ember</a></p>
-        </div>
-      {{/if}}
-
       <label>Feature Flags</label>
       {{#if featureFlags}}
         <table class='table'>
           <tbody>
-            {{#each f in featureFlags}}
+            {{#each featureFlag in featureFlags}}
               <tr>
-                <td style='width: 20%'>{{f}}</td>
-                <td><button class='btn btn-danger btn-xs' {{action "removeFeature" f}}>remove</button></td>
+                <td style='width: 20%'>{{featureFlag}}</td>
+                <td><button class='btn btn-danger btn-xs' {{action "removeFeature" featureFlag}}>remove</button></td>
               </tr>
             {{/each}}
           </tbody>
@@ -146,7 +91,7 @@
 
       <div class='footer'>
         <button class='btn btn-primary' {{action "start"}} {{bind-attr disabled=cantStart}}>Run Tests</button>
-        <button class='btn btn-primary' {{action "profile"}} {{bind-attr disabled=cantProfile}}>Run Profile</button>
+        <button class='btn btn-primary' {{action "profile"}} {{bind-attr disabled=cantStart}}>Run Tests with Profile</button>
       </div>
     </script>
 

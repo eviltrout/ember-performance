@@ -154,8 +154,8 @@
   }
 
   TestClient.run = function(test) {
-    var profile = getParameterByName('profile');
-    if (profile !== '') {
+    var session = TestSession.recover();
+    if (session.enableProfile) {
       buildProfileClient(this, test).start();
     } else {
       new this(test).start();
@@ -164,10 +164,7 @@
 
   TestClient.prototype = {
     template: function(templateName) {
-      var compiled = this.session.compiled[templateName];
-      if (!compiled) {
-        throw "Missing template " + templateName;
-      }
+      var compiled = this.session.getCompiledTemplate(templateName);
       return Ember.Handlebars.template(eval(compiled));
     },
 
@@ -213,15 +210,15 @@
     },
 
     recoverSession: function() {
-      // Recover our Test Session
       var session = this.session = TestSession.recover();
+      var testGroup = session.currentTestGroup();
 
       if (session) {
-        this.testItem = session.findItem(document.location.pathname);
+        this.testItem = session.currentTestItem();
 
-        update('remaining-text', "" + session.remainingCount(this.testItem) + " test(s) remaining");
-
-        this.emberUrl = session.emberUrl;
+        update('remaining-text', session.remainingTestCount() + " test(s) remaining");
+        this.emberUrl = testGroup.emberVersion.path;
+        update('ember-version', testGroup.emberVersion.name);
       } else {
         this.emberUrl = "/ember/1.8.1.js";
       }
@@ -229,7 +226,6 @@
 
     start: function() {
       update('status-text', 'Loading...');
-
       this.recoverSession();
 
       var deps = [];
@@ -252,36 +248,13 @@
 
       // Once the test completes
       var complete = function(result) {
-        var testItem = test.testItem;
-        if (testItem) {
-          result.name = test.name;
-          testItem.addResult(result);
-        } else {
-          update('status-text', JSON.stringify(result));
-        }
-
-        update('status-text', JSON.stringify(result));
-
-        var session = test.session;
-        if (!session) { return; }
-        var nextTest = session.nextTest();
-        if (nextTest) {
-          document.location.href = nextTest.path;
-        } else {
-          // When we're done go back to the root.
-          if (!result.skipRedirect) {
-            document.location.href = "/";
-          }
-        }
+        test.testItem.result = result;
+        test.session.progress();
+        document.location.href =  "/next-url";
       };
 
       // What to run when our dependencies have loaded
       var runner = function() {
-        // Record the ember version used
-        if (test.session && !test.noEmber) {
-          test.session.emberVersion = Ember.VERSION;
-        }
-
         RSVP.Promise.resolve(test.setup()).then(function() {
           return test.run();
         }).then(complete).catch(function(error) {
@@ -350,7 +323,6 @@
     return string;
   }
 
-
   function RenderTemplateTestClient(test) {
     TestClient.call(this, test);
   }
@@ -387,5 +359,4 @@
   }
 
   window.RenderTemplateTestClient = RenderTemplateTestClient;
-
 })();
