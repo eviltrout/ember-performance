@@ -1,10 +1,5 @@
 (function() {
-
-  var testSession = TestSession.recover();
-  console.log(testSession);
-
   var templates = {
-
     "base": '{{#if showContents}}{{benchmarked-component data=data}}{{/if}}',
 
     "render-list":
@@ -91,18 +86,17 @@
       "{{data}}"
   };
 
-  head.load(testSession.compilerUrl, function() {
-    testSession.compiled = {};
-    Object.keys(templates).forEach(function(k) {
-      testSession.compiled[k] = Ember.Handlebars.precompile(templates[k], false);
+  var testSession = TestSession.recover();
+  var testGroup = testSession.currentTestGroup();
+
+  head.load(testGroup.emberVersion.compilerPath, function() {
+    testGroup.compiledTemplates = {};
+
+    Object.keys(templates).forEach(function(key) {
+      testGroup.compiledTemplates[key] = Ember.Handlebars.precompile(templates[key], false);
     });
-    TestSession.persist(testSession);
+    testSession.save();
 
-
-    var t = testSession.nextTest();
-    if (t) {
-      document.location.href = t.path;
-    }
+    document.location.href =  "/next-url";
   });
-
 })();

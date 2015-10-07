@@ -25,7 +25,8 @@ var clientTree = mergeTrees([
   'test-client', mergeTrees(findBowerTrees())
 ]);
 
-var startTree = find('start-tests');
+var compileTemplatesTree = find('compile-templates');
+var nextUrlTree = find('next-url');
 
 var testClient = concat(clientTree, {
   inputFiles: [
@@ -84,5 +85,6 @@ module.exports = mergeTrees([
   testClient,
   testTree,
   emberTree,
-  startTree
+  compileTemplatesTree,
+  nextUrlTree
 ]);

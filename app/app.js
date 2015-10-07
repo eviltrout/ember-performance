@@ -1,11 +1,8 @@
 /* globals TestSession, AsciiTable, jQuery */
 (function() {
+  var EMBER_PERF_VERSION = "0.9.2"; // TODO: get from package.json
 
-  // TODO: get from package.json
-  var EMBER_PERF_VERSION = "0.9.2";
-
-  // TODO: Populate this automatically from the test definitions
-  var TEST_LIST = [
+  var TEST_LIST = [ // TODO: Populate this automatically from the test definitions
     { name: 'Baseline: Render List',     path: '/baseline-render-list'     },
     { name: 'Baseline: Handlebars List', path: '/baseline-handlebars-list' },
 
@@ -13,7 +10,6 @@
     { name: 'Ember.set',                 path: '/ember-set' },
     { name: 'Ember.set (primed)',        path: '/ember-set/primed' },
     { name: 'Ember.get (primed)',        path: '/ember-get/primed' },
-
     { name: 'Ember.run',                 path: '/ember-run' },
 
     // this test is broken in 1.11 beta
@@ -39,7 +35,6 @@
 
     { name: 'Render Simple Ember List',  path: '/render-simple-ember-list' },
     { name: 'Render List with link-to',  path: '/render-list-with-link-to' },
-
     { name: 'Render link-to',            path: '/render-link-to' }
   ];
 
@@ -58,26 +53,31 @@
     EMBER_VERSIONS.push({
       name: version,
       path: '/ember/ember-%@.prod.js'.fmt(version),
-      compilerPath: '/ember/ember-%@.template-compiler.js'.fmt(version)
+      compilerPath: '/ember/ember-%@.template-compiler.js'.fmt(version),
+      isEnabled: false,
+      isCustom: false
+    });
+  });
+
+  EMBER_VERSIONS[EMBER_VERSIONS.length-1].isEnabled = true;
+
+  var REMOVE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
+  REMOVE_EMBER_VERSIONS.forEach(function(version) {
+    EMBER_VERSIONS.push({
+      name: 'latest ' + version,
+      path: 'http://builds.emberjs.com/' + version + '/ember.prod.js',
+      compilerPath: 'http://builds.emberjs.com/' + version + '/ember-template-compiler.js',
+      isEnabled: false,
+      isCustom: false
     });
   });
 
   EMBER_VERSIONS.push({
-    name: 'latest release',
-    path: 'http://builds.emberjs.com/release/ember.prod.js',
-    compilerPath: 'http://builds.emberjs.com/release/ember-template-compiler.js'
-  });
-
-  EMBER_VERSIONS.push({
-    name: 'latest beta',
-    path: 'http://builds.emberjs.com/beta/ember.prod.js',
-    compilerPath: 'http://builds.emberjs.com/beta/ember-template-compiler.js'
-  });
-
-  EMBER_VERSIONS.push({
-    name: 'latest canary',
-    path: 'http://builds.emberjs.com/canary/ember.prod.js',
-    compilerPath: 'http://builds.emberjs.com/canary/ember-template-compiler.js'
+    name: 'custom version',
+    path: '',
+    compilerPath: '',
+    isEnabled: false,
+    isCustom: true
   });
 
   // This should probably be ember-cli, it just seemed so complicated to
@@ -90,9 +90,6 @@
       this._super.apply(this, arguments);
 
       this.report = null;
-      this.emberVersion = null;
-      this.customEmber = false;
-      this.showingHTML = true;
       this.sending = false;
       this.error = false;
       this.sent = false;
@@ -100,75 +97,51 @@
       this.newFlagName = null;
     },
 
-    enabledTests: Ember.computed.filterBy('model', 'enabled', true),
+    enabledTests: Ember.computed.filterBy('model', 'isEnabled', true),
+    enabledEmberVersions: Ember.computed.filterBy('emberVersions', 'isEnabled', true),
     addFeatureDisabled: Ember.computed.empty('newFlagName'),
+    customEmberVersion: Ember.computed.reads('emberVersions.lastObject'),
+    canSubmitStats: Ember.computed.equal('report.testGroupReports.length', 1),
+    hasNoEnabledTests: Ember.computed.empty('enabledTests'),
+    hasNoEnabledEmberVersions: Ember.computed.empty('enabledEmberVersions'),
+    cantStart: Ember.computed.or('hasNoEnabledTests', 'hasNoEnabledEmberVersions'),
 
     asciiTable: function() {
-      var result = 'Ember Version: ' + this.get('report.emberVersion') + "\n";
-
-      result += 'User Agent: ' + navigator.userAgent + "\n";
+      result = 'User Agent: ' + navigator.userAgent + "\n";
 
       var featureFlags = this.get('report.featureFlags');
       if (featureFlags && featureFlags.length) {
         result += 'Feature Flags: ' + featureFlags.join(', ') + "\n";
       }
-
       result += '\n';
 
       var table = new AsciiTable('Ember Performance Suite - Results');
       table.setHeading('Name', 'Speed', 'Error', 'Samples', 'Mean');
-      this.get('report.results').forEach(function(r) {
-        table.addRow(r.name,
-                     roundedNumber(r.hz),
-                     roundedNumber(r.rme),
-                     roundedNumber(r.samples),
-                     roundedNumber(r.mean));
+
+      this.get('report.testGroupReports').forEach(function(testGroupReport) {
+        testGroupReport.results.forEach(function(result) {
+          table.addRow(result.name + " (" + testGroupReport.emberVersion.name + ")",
+                       roundedNumber(result.hz),
+                       "∓" + roundedNumber(result.rme) + "%",
+                       roundedNumber(result.samples),
+                       roundedNumber(result.mean));
+        });
       });
 
       return result + table.toString();
-    }.property('report.results'),
-
-    emberUrl: function() {
-      if (this.get('customEmber')) {
-        return this.get('customEmberUrl');
-      } else {
-        return this.get('emberVersion');
-      }
-    }.property('customEmber', 'emberVersion', 'customEmberUrl'),
-
-    compilerUrl: function() {
-      if (this.get('customEmber')) {
-        return this.get('customCompilerUrl');
-      } else {
-        var v = EMBER_VERSIONS.findProperty('path', this.get('emberVersion'));
-        if (v && v.compilerPath) {
-          return v.compilerPath;
-        }
-      }
-    }.property('customEmber', 'emberVersion', 'customCompilerUrl'),
-
-    cantStart: function() {
-      return (this.get('enabledTests.length') === 0) ||
-              Ember.empty(this.get('emberUrl')) ||
-              Ember.empty(this.get('compilerUrl'));
-    }.property('emberUrl', 'compilerUrl', 'enabledTests.length'),
-
-    cantProfile: function() {
-      return (this.get('enabledTests.length') !== 1) ||
-              Ember.empty(this.get('emberUrl')) ||
-              Ember.empty(this.get('compilerUrl'));
-    }.property('emberUrl', 'compilerUrl', 'enabledTests.length'),
+    }.property('report.testGroupReports.[]'),
 
     run: function(options) {
+      options = options || {};
+      var enabledEmberVersions = this.get('enabledEmberVersions');
       var enabledTests = this.get('enabledTests');
 
       // Remember any custom urls we set for another run
-      if (this.get('customEmber')) {
-        localStorage.setItem('ember-perf-custom', 'true');
-        localStorage.setItem('ember-perf-ember-url', this.get('emberUrl'));
-        localStorage.setItem('ember-perf-compiler-url', this.get('compilerUrl'));
+      var customEmberVersion = this.get('customEmberVersion');
+      if (customEmberVersion.isEnabled) {
+        localStorage.setItem('ember-perf-ember-url', customEmberVersion.path);
+        localStorage.setItem('ember-perf-compiler-url', customEmberVersion.compilerPath);
       } else {
-        localStorage.removeItem('ember-perf-custom');
         localStorage.removeItem('ember-perf-ember-url');
         localStorage.removeItem('ember-perf-compiler-url');
       }
@@ -176,19 +149,12 @@
       localStorage.setItem('ember-perf-flags', JSON.stringify(this.get('featureFlags')));
 
       var testSession = new TestSession();
-
-      testSession.emberUrl = this.get('emberUrl');
-      testSession.compilerUrl = this.get('compilerUrl');
+      testSession.setup(enabledEmberVersions, enabledTests);
       testSession.featureFlags = this.get('featureFlags');
+      testSession.enableProfile = options.enableProfile || false;
+      testSession.save();
 
-      testSession.enqueuePaths(enabledTests.map(function(t) {
-        return t.get('path');
-      }));
-
-      TestSession.persist(testSession);
-
-      var queryParams = options ? jQuery.param(options) : '';
-      document.location.href = "/start-tests" + (queryParams !== '' ? '?' + queryParams : '');
+      document.location.href = "/next-url";
     },
 
     actions: {
@@ -199,7 +165,6 @@
         this.set('error', false);
 
         var reportJson = this.get('report');
-
         reportJson.emberPerfVersion = EMBER_PERF_VERSION;
 
         new Ember.RSVP.Promise(function (resolve, reject) {
@@ -223,43 +188,20 @@
         });
       },
 
-      toggleCustom: function() {
-        this.toggleProperty('customEmber');
-      },
-
-      showHTML: function() {
-        this.set('showingHTML', true);
-        localStorage.setItem('ember-perf-mode', 'html');
-      },
-
-      showText: function() {
-        this.set('showingHTML', false);
-        localStorage.setItem('ember-perf-mode', 'text');
-      },
-
       profile: function() {
-        this.run({ profile: true });
+        this.run({ enableProfile: true });
       },
 
       start: function() {
         this.run();
       },
 
-      clear: function() {
-        TestSession.eject();
-        this.set('report', []);
-      },
-
       selectNone: function() {
-        this.get('model').forEach(function(t) {
-          t.set('enabled', false);
-        });
+        this.get('model').setEach('isEnabled', false);
       },
 
       selectAll: function() {
-        this.get('model').forEach(function(t) {
-          t.set('enabled', true);
-        });
+        this.get('model').setEach('isEnabled', true);
       },
 
       addFeature: function() {
@@ -276,39 +218,42 @@
     }
   });
 
-  Ember.Handlebars.registerBoundHelper('fmt-number', function(num) {
-    return window.numeral(num).format('0,0.00');
-  });
-
   App.IndexRoute = Ember.Route.extend({
     model: function() {
       var session = TestSession.recover();
 
-      var tests = TEST_LIST.map(function(t) {
-
+      var tests = TEST_LIST.map(function(test) {
         if (session) {
-          t.enabled = !!session.findItem(t.path);
+          test.isEnabled = session.isTestEnabled(test);
         } else {
-          // By default all tests are enabled
-          t.enabled = true;
+          test.isEnabled = true;
         }
 
-        return Ember.Object.create(t);
+        return Ember.Object.create(test);
       });
 
-      return { tests: tests, session: session };
+      var emberVersions = EMBER_VERSIONS.map(function(emberVersion) {
+        if (session) {
+          emberVersion.isEnabled = session.isVersionEnabled(emberVersion);
+        }
+
+        if(emberVersion.isCustom) {
+          emberVersion.path = localStorage.getItem('ember-perf-ember-url');
+          emberVersion.compilerPath = localStorage.getItem('ember-perf-compiler-url');
+        }
+
+        return Ember.Object.create(emberVersion);
+      });
+
+      return { tests: tests, emberVersions: emberVersions, session: session };
     },
 
     setupController: function(controller, model) {
       var session = model.session;
-      var version = EMBER_VERSIONS[0].path;
+      var report;
 
       if (session) {
-        var report = session.report();
-        controller.set('report', report);
-        if (report && report.emberUrl) {
-          version = report.emberUrl;
-        }
+        report = session.getReport();
       }
 
       var featureFlags = [];
@@ -319,16 +264,17 @@
       }
 
       controller.setProperties({
-        emberVersion: version,
-        emberVersions: EMBER_VERSIONS,
         model: model.tests,
-        featureFlags: featureFlags,
-        showingHTML: localStorage.getItem('ember-perf-mode') !== 'text',
-        customEmber: localStorage.getItem('ember-perf-custom') === 'true',
-        customEmberUrl: localStorage.getItem('ember-perf-ember-url'),
-        customCompilerUrl: localStorage.getItem('ember-perf-compiler-url')
+        session: session,
+        report: report,
+        emberVersions: model.emberVersions,
+        featureFlags: featureFlags
       });
     }
+  });
+
+  Ember.Handlebars.registerBoundHelper('fmt-number', function(num) {
+    return window.numeral(num).format('0,0.00');
   });
 
   function roundedNumber(num) {
@@ -337,5 +283,4 @@
     }
     return num;
   }
-
 })();
