@@ -6,9 +6,9 @@
   } else {
     var testGroup = testSession.currentTestGroup();
     if(testGroup.requiresTemplateCompilation()) {
-      document.location.href =  "/compile-templates";
+      document.location.href =  "/compile-templates/index.html";
     } else {
-      document.location.href = testSession.currentTestItem().test.path;
+      document.location.href = "/benchmarks" + testSession.currentTestItem().test.path + "/index.html";
     }
   }
 })();

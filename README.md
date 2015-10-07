@@ -70,4 +70,3 @@ After you've created the test, add it to the manifest of tests in
 ### License
 
 MIT
-
