@@ -1,0 +1,81 @@
+{{#if report}}
+  <h4>Results:</h4>
+  <pre class='text-results'>{{{asciiTable}}}</pre>
+
+  {{#if canSubmitStats}}
+    <div class='well'>
+      {{#unless sent}}
+        <p>Would you like to submit your results to help the Ember tuning effort? The server is maintained by
+           by <a href='http://eviltrout.com'>eviltrout</a> and the only identifying information stored is your
+           browser's user agent.</p>
+
+        <button class='btn btn-primary' {{action "submitResults"}}>Submit my Results</button>
+        {{#if sending}}
+          Sending...
+        {{/if}}
+
+        {{#if error}}
+          <div class='alert alert-danger'><strong>Error Sending Results</strong> perhaps there is a problem with the remote server?</div>
+        {{/if}}
+      {{else}}
+        Thanks for sending your results.
+      {{/unless}}
+    </div>
+  {{/if}}
+  <hr>
+{{/if}}
+
+<h4>
+  Tests:
+  <a href {{action "selectAll"}}>All</a> | <a href {{action "selectNone"}}>None</a>
+</h4>
+
+<div class="form-group">
+  {{#each model as |test|}}
+    <div>
+      <label>{{input type="checkbox" checked=test.isEnabled}} {{test.name}}</label>
+    </div>
+  {{/each}}
+</div>
+
+<h4>Versions:</h4>
+<div class="form-group">
+  {{#each emberVersions as |emberVersion|}}
+    <div>
+      <label>
+        {{input type="checkbox" checked=emberVersion.isEnabled}} {{emberVersion.name}}
+        {{#if emberVersion.isCustom}}
+          {{#if emberVersion.isEnabled}}
+            <br />PATH: {{input value=emberVersion.path}}
+            <br />COMPILER PATH: {{input value=emberVersion.compilerPath}}
+          {{/if}}
+        {{/if}}
+      </label>
+    </div>
+  {{/each}}
+</div>
+
+<label>Feature Flags</label>
+{{#if featureFlags}}
+  <table class='table'>
+    <tbody>
+      {{#each featureFlags as |featureFlag|}}
+        <tr>
+          <td style='width: 20%'>{{featureFlag}}</td>
+          <td>
+            <button class="btn btn-danger btn-xs" {{action "removeFeature" featureFlag}}>remove</button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{/if}}
+<div class='form-group'>
+  {{input value=newFlagName placeholder="Flag Name"}}
+  <button class="btn :btn-default :btn-xs {{if addFeatureDisabled 'disabled'}}" {{action "addFeature"}}>Add Feature</button>
+</div>
+
+<div class='footer'>
+  <button class='btn btn-primary' {{action "start"}} disabled={{cantStart}}>Run Tests</button>
+  <button class='btn btn-primary' {{action "profile"}} disabled={{cantStart}}>Run Tests with Profile</button>
+</div>
