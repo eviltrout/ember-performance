@@ -22,6 +22,7 @@
     "loader.js": "ember-cli/loader.js#3.2.1",
     "numeraljs": "~1.5.3",
     "qunit": "~1.18.0",
-    "bootstrap": "~3.3.2"
+    "bootstrap": "~3.3.2",
+    "numeral": "~1.5.3"
   }
 }
