@@ -1,0 +1,61 @@
+<h4>Results:</h4>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="{{if isHtmlMode 'active'}}">
+    <a href {{action "switchMode" "html"}}>HTML</a>
+  </li>
+  <li role="presentation" class="{{if isTextMode 'active'}}">
+    <a href {{action "switchMode" "text"}}>Text</a>
+  </li>
+</ul>
+
+{{#if isHtmlMode}}
+  {{#each report.testGroupReports as |testGroupReport|}}
+    <table class='table'>
+      <thead>
+        <tr>
+          <th>Ember {{testGroupReport.emberVersion.name}}</th>
+          <th class="numeric">Speed</th>
+          <th class="numeric">Error</th>
+          <th class="numeric">Samples</th>
+          <th class="numeric">Mean</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each testGroupReport.results as |result|}}
+          <tr>
+            <td>{{result.name}}</td>
+            <td class="numeric">{{format-number result.hz format="0.00"}} / sec</td>
+            <td class="numeric">&#x2213; {{format-number result.rme format="0.00"}}%</td>
+            <td class="numeric">{{result.samples}}</td>
+            <td class="numeric">{{format-number result.mean format="0.00"}} ms</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  {{/each}}
+{{else}}
+  <pre class='text-results'>{{{asciiTable}}}</pre>
+{{/if}}
+
+{{#if canSubmitStats}}
+  <div class='well'>
+    {{#unless sent}}
+      <p>Would you like to submit your results to help the Ember tuning effort? The server is maintained by
+         by <a href='http://eviltrout.com'>eviltrout</a> and the only identifying information stored is your
+         browser's user agent.</p>
+
+      <button class='btn btn-primary' {{action "submitResults"}}>Submit my Results</button>
+      {{#if sending}}
+        Sending...
+      {{/if}}
+
+      {{#if error}}
+        <div class='alert alert-danger'><strong>Error Sending Results</strong> perhaps there is a problem with the remote server?</div>
+      {{/if}}
+    {{else}}
+      Thanks for sending your results.
+    {{/unless}}
+  </div>
+{{/if}}
+<hr>
