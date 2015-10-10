@@ -1,8 +1,6 @@
 import Ember from 'ember';
 import numeral from 'numeral';
 
-var EMBER_PERF_VERSION = "0.9.2"; // TODO: get from package.json
-
 export default Ember.Component.extend({
   mode: 'html',
   isHtmlMode: Ember.computed.equal('mode', 'html'),
@@ -47,7 +45,7 @@ export default Ember.Component.extend({
       this.set('error', false);
 
       var reportJson = this.get('report'); //TODO: GJ: fix this https://github.com/eviltrout/ember-performance/issues/69
-      reportJson.emberPerfVersion = EMBER_PERF_VERSION;
+      reportJson.emberPerfVersion = window.EmberPerformance.version;
 
       new Ember.RSVP.Promise(function (resolve, reject) {
         Ember.$.ajax({
