@@ -51,8 +51,8 @@ var EMBER_VERSIONS = [];
 LOCAL_EMBER_VERSIONS.forEach(function(version) {
   EMBER_VERSIONS.push({
     name: version,
-    path: '/ember/ember-%@.prod.js'.fmt(version),
-    compilerPath: '/ember/ember-%@.template-compiler.js'.fmt(version),
+    path: `/ember/ember-${version}.prod.js`,
+    compilerPath: `/ember/ember-${version}.template-compiler.js`,
     isEnabled: false,
     isCustom: false
   });
@@ -63,9 +63,9 @@ EMBER_VERSIONS[EMBER_VERSIONS.length-1].isEnabled = true;
 var REMOVE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
 REMOVE_EMBER_VERSIONS.forEach(function(version) {
   EMBER_VERSIONS.push({
-    name: 'latest ' + version,
-    path: 'http://builds.emberjs.com/' + version + '/ember.prod.js',
-    compilerPath: 'http://builds.emberjs.com/' + version + '/ember-template-compiler.js',
+    name: `latest ${version}`,
+    path: `http://builds.emberjs.com/${version}/ember.prod.js`,
+    compilerPath: `http://builds.emberjs.com/${version}/ember-template-compiler.js`,
     isEnabled: false,
     isCustom: false
   });

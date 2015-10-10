@@ -7,6 +7,23 @@ export default Ember.Component.extend({
   isTextMode: Ember.computed.equal('mode', 'text'),
   canSubmitStats: Ember.computed.equal('report.testGroupReports.length', 1),
 
+  groupedTests: function() {
+    var tests = {};
+    this.get('report.testGroupReports').forEach(function(testGroupReport) {
+      testGroupReport.results.forEach(function(result) {
+        var test = tests[result.name] || { name: result.name, data: [] };
+        test.data.push({
+          emberVersion: testGroupReport.emberVersion,
+          result: result
+        });
+
+        tests[result.name] = test;
+      });
+    });
+
+    return tests;
+  }.property('report.testGroupReports.[]'),
+
   asciiTable: function() {
     var result = 'User Agent: ' + navigator.userAgent + "\n";
 
