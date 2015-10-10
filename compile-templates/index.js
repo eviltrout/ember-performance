@@ -97,6 +97,6 @@
     });
     testSession.save();
 
-    document.location.href = "/next-url/index.html"; 
+    testSession.goToNextUrl();
   });
 })();

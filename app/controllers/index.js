@@ -43,7 +43,7 @@ export default Ember.Controller.extend({
     testSession.enableProfile = options.enableProfile || false;
     testSession.save();
 
-    document.location.href = "/next-url/index.html";
+    testSession.goToNextUrl();
   },
 
   actions: {

@@ -8,7 +8,6 @@ var findBowerTrees = require('broccoli-bower');
 var copyIndex = require('./lib/copy-index');
 var Funnel = require('broccoli-funnel');
 
-var nextUrlTree = find('next-url');
 var compileTemplatesTree = find('compile-templates');
 var emberTree = find('ember/**/*.js');
 
@@ -43,7 +42,6 @@ module.exports = function(defaults) {
   return mergeTrees([
     app.toTree(),
     testClient,
-    nextUrlTree,
     compileTemplatesTree,
     benchmarksTree,
     benchmarksTreeJS,
