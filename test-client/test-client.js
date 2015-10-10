@@ -250,7 +250,7 @@
       var complete = function(result) {
         test.testItem.result = result;
         test.session.progress();
-        document.location.href =  "/next-url/index.html";
+        test.session.goToNextUrl();
       };
 
       // What to run when our dependencies have loaded

@@ -243,6 +243,19 @@
     return compiled;
   };
 
+  TestSession.prototype.goToNextUrl = function() {
+    if(this.isComplete()) {
+      document.location.href = "/";
+    } else {
+      var testGroup = this.currentTestGroup();
+      if(testGroup.requiresTemplateCompilation()) {
+        document.location.href =  "/compile-templates/index.html";
+      } else {
+        document.location.href = "/benchmarks" + this.currentTestItem().test.path + "/index.html";
+      }
+    }
+  };
+
   TestSession.generateUUID = function() { // thanks http://stackoverflow.com/a/873856
     var s = [];
     var hexDigits = "0123456789abcdef";
