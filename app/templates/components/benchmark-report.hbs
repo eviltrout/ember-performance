@@ -25,10 +25,10 @@
         {{#each testGroupReport.results as |result|}}
           <tr>
             <td>{{result.name}}</td>
-            <td class="numeric">{{format-number result.hz format="0.00"}} / sec</td>
-            <td class="numeric">&#x2213; {{format-number result.rme format="0.00"}}%</td>
+            <td class="numeric">{{format-number result.hz format="0,0.00"}} / sec</td>
+            <td class="numeric">&#x2213; {{format-number result.rme format="0,0.00"}}%</td>
             <td class="numeric">{{result.samples}}</td>
-            <td class="numeric">{{format-number result.mean format="0.00"}} ms</td>
+            <td class="numeric">{{format-number result.mean format="0,0.00"}} ms</td>
           </tr>
         {{/each}}
       </tbody>

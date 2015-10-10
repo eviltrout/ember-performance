@@ -26,10 +26,10 @@ export default Ember.Component.extend({
 
       testGroupReport.results.forEach(function(result) {
         table.addRow(result.name,
-                     numeral(result.hz).format("0.00") + " / sec",
-                     "∓" + numeral(result.rme).format("0.00") + "%",
+                     numeral(result.hz).format("0,0.00") + " / sec",
+                     "∓" + numeral(result.rme).format("0,0.00") + "%",
                      numeral(result.samples).format(),
-                     numeral(result.mean).format("0.00") + " ms");
+                     numeral(result.mean).format("0,0.00") + " ms");
       });
     });
 
