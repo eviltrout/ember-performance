@@ -17,7 +17,7 @@ export default Ember.Component.extend({
           emberVersion: testGroupReport.emberVersion,
           result: result
         });
-        test.chartData.push([testGroupReport.emberVersion.name, result.mean])
+        test.chartData.push([testGroupReport.emberVersion.name, result.mean]);
 
         tests[result.name] = test;
       });
