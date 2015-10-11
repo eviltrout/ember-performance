@@ -4,7 +4,8 @@
 
 <h4>
   Tests:
-  <a href {{action "selectAll"}}>All</a> | <a href {{action "selectNone"}}>None</a>
+  <button {{action "selectAllTests"}} type="button" class="btn btn-default btn-xs">All</button>
+  <button {{action "selectNoTests"}} type="button" class="btn btn-default btn-xs">None</button>
 </h4>
 
 <div class="form-group">
@@ -15,7 +16,11 @@
   {{/each}}
 </div>
 
-<h4>Versions:</h4>
+<h4>
+  Versions:
+  <button {{action "selectAllVersions"}} type="button" class="btn btn-default btn-xs">All</button>
+  <button {{action "selectNoVersions"}} type="button" class="btn btn-default btn-xs">None</button>
+</h4>
 <div class="form-group">
   {{#each emberVersions as |emberVersion|}}
     <div>
