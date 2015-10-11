@@ -1,27 +1,31 @@
 /* global require, module */
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
-
-var find = require('broccoli-stew').find;
-var mergeTrees = require('broccoli-merge-trees');
-var concat = require('broccoli-concat');
+var MergeTrees = require('broccoli-merge-trees');
+var Concat = require('broccoli-sourcemap-concat');
 var findBowerTrees = require('broccoli-bower');
-var copyIndex = require('./lib/copy-index');
+var CopyIndex = require('./lib/copy-index');
 var Funnel = require('broccoli-funnel');
 var uglify = require('broccoli-uglify-js');
 
-var compileTemplatesTree = find('compile-templates');
-var emberTree = find('ember/**/*.js');
-
-if (EmberApp.env() === 'production') {
-  emberTree = uglify(emberTree);
-}
-
-var clientTree = mergeTrees([
+var bowerTree = new MergeTrees(findBowerTrees(), {
+  annotation: 'bower trees merge',
+  overwrite: true
+});
+var clientBowerTree = new Funnel(bowerTree, {
+  include: [
+    'head.min.js',
+    'benchmark.js',
+    'rsvp.js',
+    'ascii-table.js'
+  ]
+});
+var clientTree = new MergeTrees([
   'test-client',
-  mergeTrees(findBowerTrees(), { overwrite: true })
-]);
-
-var testClient = concat(clientTree, {
+  clientBowerTree
+], {
+  annotation: 'test-client merge'
+});
+var testClient = new Concat(clientTree, {
   inputFiles: [
     'test-client.js',
     'test-session.js',
@@ -34,22 +38,45 @@ var testClient = concat(clientTree, {
   outputFile: '/assets/test-client.js'
 });
 
+var nextUrlTree = new Funnel('next-url', {
+  include: [ 'index.{html,js}' ],
+  destDir: 'next-url'
+});
 
-var benchmarksTree = find('benchmarks');
-var benchmarksTreeJS = copyIndex('benchmarks', { extensions: ['js'] });
-benchmarksTreeJS = new Funnel(benchmarksTreeJS, { destDir: 'benchmarks' });
+var compileTemplatesTree = new Funnel('compile-templates', {
+  include: [ 'index.{html,js}' ],
+  destDir: 'compile-templates'
+});
+
+var benchmarksIndexJs = new Funnel('benchmarks', {
+  include: [ '**/*.js' ],
+  destDir: 'benchmarks'
+});
+
+var benchmarksIndexHtml = new CopyIndex(benchmarksIndexJs, {
+  annotation: 'Copy index.html to benchmark'
+});
+
+var emberTree = new Funnel('ember', {
+  include: [ '**/*.js' ],
+  destDir: 'ember'
+});
+
+if (EmberApp.env() === 'production') {
+  emberTree = uglify(emberTree);
+}
 
 module.exports = function(defaults) {
   var app = new EmberApp(defaults, {
-    // Add options here
   });
-
-  return mergeTrees([
+  return new MergeTrees([
     app.toTree(),
     testClient,
     compileTemplatesTree,
-    benchmarksTree,
-    benchmarksTreeJS,
+    benchmarksIndexJs,
+    benchmarksIndexHtml,
     emberTree
-  ]);
+  ], {
+    annotation: 'final dist merge'
+  });
 };

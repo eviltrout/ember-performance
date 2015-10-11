@@ -16,15 +16,16 @@
     "ember-qunit": "0.4.10",
     "ember-qunit-notifications": "0.1.0",
     "ember-resolver": "~0.1.18",
-    "jquery": "^1.11.3",
+    "jquery": "~2.1.1",
     "loader.js": "ember-cli/loader.js#3.3.0",
     "qunit": "~1.19.0",
     "headjs": "~1.0.3",
     "rsvp": "3.0.13",
-    "jquery": "~2.1.1",
-    "loader.js": "ember-cli/loader.js#3.2.1",
     "numeraljs": "~1.5.3",
     "bootstrap": "~3.3.2",
     "numeral": "~1.5.3"
+  },
+  "resolutions": {
+    "ember": "2.1.0"
   }
 }
