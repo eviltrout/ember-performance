@@ -7,9 +7,14 @@ var concat = require('broccoli-concat');
 var findBowerTrees = require('broccoli-bower');
 var copyIndex = require('./lib/copy-index');
 var Funnel = require('broccoli-funnel');
+var uglify = require('broccoli-uglify-js');
 
 var compileTemplatesTree = find('compile-templates');
 var emberTree = find('ember/**/*.js');
+
+if (EmberApp.env() === 'production') {
+  emberTree = uglify(emberTree);
+}
 
 var clientTree = mergeTrees([
   'test-client',
