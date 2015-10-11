@@ -11,6 +11,8 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
+    "server": "ember server",
+    "prod-server": "ember server -prod",
     "test": "ember test"
   },
   "repository": "",

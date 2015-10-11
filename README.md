@@ -17,7 +17,7 @@ the performance of the Ember.js framework. The general strategy is:
 1. `npm install`
 2. `npm install -g bower`
 3. `bower install`
-4. `npm start`
+4. `npm run server`
 
 And open a browser to http://localhost:4200
 
@@ -25,10 +25,9 @@ And open a browser to http://localhost:4200
 
 1. `npm install`
 2. `npm install -g bower`
-3. `bower install`
-4. `broccoli build dist`
+3. `npm run prod-server`
 
-The compiled version will be in your `dist` folder
+And open a browser to http://localhost:4200
 
 ### To add a new test
 
