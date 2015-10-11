@@ -14,6 +14,7 @@ export default Ember.Controller.extend({
 
   enabledTests: Ember.computed.filterBy('model', 'isEnabled', true),
   enabledEmberVersions: Ember.computed.filterBy('emberVersions', 'isEnabled', true),
+  nonCustomEmberVersions: Ember.computed.filterBy('emberVersions', 'isCustom', false),
   addFeatureDisabled: Ember.computed.empty('newFlagName'),
   customEmberVersion: Ember.computed.reads('emberVersions.lastObject'),
   hasNoEnabledTests: Ember.computed.empty('enabledTests'),
@@ -55,12 +56,20 @@ export default Ember.Controller.extend({
       this.run();
     },
 
-    selectNone: function() {
+    selectAllTests: function() {
+      this.get('model').setEach('isEnabled', true);
+    },
+
+    selectNoTests: function() {
       this.get('model').setEach('isEnabled', false);
     },
 
-    selectAll: function() {
-      this.get('model').setEach('isEnabled', true);
+    selectAllVersions: function() {
+      this.get('nonCustomEmberVersions').setEach('isEnabled', true);
+    },
+
+    selectNoVersions: function() {
+      this.get('emberVersions').setEach('isEnabled', false);
     },
 
     addFeature: function() {
