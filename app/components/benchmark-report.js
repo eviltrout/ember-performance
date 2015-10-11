@@ -6,16 +6,18 @@ export default Ember.Component.extend({
   isHtmlMode: Ember.computed.equal('mode', 'html'),
   isTextMode: Ember.computed.equal('mode', 'text'),
   canSubmitStats: Ember.computed.equal('report.testGroupReports.length', 1),
+  showGraph: Ember.computed.gt('report.testGroupReports.length', 1),
 
   groupedTests: function() {
     var tests = {};
     this.get('report.testGroupReports').forEach(function(testGroupReport) {
       testGroupReport.results.forEach(function(result) {
-        var test = tests[result.name] || { name: result.name, data: [] };
+        var test = tests[result.name] || { name: result.name, data: [], chartData: [["Ember Version", "Time in ms (lower is better)"]] };
         test.data.push({
           emberVersion: testGroupReport.emberVersion,
           result: result
         });
+        test.chartData.push([testGroupReport.emberVersion.name, result.mean])
 
         tests[result.name] = test;
       });
