@@ -38,11 +38,6 @@ var testClient = new Concat(clientTree, {
   outputFile: '/assets/test-client.js'
 });
 
-var nextUrlTree = new Funnel('next-url', {
-  include: [ 'index.{html,js}' ],
-  destDir: 'next-url'
-});
-
 var compileTemplatesTree = new Funnel('compile-templates', {
   include: [ 'index.{html,js}' ],
   destDir: 'compile-templates'
