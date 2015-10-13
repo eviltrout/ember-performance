@@ -73,6 +73,7 @@
       }
     });
     return {
+      id: this.id,
       emberVersion: this.emberVersion,
       results: results
     };
@@ -80,6 +81,7 @@
 
   TestGroup.prototype.serialize = function() {
     return {
+      id: this.id || TestGroup.generateUUID(),
       emberVersion: this.emberVersion,
       currentTestItemIndex: this.currentTestItemIndex,
       testItems: this.testItems.map(function(testItem) {
@@ -92,6 +94,7 @@
   TestGroup.deserialize = function(session, data) {
     var self = this;
     var testGroup = new TestGroup();
+    testGroup.id = data.id;
     testGroup.session = session;
     testGroup.emberVersion = data.emberVersion;
     testGroup.currentTestItemIndex = data.currentTestItemIndex;
@@ -103,6 +106,19 @@
     return testGroup;
   };
 
+  TestGroup.generateUUID = function() { // thanks http://stackoverflow.com/a/873856
+    var s = [];
+    var hexDigits = "0123456789abcdef";
+    for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+    s[8] = s[13] = s[18] = s[23] = "-";
+
+    return s.join("");
+  };
+
   // A TestSession is the way we can perist the work we need to do between browser reloads
   var TestSession = window.TestSession = function() {
     this.testGroups = [];
@@ -112,7 +128,6 @@
 
   TestSession.prototype.serialize = function() {
     var result = {
-      id: this.id || TestSession.generateUUID(),
       featureFlags: JSON.stringify(this.featureFlags),
       testGroups: this.testGroups.map(function(testGroup) {
         return testGroup.serialize();
@@ -126,7 +141,6 @@
 
   TestSession.deserialize = function(data) {
     var testSession = new TestSession();
-    testSession.id = data.id;
     testSession.featureFlags = JSON.parse(data.featureFlags);
 
     if (data.testGroups) {
@@ -254,18 +268,5 @@
         document.location.href = "/benchmarks" + this.currentTestItem().test.path + "/index.html";
       }
     }
-  };
-
-  TestSession.generateUUID = function() { // thanks http://stackoverflow.com/a/873856
-    var s = [];
-    var hexDigits = "0123456789abcdef";
-    for (var i = 0; i < 36; i++) {
-        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-    }
-    s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
-    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-    s[8] = s[13] = s[18] = s[23] = "-";
-
-    return s.join("");
   };
 })();

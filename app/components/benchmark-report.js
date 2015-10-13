@@ -2,10 +2,11 @@ import Ember from 'ember';
 import numeral from 'numeral';
 
 export default Ember.Component.extend({
+  ajax: Ember.inject.service(),
   mode: 'html',
   isHtmlMode: Ember.computed.equal('mode', 'html'),
   isTextMode: Ember.computed.equal('mode', 'text'),
-  canSubmitStats: Ember.computed.equal('report.testGroupReports.length', 1),
+  canSubmitStats: Ember.computed.gt('report.testGroupReports.length', 0),
   showGraph: Ember.computed.gt('report.testGroupReports.length', 1),
 
   groupedTests: function() {
@@ -53,37 +54,48 @@ export default Ember.Component.extend({
     return result + table.toString();
   }.property('report.testGroupReports.[]'),
 
+  remoteReports: function() {
+    var featureFlags = this.get('report.featureFlags');
+
+    return this.get('report.testGroupReports').map(function(testGroupReport) {
+      return {
+        id: testGroupReport.id,
+        emberUrl: testGroupReport.emberVersion.path,
+        compilerUrl: testGroupReport.emberVersion.compilerPath,
+        emberVersion: testGroupReport.emberVersion.name,
+        featureFlags: featureFlags,
+        results: testGroupReport.results,
+        emberPerfVersion: window.EmberPerformance.version
+      };
+    });
+  }.property('report.testGroupReports.[]'),
+
   actions: {
     switchMode: function(mode) {
       this.set('mode', mode);
     },
     submitResults: function() {
-      var controller = this;
+      var ajax = this.get('ajax');
+      var self = this;
 
-      this.set('sending', true);
-      this.set('error', false);
+      this.setProperties({
+        sending: true,
+        error: false
+      });
 
-      var reportJson = this.get('report'); //TODO: GJ: fix this https://github.com/eviltrout/ember-performance/issues/69
-      reportJson.emberPerfVersion = window.EmberPerformance.version;
-
-      new Ember.RSVP.Promise(function (resolve, reject) {
-        Ember.$.ajax({
-          url: 'http://perflogger.eviltrout.com/api/results',
+      var promises = this.get('remoteReports').map(function(remoteReport) {
+        return ajax.request('http://perflogger.eviltrout.com/api/results', {
           type: 'POST',
-          data: { results: JSON.stringify(reportJson) },
-          success: function(result) {
-            Ember.run(null, resolve, result);
-          },
-          error: function(result) {
-            Ember.run(null, reject, result);
-          }
+          data: { results: JSON.stringify(remoteReport) }
         });
-      }).then(function() {
-        controller.set('sent', true);
+      })
+
+      Ember.RSVP.all(promises).then(function() {
+        self.set('sent', true);
       }).catch(function() {
-        controller.set('error', true);
+        self.set('error', true);
       }).finally(function() {
-        controller.set('sending', false);
+        self.set('sending', false);
       });
     },
   }
