@@ -1,8 +1,17 @@
 import Ember from 'ember';
 
+const {
+  computed: {
+    filterBy,
+    empty,
+    reads,
+    or
+  }
+} = Ember;
+
 export default Ember.Controller.extend({
-  init: function() {
-    this._super.apply(this, arguments);
+  init() {
+    this._super(...arguments);
 
     this.report = null;
     this.sending = false;
@@ -12,17 +21,16 @@ export default Ember.Controller.extend({
     this.newFlagName = null;
   },
 
-  enabledTests: Ember.computed.filterBy('model', 'isEnabled', true),
-  enabledEmberVersions: Ember.computed.filterBy('emberVersions', 'isEnabled', true),
-  nonCustomEmberVersions: Ember.computed.filterBy('emberVersions', 'isCustom', false),
-  addFeatureDisabled: Ember.computed.empty('newFlagName'),
-  customEmberVersion: Ember.computed.reads('emberVersions.lastObject'),
-  hasNoEnabledTests: Ember.computed.empty('enabledTests'),
-  hasNoEnabledEmberVersions: Ember.computed.empty('enabledEmberVersions'),
-  cantStart: Ember.computed.or('hasNoEnabledTests', 'hasNoEnabledEmberVersions'),
+  enabledTests: filterBy('model', 'isEnabled', true),
+  enabledEmberVersions: filterBy('emberVersions', 'isEnabled', true),
+  nonCustomEmberVersions: filterBy('emberVersions', 'isCustom', false),
+  addFeatureDisabled: empty('newFlagName'),
+  customEmberVersion: reads('emberVersions.lastObject'),
+  hasNoEnabledTests: empty('enabledTests'),
+  hasNoEnabledEmberVersions: empty('enabledEmberVersions'),
+  cantStart: or('hasNoEnabledTests', 'hasNoEnabledEmberVersions'),
 
-  run: function(options) {
-    options = options || {};
+  run(options = {}) {
     var enabledEmberVersions = this.get('enabledEmberVersions');
     var enabledTests = this.get('enabledTests');
 
@@ -48,31 +56,31 @@ export default Ember.Controller.extend({
   },
 
   actions: {
-    profile: function() {
+    profile() {
       this.run({ enableProfile: true });
     },
 
-    start: function() {
+    start() {
       this.run();
     },
 
-    selectAllTests: function() {
+    selectAllTests() {
       this.get('model').setEach('isEnabled', true);
     },
 
-    selectNoTests: function() {
+    selectNoTests() {
       this.get('model').setEach('isEnabled', false);
     },
 
-    selectAllVersions: function() {
+    selectAllVersions() {
       this.get('nonCustomEmberVersions').setEach('isEnabled', true);
     },
 
-    selectNoVersions: function() {
+    selectNoVersions() {
       this.get('emberVersions').setEach('isEnabled', false);
     },
 
-    addFeature: function() {
+    addFeature() {
       var f = this.get('newFlagName');
       if (f && f.length) {
         this.get('featureFlags').addObject(this.get('newFlagName'));
@@ -80,7 +88,7 @@ export default Ember.Controller.extend({
       }
     },
 
-    removeFeature: function(f) {
+    removeFeature(f) {
       this.get('featureFlags').removeObject(f);
     }
   }

@@ -48,7 +48,7 @@ var LOCAL_EMBER_VERSIONS = [
 
 var EMBER_VERSIONS = [];
 
-LOCAL_EMBER_VERSIONS.forEach(function(version) {
+LOCAL_EMBER_VERSIONS.forEach(version => {
   EMBER_VERSIONS.push({
     name: version,
     path: `/ember/ember-${version}.prod.js`,
@@ -61,7 +61,7 @@ LOCAL_EMBER_VERSIONS.forEach(function(version) {
 EMBER_VERSIONS[EMBER_VERSIONS.length-1].isEnabled = true;
 
 var REMOVE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
-REMOVE_EMBER_VERSIONS.forEach(function(version) {
+REMOVE_EMBER_VERSIONS.forEach(version => {
   EMBER_VERSIONS.push({
     name: `latest ${version}`,
     path: `http://builds.emberjs.com/${version}/ember.prod.js`,
@@ -80,20 +80,20 @@ EMBER_VERSIONS.push({
 });
 
 export default Ember.Route.extend({
-  model: function() {
+  model() {
     var session = window.TestSession.recover();
 
-    var tests = TEST_LIST.map(function(test) {
+    var tests = TEST_LIST.map(test => {
       if (session) {
         test.isEnabled = session.isTestEnabled(test);
       } else {
         test.isEnabled = true;
       }
 
-      return Ember.Object.create(test);
+      return test;
     });
 
-    var emberVersions = EMBER_VERSIONS.map(function(emberVersion) {
+    var emberVersions = EMBER_VERSIONS.map(emberVersion => {
       if (session) {
         emberVersion.isEnabled = session.isVersionEnabled(emberVersion);
       }
@@ -103,13 +103,17 @@ export default Ember.Route.extend({
         emberVersion.compilerPath = localStorage.getItem('ember-perf-compiler-url');
       }
 
-      return Ember.Object.create(emberVersion);
+      return emberVersion;
     });
 
-    return { tests: tests, emberVersions: emberVersions, session: session };
+    return {
+      tests,
+      emberVersions,
+      session
+    };
   },
 
-  setupController: function(controller, model) {
+  setupController(controller, model) {
     var session = model.session;
     var report;
 
@@ -126,10 +130,10 @@ export default Ember.Route.extend({
 
     controller.setProperties({
       model: model.tests,
-      session: session,
-      report: report,
+      session,
+      report,
       emberVersions: model.emberVersions,
-      featureFlags: featureFlags
+      featureFlags
     });
   }
 });
