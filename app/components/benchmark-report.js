@@ -1,19 +1,28 @@
 import Ember from 'ember';
 import numeral from 'numeral';
 
+const {
+  computed,
+  computed: { equal, gt }
+} = Ember;
+
 export default Ember.Component.extend({
   ajax: Ember.inject.service(),
   mode: 'html',
-  isHtmlMode: Ember.computed.equal('mode', 'html'),
-  isTextMode: Ember.computed.equal('mode', 'text'),
-  canSubmitStats: Ember.computed.gt('report.testGroupReports.length', 0),
-  showGraph: Ember.computed.gt('report.testGroupReports.length', 1),
+  isHtmlMode: equal('mode', 'html'),
+  isTextMode: equal('mode', 'text'),
+  canSubmitStats: gt('report.testGroupReports.length', 0),
+  showGraph: gt('report.testGroupReports.length', 1),
 
-  groupedTests: function() {
+  groupedTests: computed('report.testGroupReports.[]', function() {
     var tests = {};
-    this.get('report.testGroupReports').forEach(function(testGroupReport) {
-      testGroupReport.results.forEach(function(result) {
-        var test = tests[result.name] || { name: result.name, data: [], chartData: [["Ember Version", "Time in ms (lower is better)"]] };
+    this.get('report.testGroupReports').forEach((testGroupReport) => {
+      testGroupReport.results.forEach((result) => {
+        var test = tests[result.name] || {
+          name: result.name,
+          data: [],
+          chartData: [["Ember Version", "Time in ms (lower is better)"]]
+        };
         test.data.push({
           emberVersion: testGroupReport.emberVersion,
           result: result
@@ -25,39 +34,40 @@ export default Ember.Component.extend({
     });
 
     return tests;
-  }.property('report.testGroupReports.[]'),
+  }),
 
-  asciiTable: function() {
-    var result = 'User Agent: ' + navigator.userAgent + "\n";
+  asciiTable: computed('report.testGroupReports.[]', function() {
+    var result = 'User Agent: ' + navigator.userAgent + '\n';
 
     var featureFlags = this.get('report.featureFlags');
     if (featureFlags && featureFlags.length) {
-      result += 'Feature Flags: ' + featureFlags.join(', ') + "\n";
+      result += 'Feature Flags: ' + featureFlags.join(', ') + '\n';
     }
     result += '\n';
 
     var table = new window.AsciiTable('Ember Performance Suite - Results');
+
     table.setHeading('Name', 'Speed', 'Error', 'Samples', 'Mean');
 
-    this.get('report.testGroupReports').forEach(function(testGroupReport) {
-      table.addRow(" -- Ember " + testGroupReport.emberVersion.name + " -- ");
+    this.get('report.testGroupReports').forEach(testGroupReport => {
+      table.addRow(' -- Ember ' + testGroupReport.emberVersion.name + ' -- ');
 
-      testGroupReport.results.forEach(function(result) {
+      testGroupReport.results.forEach(result => {
         table.addRow(result.name,
-                     numeral(result.hz).format("0,0.00") + " / sec",
-                     "∓" + numeral(result.rme).format("0,0.00") + "%",
+                     numeral(result.hz).format('0,0.00') + ' / sec',
+                     '∓' + numeral(result.rme).format('0,0.00') + '%',
                      numeral(result.samples).format(),
-                     numeral(result.mean).format("0,0.00") + " ms");
+                     numeral(result.mean).format('0,0.00') + ' ms');
       });
     });
 
     return result + table.toString();
-  }.property('report.testGroupReports.[]'),
+  }),
 
-  remoteReports: function() {
+  remoteReports: computed('report.testGroupReports.[]', function() {
     var featureFlags = this.get('report.featureFlags');
 
-    return this.get('report.testGroupReports').map(function(testGroupReport) {
+    return this.get('report.testGroupReports').map(testGroupReport => {
       return {
         id: testGroupReport.id,
         emberUrl: testGroupReport.emberVersion.path,
@@ -68,35 +78,32 @@ export default Ember.Component.extend({
         emberPerfVersion: window.EmberPerformance.version
       };
     });
-  }.property('report.testGroupReports.[]'),
+  }),
 
   actions: {
-    switchMode: function(mode) {
+    switchMode(mode) {
       this.set('mode', mode);
     },
-    submitResults: function() {
+
+    submitResults() {
       var ajax = this.get('ajax');
-      var self = this;
 
       this.setProperties({
         sending: true,
         error: false
       });
 
-      var promises = this.get('remoteReports').map(function(remoteReport) {
+      var reports = this.get('remoteReports').map(remoteReport => {
         return ajax.request('http://perflogger.eviltrout.com/api/results', {
           type: 'POST',
           data: { results: JSON.stringify(remoteReport) }
         });
-      })
-
-      Ember.RSVP.all(promises).then(function() {
-        self.set('sent', true);
-      }).catch(function() {
-        self.set('error', true);
-      }).finally(function() {
-        self.set('sending', false);
       });
+
+      Ember.RSVP.Promise.all(reports).
+        then(() => this.set('sent', true)).
+        catch(() => this.set('error', true)).
+        finally(() => this.set('sending', false));
     },
   }
 });
