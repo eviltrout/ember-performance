@@ -16,9 +16,9 @@ config.LOCAL_EMBER_VERSIONS.forEach(version => {
 
 EMBER_VERSIONS[EMBER_VERSIONS.length-1].isEnabled = true;
 
-const REMOVE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
+const REMOTE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
 
-REMOVE_EMBER_VERSIONS.forEach(version => {
+REMOTE_EMBER_VERSIONS.forEach(version => {
   EMBER_VERSIONS.push({
     name: `latest ${version}`,
     path: `http://builds.emberjs.com/${version}/ember.prod.js`,
