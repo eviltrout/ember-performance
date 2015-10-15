@@ -8,9 +8,24 @@ function emberVersions() {
   }).filter(Boolean);
 }
 
+var walkSync = require('walk-sync');
+var path = require('path');
+var fs = require('fs');
+
+function benchmarks() {
+  return walkSync('benchmarks', ['**/bench.json']).map(function(bench) {
+    var data = JSON.parse(fs.readFileSync('benchmarks' + '/' + bench));
+    data.path = '/' + path.dirname(bench);
+    return data;
+  }).filter(function(data) {
+    return data.disabled !== false
+  });
+}
+
 module.exports = function(environment) {
   var ENV = {
     LOCAL_EMBER_VERSIONS: emberVersions(),
+    BENCHMARKS: benchmarks(),
     modulePrefix: 'ember-performance',
     environment: environment,
     baseURL: '/',

@@ -12,6 +12,13 @@ the performance of the Ember.js framework. The general strategy is:
 - Record Baseline performance so that we can compare Ember to the
   baseline performance of the platform it's run on.
 
+### bench.json
+
+* name: humanized name
+* description: TL;DR of the benchmark, sometimes notes can be handy to display
+* keywords: these are meant to label/categorize tests, allowing tooling and users to quickly group and differentiate
+* disabled: allows for a test to be entirely disabled
+
 ### To run in development mode
 
 1. `npm install`
