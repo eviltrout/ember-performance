@@ -11,7 +11,12 @@
 <div class="form-group">
   {{#each model as |test|}}
     <div>
-      <label>{{input type="checkbox" checked=test.isEnabled}} {{test.name}}</label>
+      <label>
+        <input type="checkbox"
+               checked={{test.isEnabled}}
+               onchange={{action (mut test.isEnabled) value="target.checked"}}>
+               {{test.name}}
+      </label>
     </div>
   {{/each}}
 </div>
@@ -25,7 +30,12 @@
   {{#each emberVersions as |emberVersion|}}
     <div>
       <label>
-        {{input type="checkbox" checked=emberVersion.isEnabled}} {{emberVersion.name}}
+
+        <input type="checkbox"
+               checked={{emberVersion.isEnabled}}
+               onchange={{action (mut emberVersion.isEnabled) value="target.checked"}}>
+
+        {{emberVersion.name}}
         {{#if emberVersion.isCustom}}
           {{#if emberVersion.isEnabled}}
             <br />PATH: {{input value=emberVersion.path}}
@@ -53,8 +63,11 @@
   </table>
 {{/if}}
 <div class='form-group'>
-  {{input value=newFlagName placeholder="Flag Name"}}
-  <button class="btn :btn-default :btn-xs {{if addFeatureDisabled 'disabled'}}" {{action "addFeature"}}>Add Feature</button>
+  <input value={{newFlagName}}
+         placeholder="Flag Name"
+         onchange={{action (mut newFlagName) value="target.value"}} />
+  <button class="btn :btn-default :btn-xs {{if addFeatureDisabled 'disabled'}}"
+          {{action "addFeature"}}>Add Feature</button>
 </div>
 
 <div class='footer'>
