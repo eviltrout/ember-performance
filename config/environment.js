@@ -1,7 +1,16 @@
 /* jshint node: true */
+var fs = require('fs');
+function emberVersions() {
+  return fs.readdirSync('ember').map(function(file) {
+    var matched = file.match(/^ember-(\d+\.\d+\.\d+)\.(\w+)/);
+
+    if (matched) { return matched[1]; }
+  }).filter(Boolean);
+}
 
 module.exports = function(environment) {
   var ENV = {
+    LOCAL_EMBER_VERSIONS: emberVersions(),
     modulePrefix: 'ember-performance',
     environment: environment,
     baseURL: '/',
