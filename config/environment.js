@@ -2,7 +2,7 @@
 var fs = require('fs');
 function emberVersions() {
   return fs.readdirSync('ember').map(function(file) {
-    var matched = file.match(/^ember-(\d+\.\d+\.\d+)\.(\w+)/);
+    var matched = file.match(/^ember-(\d+\.\d+\.\d+)\.prod/);
 
     if (matched) { return matched[1]; }
   }).filter(Boolean);
