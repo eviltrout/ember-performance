@@ -17,6 +17,8 @@ function benchmarks() {
     var data = JSON.parse(fs.readFileSync('benchmarks' + '/' + bench));
     data.path = '/' + path.dirname(bench);
     return data;
+  }).filter(function(data) {
+    return data.disabled !== false
   });
 }
 

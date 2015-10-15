@@ -1,4 +1,5 @@
 {
   "name": "link-to get('active')",
-  "keywords": []
+  "keywords": [],
+  "disabled": true
 }
