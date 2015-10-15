@@ -1,9 +1,9 @@
 /* jshint node: true */
 var fs = require('fs');
-function emberVersions() {
-  return fs.readdirSync('ember').map(function(file) {
-    var matched = file.match(/^ember-(\d+\.\d+\.\d+)\.prod/);
 
+function versionsFor(name) {
+  return fs.readdirSync(name).map(function(file) {
+    var matched = file.match(new RegExp('^' + name + '-(\\d+\\.\\d+\.\\d+)\.prod'));
     if (matched) { return matched[1]; }
   }).filter(Boolean);
 }
@@ -24,7 +24,8 @@ function benchmarks() {
 
 module.exports = function(environment) {
   var ENV = {
-    LOCAL_EMBER_VERSIONS: emberVersions(),
+    LOCAL_EMBER_VERSIONS: versionsFor('ember'),
+    LOCAL_EMBER_DATA_VERSIONS: versionsFor('ember-data'),
     BENCHMARKS: benchmarks(),
     modulePrefix: 'ember-performance',
     environment: environment,

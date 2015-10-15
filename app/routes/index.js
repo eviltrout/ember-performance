@@ -13,6 +13,15 @@ const EMBER_VERSIONS = config.LOCAL_EMBER_VERSIONS.map(version => {
   };
 });
 
+const EMBER_DATA_VERSIONS = config.LOCAL_EMBER_DATA_VERSIONS.map(version => {
+  return {
+    name: version,
+    path: `/ember-data/ember-data-${version}.prod.js`,
+    isEnabled: false,
+    isCustom: false
+  };
+});
+
 EMBER_VERSIONS[EMBER_VERSIONS.length-1].isEnabled = true;
 
 const REMOTE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
@@ -54,7 +63,7 @@ export default Ember.Route.extend({
         emberVersion.isEnabled = session.isVersionEnabled(emberVersion);
       }
 
-      if(emberVersion.isCustom) {
+      if (emberVersion.isCustom) {
         emberVersion.path = localStorage.getItem('ember-perf-ember-url');
         emberVersion.compilerPath = localStorage.getItem('ember-perf-compiler-url');
       }
@@ -62,9 +71,12 @@ export default Ember.Route.extend({
       return emberVersion;
     });
 
+    let emberDataVersions = EMBER_DATA_VERSIONS;
+
     return {
       tests,
       emberVersions,
+      emberDataVersions,
       session
     };
   },
@@ -89,6 +101,7 @@ export default Ember.Route.extend({
       session,
       report,
       emberVersions: model.emberVersions,
+      emberDataVersions: model.emberDataVersions,
       featureFlags
     });
   }

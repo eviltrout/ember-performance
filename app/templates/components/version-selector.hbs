@@ -1,0 +1,13 @@
+<div class='form-group'>
+  {{#each versions as |version|}}
+    <div>
+      <label>
+        <input type='checkbox'
+               checked={{version.isEnabled}}
+               onchange={{action (mut version.isEnabled) value='target.checked'}}>
+        {{yield version}}
+        </label>
+    </div>
+  {{/each}}
+</div>
+

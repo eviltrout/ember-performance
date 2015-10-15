@@ -26,26 +26,36 @@
   <button {{action "selectAllVersions"}} type="button" class="btn btn-default btn-xs">All</button>
   <button {{action "selectNoVersions"}} type="button" class="btn btn-default btn-xs">None</button>
 </h4>
-<div class="form-group">
-  {{#each emberVersions as |emberVersion|}}
-    <div>
-      <label>
 
-        <input type="checkbox"
-               checked={{emberVersion.isEnabled}}
-               onchange={{action (mut emberVersion.isEnabled) value="target.checked"}}>
+<table>
+  <td>
+    <h3>Ember</h3>
+    {{#version-selector versions=emberVersions as |version|}}
+      {{version.name}}
+        {{#if version.isCustom}}
+          {{#if version.isEnabled}}
+            <br />PATH: {{input value=version.path}}
 
-        {{emberVersion.name}}
-        {{#if emberVersion.isCustom}}
-          {{#if emberVersion.isEnabled}}
-            <br />PATH: {{input value=emberVersion.path}}
-            <br />COMPILER PATH: {{input value=emberVersion.compilerPath}}
+            <br />COMPILER PATH: {{input value=version.compilerPath}}
           {{/if}}
         {{/if}}
-      </label>
-    </div>
-  {{/each}}
-</div>
+    {{/version-selector}}
+    </td>
+  <td>
+    <h3>EmberData</h3>
+    {{#version-selector versions=emberDataVersions as |version|}}
+      {{version.name}}
+        {{#if version.isCustom}}
+          {{#if version.isEnabled}}
+            <br />PATH: {{input value=version.path}}
+
+            <br />COMPILER PATH: {{input value=version.compilerPath}}
+          {{/if}}
+        {{/if}}
+    {{/version-selector}}
+
+  </td>
+</table>
 
 <label>Feature Flags</label>
 {{#if featureFlags}}
@@ -62,6 +72,7 @@
     </tbody>
   </table>
 {{/if}}
+
 <div class='form-group'>
   <input value={{newFlagName}}
          placeholder="Flag Name"
