@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-var TEST_LIST = [ // TODO: Populate this automatically from the test definitions
+const TEST_LIST = [ // TODO: Populate this automatically from the test definitions
   { name: 'Baseline: Render List',     path: '/baseline-render-list'     },
   { name: 'Baseline: Handlebars List', path: '/baseline-handlebars-list' },
 
@@ -36,7 +36,7 @@ var TEST_LIST = [ // TODO: Populate this automatically from the test definitions
   { name: 'Render link-to',            path: '/render-link-to' }
 ];
 
-var LOCAL_EMBER_VERSIONS = [
+const LOCAL_EMBER_VERSIONS = [
   '1.11.3',
   '1.12.0',
   '1.13.3',
@@ -46,7 +46,7 @@ var LOCAL_EMBER_VERSIONS = [
   '2.1.0'
 ];
 
-var EMBER_VERSIONS = [];
+const EMBER_VERSIONS = [];
 
 LOCAL_EMBER_VERSIONS.forEach(version => {
   EMBER_VERSIONS.push({
@@ -60,7 +60,8 @@ LOCAL_EMBER_VERSIONS.forEach(version => {
 
 EMBER_VERSIONS[EMBER_VERSIONS.length-1].isEnabled = true;
 
-var REMOVE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
+const REMOVE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
+
 REMOVE_EMBER_VERSIONS.forEach(version => {
   EMBER_VERSIONS.push({
     name: `latest ${version}`,
@@ -81,9 +82,9 @@ EMBER_VERSIONS.push({
 
 export default Ember.Route.extend({
   model() {
-    var session = window.TestSession.recover();
+    let session = window.TestSession.recover();
 
-    var tests = TEST_LIST.map(test => {
+    let tests = TEST_LIST.map(test => {
       if (session) {
         test.isEnabled = session.isTestEnabled(test);
       } else {
@@ -93,7 +94,7 @@ export default Ember.Route.extend({
       return test;
     });
 
-    var emberVersions = EMBER_VERSIONS.map(emberVersion => {
+    let emberVersions = EMBER_VERSIONS.map(emberVersion => {
       if (session) {
         emberVersion.isEnabled = session.isVersionEnabled(emberVersion);
       }
@@ -114,15 +115,15 @@ export default Ember.Route.extend({
   },
 
   setupController(controller, model) {
-    var session = model.session;
-    var report;
+    let session = model.session;
+    let report;
 
     if (session) {
       report = session.getReport();
     }
 
-    var featureFlags = [];
-    var flagsJson = localStorage.getItem('ember-perf-flags');
+    let featureFlags = [];
+    let flagsJson = localStorage.getItem('ember-perf-flags');
 
     if (flagsJson && flagsJson.length) {
       featureFlags = JSON.parse(flagsJson);

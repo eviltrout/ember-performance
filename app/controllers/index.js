@@ -31,11 +31,11 @@ export default Ember.Controller.extend({
   cantStart: or('hasNoEnabledTests', 'hasNoEnabledEmberVersions'),
 
   run(options = {}) {
-    var enabledEmberVersions = this.get('enabledEmberVersions');
-    var enabledTests = this.get('enabledTests');
+    let enabledEmberVersions = this.get('enabledEmberVersions');
+    let enabledTests = this.get('enabledTests');
 
     // Remember any custom urls we set for another run
-    var customEmberVersion = this.get('customEmberVersion');
+    let customEmberVersion = this.get('customEmberVersion');
     if (customEmberVersion.isEnabled) {
       localStorage.setItem('ember-perf-ember-url', customEmberVersion.path);
       localStorage.setItem('ember-perf-compiler-url', customEmberVersion.compilerPath);
@@ -46,7 +46,8 @@ export default Ember.Controller.extend({
 
     localStorage.setItem('ember-perf-flags', JSON.stringify(this.get('featureFlags')));
 
-    var testSession = new window.TestSession();
+    let testSession = new window.TestSession();
+
     testSession.setup(enabledEmberVersions, enabledTests);
     testSession.featureFlags = this.get('featureFlags');
     testSession.enableProfile = options.enableProfile || false;
@@ -81,7 +82,7 @@ export default Ember.Controller.extend({
     },
 
     addFeature() {
-      var f = this.get('newFlagName');
+      let f = this.get('newFlagName');
       if (f && f.length) {
         this.get('featureFlags').addObject(this.get('newFlagName'));
         this.set('newFlagName', '');
