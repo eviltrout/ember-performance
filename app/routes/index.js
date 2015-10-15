@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import config from 'ember-performance/config/environment';
 
 const TEST_LIST = [ // TODO: Populate this automatically from the test definitions
   { name: 'Baseline: Render List',     path: '/baseline-render-list'     },
@@ -36,19 +37,9 @@ const TEST_LIST = [ // TODO: Populate this automatically from the test definitio
   { name: 'Render link-to',            path: '/render-link-to' }
 ];
 
-const LOCAL_EMBER_VERSIONS = [
-  '1.11.3',
-  '1.12.0',
-  '1.13.3',
-  '1.13.9',
-  '1.13.10',
-  '2.0.2',
-  '2.1.0'
-];
-
 const EMBER_VERSIONS = [];
 
-LOCAL_EMBER_VERSIONS.forEach(version => {
+config.LOCAL_EMBER_VERSIONS.forEach(version => {
   EMBER_VERSIONS.push({
     name: version,
     path: `/ember/ember-${version}.prod.js`,
