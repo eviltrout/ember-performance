@@ -93,7 +93,7 @@
 
         RSVP.Promise.resolve(t.test()).then(function() {
           var elapsed = new Date().getTime() - t1,
-          nextPromise = t.reset();
+            nextPromise = t.reset();
 
           sum += elapsed;
           samples.push(elapsed);
@@ -106,7 +106,7 @@
           }
           result.deviation = (squareSum / samples.length);
           var standardErr = result.deviation / Math.sqrt(samples.length),
-          critical = tTable[Math.round(result.samples - 1) || 1] || tTable.infinity;
+            critical = tTable[Math.round(result.samples - 1) || 1] || tTable.infinity;
 
           result.rme = ((standardErr * critical) / result.mean) * 100 || 0;
           result.samples = samples.length;
@@ -116,7 +116,9 @@
 
           var next = function() {
             // Loop until the min time is passed and the rme is low, or the max time ellapsed
-            if ((samples.length < MIN_SAMPLES) || ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) && (totalEllapsed < MACRO_MAX_TIME))) {
+            if ((samples.length < MIN_SAMPLES) ||
+                ((totalEllapsed < MACRO_MIN_TIME || result.rme > MACRO_STOP_RME) &&
+                 (totalEllapsed < MACRO_MAX_TIME))) {
               setTimeout(tester, 10);
             } else {
               resolve(result);
@@ -141,55 +143,53 @@
     });
   }
 
-  function TestClient(test) {
-    this.name = test.name;
-    this.options = test;
+  class TestClient {
+    constructor(test) {
+      this.name = test.name;
+      this.options = test;
 
-    this.setup = test.setup || K;
-    this.reset = test.reset || K; // remove this in-favour of teardown
-    this.test  = test.test  || K;
-    this.teardown = test.teardown || function() { };
+      this.setup = test.setup || K;
+      this.reset = test.reset || K; // remove this in-favour of teardown
+      this.test  = test.test  || K;
+      this.teardown = test.teardown || function() { };
 
-    this.noEmber = test.noEmber;
-  }
-
-  TestClient.run = function(test) {
-    var session = TestSession.recover();
-    if (session.enableProfile) {
-      buildProfileClient(this, test).start();
-    } else {
-      new this(test).start();
+      this.noEmber = test.noEmber;
     }
-  };
 
-  TestClient.prototype = {
-    template: function(templateName) {
-      var compiled = this.session.getCompiledTemplate(templateName);
+    static run(test) {
+      let  session = TestSession.recover();
+      if (session.enableProfile) {
+        buildProfileClient(this, test).start();
+      } else {
+        new this(test).start();
+      }
+    }
+
+    template(templateName) {
+      let compiled = this.session.getCompiledTemplate(templateName);
       return Ember.Handlebars.template(eval(compiled));
-    },
+    }
 
-    updateTitle: function() {
+    updateTitle() {
       document.title = this.name;
       update('test-title', this.name);
-    },
+    }
 
-    run: function() {
+    run() {
       return macroBenchmark(this, this.testItem);
-    },
+    }
 
-    profile: function() {
-      var test = this;
-
-      return new RSVP.Promise(function(resolve) {
+    profile() {
+      return new RSVP.Promise((resolve) => {
         // Why on earth do we reset before we run?, must be a mistake?
-        var resetPromise = test.reset();
+        let resetPromise = this.reset();
 
-        var tester = function() {
-          var result = test.test();
+        let tester =() => {
+          let result = this.test();
 
           if (typeof result === 'object' && typeof result.then === 'function') {
             // we should chain these promises correctly
-            RSVP.Promise.resolve(result).then(function() {
+            RSVP.Promise.resolve(result).then(() => {
               console.profileEnd();
               resolve({ skipRedirect: true });
             });
@@ -200,66 +200,66 @@
         };
 
         if (resetPromise && resetPromise.then) {
-          resetPromise.then(function() {
+          resetPromise.then(() => {
             setTimeout(tester, 10);
           });
         } else {
           setTimeout(tester, 10);
         }
       });
-    },
+    }
 
-    recoverSession: function() {
-      var session = this.session = TestSession.recover();
-      var testGroup = session.currentTestGroup();
+    recoverSession() {
+      let session = this.session = TestSession.recover();
+      let testGroup = session.currentTestGroup();
 
       if (session) {
         this.testItem = session.currentTestItem();
 
         update('remaining-text', session.remainingTestCount() + " test(s) remaining");
         this.emberUrl = testGroup.emberVersion.path;
+        this.emberDataUrl = testGroup.emberDataVersion && testGroup.emberDataVersion.path;
         update('ember-version', testGroup.emberVersion.name);
       } else {
         this.emberUrl = "/ember/1.8.1.js";
       }
-    },
+    }
 
-    start: function() {
+    start() {
       update('status-text', 'Loading...');
       this.recoverSession();
 
-      var deps = [];
+      let deps = [];
 
       if (!this.noEmber) {
         if (this.session && this.session.featureFlags && this.session.featureFlags.length) {
-          var features = {};
-          this.session.featureFlags.forEach(function(f) {
-            features[f] = true;
-          });
+          let features = {};
+          this.session.featureFlags.forEach(f => features[f] = true);
           window.EmberENV = {
             FEATURES: features
           };
         }
 
-        deps = [ '/ember/jquery-2.1.1.min.js', this.emberUrl ];
+        deps = [
+          '/ember/jquery-2.1.1.min.js',
+          this.emberUrl,
+          this.emberDataUrl
+        ].filter(Boolean);
       }
 
-      var test = this;
-
       // Once the test completes
-      var complete = function(result) {
-        test.testItem.result = result;
-        test.session.progress();
-        test.session.goToNextUrl();
+      let complete = (result) => {
+        this.testItem.result = result;
+        this.session.progress();
+        this.session.goToNextUrl();
       };
 
       // What to run when our dependencies have loaded
-      var runner = function() {
-        RSVP.Promise.resolve(test.setup()).then(function() {
-          return test.run();
-        }).then(complete).catch(function(error) {
-          console.error(error);
-        });
+      let runner = () => {
+        RSVP.Promise.resolve(this.setup()).
+          then(() => this.run()).
+          then(complete).
+          catch(error => console.error(error));
       };
 
       if (deps.length) {
@@ -268,45 +268,39 @@
         runner();
       }
     }
-  };
+  }
 
   window.TestClient = TestClient;
 
+  class MicroTestClient extends TestClient {
+    run() {
+      return microBenchmark(this);
+    }
 
-  function MicroTestClient(test) {
-    TestClient.call(this, test);
+    profile() {
+      let setup = functionToString(this.setup);
+      let test = functionToString(this.test);
+      let teardown = functionToString(this.teardown);
+
+      let functionSpec = '' +
+        setup + '\n' +
+        'console.profile("' + this.name + '");\n' +
+        test + '\n' +
+        'console.profileEnd();\n' +
+        teardown +  '\n';
+
+      let run = new Function(functionSpec);
+
+      return new RSVP.Promise((resolve) => {
+        setTimeout(() => {
+          run();
+          resolve({
+            skipRedirect: true
+          });
+        }, 10);
+      });
+    }
   }
-
-  MicroTestClient.run = TestClient.run;
-
-  MicroTestClient.prototype = Object.create(TestClient.prototype);
-  MicroTestClient.prototype.run = function() {
-    return microBenchmark(this);
-  };
-
-  MicroTestClient.prototype.profile = function() {
-    var setup = functionToString(this.setup);
-    var test = functionToString(this.test);
-    var teardown = functionToString(this.teardown);
-
-    var functionSpec = '' +
-      setup + '\n' +
-      'console.profile("'+this.name+'");\n' +
-      test + '\n' +
-      'console.profileEnd();\n' +
-      teardown +  '\n';
-
-    var run = new Function(functionSpec);
-
-    return new RSVP.Promise(function(resolve) {
-      setTimeout(function() {
-        run();
-        resolve({
-          skipRedirect: true
-        });
-      }, 10);
-    });
-  };
 
   window.MicroTestClient = MicroTestClient;
 
@@ -319,44 +313,35 @@
   function functionToString(fn) {
     var string = fn.toString();
     string = (/^[^{]+\{([\s\S]*)}\s*$/.exec(string) || 0)[1];
-    string = (string || '').replace(/^\s+|\s+$/g, '');
-    return string;
-  }
+      string = (string || '').replace(/^\s+|\s+$/g, '');
+      return string;
+    }
 
-  function RenderTemplateTestClient(test) {
-    TestClient.call(this, test);
-  }
+    class RenderTemplateTestClient extends TestClient {
+      setupTemplateTest(templateName, data) {
+        this.app = Ember.Application.create({ rootElement: '#scratch' });
+        this.app.deferReadiness();
 
-  RenderTemplateTestClient.run = TestClient.run;
-  RenderTemplateTestClient.prototype = Object.create(TestClient.prototype);
+        this.registry = this.app.__registry__ || this.app.registry;
 
-  RenderTemplateTestClient.prototype.setupTemplateTest = function(templateName, data) {
-    this.app = Ember.Application.create({ rootElement: '#scratch' });
-    this.app.deferReadiness();
+        this.registry.register('controller:index', Ember.Controller.extend());
+        this.registry.register('template:index', this.template('base'));
+        this.registry.register('template:components/benchmarked-component', this.template(templateName));
 
-    this.registry = this.app.__registry__ || this.app.registry;
+        Ember.run(this.app, 'advanceReadiness');
 
-    this.registry.register('controller:index', Ember.Controller.extend());
-    this.registry.register('template:index', this.template('base'));
-    this.registry.register('template:components/benchmarked-component', this.template(templateName));
+        this.controller = this.app.__container__.lookup('controller:index');
+        this.controller.set('data', data);
+      }
 
-    Ember.run(this.app, 'advanceReadiness');
+      hideComponent() {
+        Ember.run(() => this.controller.set('showContents', false));
+      }
 
-    this.controller = this.app.__container__.lookup('controller:index');
-    this.controller.set('data', data);
-  }
+      showComponent() {
+        Ember.run(() => this.controller.set('showContents', true));
+      }
+    }
 
-  RenderTemplateTestClient.prototype.hideComponent = function() {
-    Ember.run(this, function() {
-      this.controller.set('showContents', false);
-    });
-  }
-
-  RenderTemplateTestClient.prototype.showComponent = function() {
-    Ember.run(this, function() {
-      this.controller.set('showContents', true);
-    });
-  }
-
-  window.RenderTemplateTestClient = RenderTemplateTestClient;
-})();
+    window.RenderTemplateTestClient = RenderTemplateTestClient;
+  })();
