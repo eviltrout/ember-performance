@@ -6,11 +6,13 @@ var findBowerTrees = require('broccoli-bower');
 var CopyIndex = require('./lib/copy-index');
 var Funnel = require('broccoli-funnel');
 var uglify = require('broccoli-uglify-js');
+var Babel = require('broccoli-babel-transpiler');
 
 var bowerTree = new MergeTrees(findBowerTrees(), {
   annotation: 'bower trees merge',
   overwrite: true
 });
+
 var clientBowerTree = new Funnel(bowerTree, {
   include: [
     'head.min.js',
@@ -19,12 +21,14 @@ var clientBowerTree = new Funnel(bowerTree, {
     'ascii-table.js'
   ]
 });
+
 var clientTree = new MergeTrees([
-  'test-client',
+  new Babel('test-client'),
   clientBowerTree
 ], {
   annotation: 'test-client merge'
 });
+
 var testClient = new Concat(clientTree, {
   inputFiles: [
     'test-client.js',
@@ -62,8 +66,8 @@ if (EmberApp.env() === 'production') {
 }
 
 module.exports = function(defaults) {
-  var app = new EmberApp(defaults, {
-  });
+  var app = new EmberApp(defaults);
+
   return new MergeTrees([
     app.toTree(),
     testClient,
