@@ -25,6 +25,14 @@
     document.getElementById(id).innerText = txt;
   }
 
+  function hide(id){
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function show(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
   function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
@@ -220,7 +228,15 @@
         this.emberUrl = testGroup.emberVersion.path;
         this.emberDataUrl = testGroup.emberDataVersion && testGroup.emberDataVersion.path;
         update('ember-version', testGroup.emberVersion.name);
+        var emberData =testGroup.emberDataVersion;
+        if (emberData) {
+          show('ember-data-version-container');
+          update('ember-data-version', emberData.name);
+        } else {
+          hide('ember-data-version-container');
+        }
       } else {
+        hide('ember-data-version-container');
         this.emberUrl = "/ember/1.8.1.js";
       }
     }
