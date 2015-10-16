@@ -182,7 +182,7 @@
 
       emberVersions.forEach(emberVersion => {
         if (emberDataVersions.length === 0) {
-          this.testGroups.push(TestGroup.build(this, emberVersion, emberDataVersion, tests));
+          this.testGroups.push(TestGroup.build(this, emberVersion, undefined, tests));
         } else {
           emberDataVersions.forEach(emberDataVersion => {
             this.testGroups.push(TestGroup.build(this, emberVersion, emberDataVersion, tests));
