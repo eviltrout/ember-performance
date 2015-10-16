@@ -61,6 +61,11 @@ var emberTree = new Funnel('ember', {
   destDir: 'ember'
 });
 
+var emberDataTree = new Funnel('ember-data', {
+  include: [ '**/*.js' ],
+  destDir: 'ember-data'
+});
+
 if (EmberApp.env() === 'production') {
   emberTree = uglify(emberTree);
 }
@@ -74,7 +79,8 @@ module.exports = function(defaults) {
     compileTemplatesTree,
     benchmarksIndexJs,
     benchmarksIndexHtml,
-    emberTree
+    emberTree,
+    emberDataTree,
   ], {
     annotation: 'final dist merge'
   });

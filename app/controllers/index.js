@@ -23,6 +23,7 @@ export default Ember.Controller.extend({
 
   enabledTests: filterBy('model', 'isEnabled', true),
   enabledEmberVersions: filterBy('emberVersions', 'isEnabled', true),
+  enabledEmberDataVersions: filterBy('emberDataVersions', 'isEnabled', true),
   nonCustomEmberVersions: filterBy('emberVersions', 'isCustom', false),
   addFeatureDisabled: empty('newFlagName'),
   customEmberVersion: reads('emberVersions.lastObject'),

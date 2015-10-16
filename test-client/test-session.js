@@ -100,6 +100,7 @@
       testGroup.id = data.id;
       testGroup.session = session;
       testGroup.emberVersion = data.emberVersion;
+      testGroup.emberDataVersion = data.emberDataVersion;
       testGroup.currentTestItemIndex = data.currentTestItemIndex;
       testGroup.testItems = data.testItems.map(testItemData => {
         return TestItem.deserialize(this, testItemData);
@@ -180,9 +181,13 @@
       this.testGroups = [];
 
       emberVersions.forEach(emberVersion => {
-        [undefined, ...emberDataVersions].forEach(emberDataVersion => {
+        if (emberDataVersions.length === 0) {
           this.testGroups.push(TestGroup.build(this, emberVersion, emberDataVersion, tests));
-        });
+        } else {
+          emberDataVersions.forEach(emberDataVersion => {
+            this.testGroups.push(TestGroup.build(this, emberVersion, emberDataVersion, tests));
+          });
+        }
       });
     }
 
