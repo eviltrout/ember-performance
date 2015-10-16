@@ -34,6 +34,13 @@ REMOTE_EMBER_VERSIONS.forEach(version => {
     isEnabled: false,
     isCustom: false
   });
+
+  EMBER_DATA_VERSIONS.push({
+    name: `latest ${version}`,
+    path: `http://builds.emberjs.com/${version}/ember-data.prod.js`,
+    isEnabled: false,
+    isCustom: false
+  });
 });
 
 EMBER_VERSIONS.push({
