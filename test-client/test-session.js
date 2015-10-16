@@ -80,6 +80,7 @@
       return {
         id: this.id,
         emberVersion: this.emberVersion,
+        emberDataVersion: this.emberDataVersion,
         results: results
       };
     }
