@@ -21,7 +21,10 @@ export default Ember.Component.extend({
         var test = tests[result.name] || {
           name: result.name,
           data: [],
-          chartData: [["Ember Version", "Time in ms (lower is better)"]]
+          chartData: [["Ember Version", "Time in ms (lower is better)"]],
+          chartOptions: {
+            vAxis: { minValue: 0 }
+          }
         };
         test.data.push({
           emberVersion: testGroupReport.emberVersion,
