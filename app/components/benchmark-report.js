@@ -15,19 +15,27 @@ export default Ember.Component.extend({
   showGraph: gt('report.testGroupReports.length', 1),
 
   groupedTests: computed('report.testGroupReports.[]', function() {
-    var tests = {};
+    let tests = {};
+
     this.get('report.testGroupReports').forEach((testGroupReport) => {
       testGroupReport.results.forEach((result) => {
-        var test = tests[result.name] || {
+
+        let test = tests[result.name] || {
           name: result.name,
           data: [],
-          chartData: [["Ember Version", "Time in ms (lower is better)"]]
+          chartData: [['Version', 'Time in ms (lower is better)']]
         };
+
         test.data.push({
           emberVersion: testGroupReport.emberVersion,
-          result: result
+          emberDataVersion: testGroupReport.emberDataVersion,
+          result
         });
-        test.chartData.push([testGroupReport.emberVersion.name, result.mean]);
+
+        test.chartData.push([
+          testGroupReport.emberVersion.name + (testGroupReport.emberDataVersion && testGroupReport.emberDataVersion.name),
+          result.mean
+        ]);
 
         tests[result.name] = test;
       });
@@ -37,15 +45,15 @@ export default Ember.Component.extend({
   }),
 
   asciiTable: computed('report.testGroupReports.[]', function() {
-    var result = 'User Agent: ' + navigator.userAgent + '\n';
+    let result = 'User Agent: ' + navigator.userAgent + '\n';
 
-    var featureFlags = this.get('report.featureFlags');
+    let featureFlags = this.get('report.featureFlags');
     if (featureFlags && featureFlags.length) {
       result += 'Feature Flags: ' + featureFlags.join(', ') + '\n';
     }
     result += '\n';
 
-    var table = new window.AsciiTable('Ember Performance Suite - Results');
+    let table = new window.AsciiTable('Ember Performance Suite - Results');
 
     table.setHeading('Name', 'Speed', 'Error', 'Samples', 'Mean');
 
@@ -65,7 +73,7 @@ export default Ember.Component.extend({
   }),
 
   remoteReports: computed('report.testGroupReports.[]', function() {
-    var featureFlags = this.get('report.featureFlags');
+    let featureFlags = this.get('report.featureFlags');
 
     return this.get('report.testGroupReports').map(testGroupReport => {
       return {
@@ -86,14 +94,14 @@ export default Ember.Component.extend({
     },
 
     submitResults() {
-      var ajax = this.get('ajax');
+      let ajax = this.get('ajax');
 
       this.setProperties({
         sending: true,
         error: false
       });
 
-      var reports = this.get('remoteReports').map(remoteReport => {
+      let reports = this.get('remoteReports').map(remoteReport => {
         return ajax.request('http://perflogger.eviltrout.com/api/results', {
           type: 'POST',
           data: { results: JSON.stringify(remoteReport) }

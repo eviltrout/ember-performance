@@ -47,6 +47,7 @@
     "ember-google-charts": "0.1.1"
   },
   "dependencies": {
+    "broccoli-babel-transpiler": "^5.4.5",
     "walk-sync": "^0.2.5"
   }
 }

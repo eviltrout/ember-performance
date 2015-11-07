@@ -23,6 +23,7 @@ export default Ember.Controller.extend({
 
   enabledTests: filterBy('model', 'isEnabled', true),
   enabledEmberVersions: filterBy('emberVersions', 'isEnabled', true),
+  enabledEmberDataVersions: filterBy('emberDataVersions', 'isEnabled', true),
   nonCustomEmberVersions: filterBy('emberVersions', 'isCustom', false),
   addFeatureDisabled: empty('newFlagName'),
   customEmberVersion: reads('emberVersions.lastObject'),
@@ -32,10 +33,13 @@ export default Ember.Controller.extend({
 
   run(options = {}) {
     let enabledEmberVersions = this.get('enabledEmberVersions');
+    let enabledEmberDataVersions = this.get('enabledEmberDataVersions') || [];
+
     let enabledTests = this.get('enabledTests');
 
     // Remember any custom urls we set for another run
     let customEmberVersion = this.get('customEmberVersion');
+
     if (customEmberVersion.isEnabled) {
       localStorage.setItem('ember-perf-ember-url', customEmberVersion.path);
       localStorage.setItem('ember-perf-compiler-url', customEmberVersion.compilerPath);
@@ -48,7 +52,7 @@ export default Ember.Controller.extend({
 
     let testSession = new window.TestSession();
 
-    testSession.setup(enabledEmberVersions, enabledTests);
+    testSession.setup(enabledEmberVersions, enabledEmberDataVersions, enabledTests);
     testSession.featureFlags = this.get('featureFlags');
     testSession.enableProfile = options.enableProfile || false;
     testSession.save();
