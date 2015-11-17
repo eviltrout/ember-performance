@@ -1,11 +1,13 @@
 /* jshint node: true */
 var fs = require('fs');
+var naturalSort = require('javascript-natural-sort');
+
 function emberVersions() {
   return fs.readdirSync('ember').map(function(file) {
     var matched = file.match(/^ember-(\d+\.\d+\.\d+)\.prod/);
 
     if (matched) { return matched[1]; }
-  }).filter(Boolean);
+  }).filter(Boolean).sort(naturalSort);
 }
 
 var walkSync = require('walk-sync');
