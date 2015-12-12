@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "ascii-table": "~0.0.4",
-    "benchmark": "bestiejs/benchmark.js#master",
+    "benchmark": "bestiejs/benchmark.js#f3c1476cfac950b186b167843077f2cf7014f080",
     "ember": "2.1.0",
     "ember-cli-shims": "ember-cli/ember-cli-shims#0.0.5",
     "ember-cli-test-loader": "ember-cli-test-loader#0.2.1",
