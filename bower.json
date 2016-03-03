@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "ascii-table": "~0.0.4",
-    "benchmark": "bestiejs/benchmark.js#f3c1476cfac950b186b167843077f2cf7014f080",
+    "benchmark": "bestiejs/benchmark.js#master",
     "ember": "2.1.0",
     "ember-cli-shims": "ember-cli/ember-cli-shims#0.0.5",
     "ember-cli-test-loader": "ember-cli-test-loader#0.2.1",
@@ -23,7 +23,8 @@
     "rsvp": "3.0.13",
     "numeraljs": "~1.5.3",
     "bootstrap": "~3.3.2",
-    "numeral": "~1.5.3"
+    "numeral": "~1.5.3",
+    "lodash": "^4.6.1"
   },
   "resolutions": {
     "ember": "2.1.0",

@@ -16,11 +16,17 @@ var clientBowerTree = new Funnel(bowerTree, {
     'head.min.js',
     'benchmark.js',
     'rsvp.js',
-    'ascii-table.js'
+    'ascii-table.js',
   ]
 });
+
+var lodash = new Funnel('bower_components/lodash', {
+  include: ['lodash.js']
+});
+
 var clientTree = new MergeTrees([
   'test-client',
+  lodash,
   clientBowerTree
 ], {
   annotation: 'test-client merge'
@@ -30,6 +36,7 @@ var testClient = new Concat(clientTree, {
     'test-client.js',
     'test-session.js',
     'head.min.js',
+    'lodash.js',
     'benchmark.js',
     'rsvp.js',
     'people.js',
