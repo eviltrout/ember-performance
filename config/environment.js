@@ -30,7 +30,7 @@ module.exports = function(environment) {
     BENCHMARKS: benchmarks(),
     modulePrefix: 'ember-performance',
     environment: environment,
-    baseURL: '/',
+    rootURL: '/',
     locationType: 'auto',
     EmberENV: {
       FEATURES: {
@@ -54,8 +54,6 @@ module.exports = function(environment) {
   }
 
   if (environment === 'test') {
-    // Testem prefers this...
-    ENV.baseURL = '/';
     ENV.locationType = 'none';
 
     // keep test console output quieter

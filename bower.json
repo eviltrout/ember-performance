@@ -8,17 +8,9 @@
   "dependencies": {
     "ascii-table": "~0.0.4",
     "benchmark": "bestiejs/benchmark.js#master",
-    "ember": "2.1.0",
-    "ember-cli-shims": "ember-cli/ember-cli-shims#0.0.5",
-    "ember-cli-test-loader": "ember-cli-test-loader#0.2.1",
-    "ember-data": "2.0.0",
-    "ember-load-initializers": "ember-cli/ember-load-initializers#0.1.7",
-    "ember-qunit": "0.4.10",
+    "ember": "2.6.1",
+    "ember-cli-shims": "0.1.1",
     "ember-qunit-notifications": "0.1.0",
-    "ember-resolver": "~0.1.18",
-    "jquery": "~2.1.1",
-    "loader.js": "ember-cli/loader.js#3.3.0",
-    "qunit": "~1.19.0",
     "headjs": "~1.0.3",
     "rsvp": "3.0.13",
     "numeraljs": "~1.5.3",
@@ -27,7 +19,6 @@
     "lodash": "^4.6.1"
   },
   "resolutions": {
-    "ember": "2.1.0",
-    "qunit-notifications": "~0.1.0"
+    "ember": "2.6.0"
   }
 }
