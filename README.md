@@ -25,8 +25,7 @@ the performance of the Ember.js framework. The general strategy is:
 2. `npm install -g bower`
 3. `bower install`
 4. `npm run server`
-
-And open a browser to http://localhost:4200
+5. `bin/launch-chrome http://localhost:4200`
 
 ### To build for production mode
 
