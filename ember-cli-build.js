@@ -1,46 +1,38 @@
 /* global require, module */
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 var MergeTrees = require('broccoli-merge-trees');
-var Concat = require('broccoli-sourcemap-concat');
-var findBowerTrees = require('broccoli-bower');
+var Concat = require('broccoli-concat');
 var CopyIndex = require('./lib/copy-index');
 var Funnel = require('broccoli-funnel');
 var uglify = require('broccoli-uglify-js');
 
-var bowerTree = new MergeTrees(findBowerTrees(), {
-  annotation: 'bower trees merge',
-  overwrite: true
-});
-var clientBowerTree = new Funnel(bowerTree, {
+var bowerTree = new Funnel('bower_components', {
   include: [
-    'head.min.js',
-    'benchmark.js',
-    'rsvp.js',
-    'ascii-table.js',
+    'headjs/dist/1.0.0/head.js',
+    'benchmark/benchmark.js',
+    'rsvp/rsvp.js',
+    'ascii-table/ascii-table.js',
+    'lodash/lodash.js'
   ]
-});
-
-var lodash = new Funnel('bower_components/lodash', {
-  include: ['lodash.js']
 });
 
 var clientTree = new MergeTrees([
   'test-client',
-  lodash,
-  clientBowerTree
+  bowerTree
 ], {
   annotation: 'test-client merge'
 });
+
 var testClient = new Concat(clientTree, {
   inputFiles: [
     'test-client.js',
     'test-session.js',
-    'head.min.js',
-    'lodash.js',
-    'benchmark.js',
-    'rsvp.js',
-    'people.js',
-    'ascii-table.js'
+    'headjs/dist/1.0.0/head.js',
+    'benchmark/benchmark.js',
+    'rsvp/rsvp.js',
+    'ascii-table/ascii-table.js',
+    'lodash/lodash.js',
+    'people.js'
   ],
   outputFile: '/assets/test-client.js'
 });
