@@ -28,10 +28,10 @@ var testClient = new Concat(clientTree, {
     'test-client.js',
     'test-session.js',
     'headjs/dist/1.0.0/head.js',
+    'lodash/lodash.js',
     'benchmark/benchmark.js',
     'rsvp/rsvp.js',
     'ascii-table/ascii-table.js',
-    'lodash/lodash.js',
     'people.js'
   ],
   outputFile: '/assets/test-client.js'
