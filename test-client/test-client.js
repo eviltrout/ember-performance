@@ -165,7 +165,14 @@
   TestClient.prototype = {
     template: function(templateName) {
       var compiled = this.session.getCompiledTemplate(templateName);
-      return Ember.Handlebars.template(eval(compiled));
+      var template;
+      var ember2_10_plus = Ember.__loader.registry.hasOwnProperty('ember-glimmer/index');
+      if (ember2_10_plus) {
+        template = JSON.parse(compiled);
+      } else {
+        template = eval(compiled);
+      }
+      return Ember.Handlebars.template(template);
     },
 
     updateTitle: function() {
