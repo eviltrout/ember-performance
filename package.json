@@ -21,6 +21,7 @@
   },
   "author": "Robin Ward",
   "devDependencies": {
+    "npm-registry-client": "8.5.0",
     "broccoli-bower": "^0.2.1",
     "broccoli-filter": "^1.2.3",
     "broccoli-funnel": "^1.0.2",

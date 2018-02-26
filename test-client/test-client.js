@@ -167,7 +167,8 @@
       var compiled = this.session.getCompiledTemplate(templateName);
       var template;
       var ember2_10_plus = Ember.__loader.registry.hasOwnProperty('ember-glimmer/index');
-      if (ember2_10_plus) {
+      var ember3_0_plus = Ember.__loader.registry.hasOwnProperty('ember-runtime/mixins/freezable');
+      if (ember2_10_plus || ember3_0_plus) {
         template = JSON.parse(compiled);
       } else {
         template = eval(compiled);
