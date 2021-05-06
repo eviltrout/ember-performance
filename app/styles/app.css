@@ -1,5 +1,7 @@
 body {
   background-color: white;
+  padding: 2rem;
+  font-family: Arial, Helvetica;
 }
 
 .control {
@@ -39,4 +41,8 @@ th.numeric, td.numeric{
   table { color: white !important; }
 
   a { color: white !important; }
+}
+
+.form-group {
+  margin-bottom: 1rem;
 }
