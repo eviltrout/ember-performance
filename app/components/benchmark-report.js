@@ -12,7 +12,6 @@ export default Ember.Component.extend({
   mode: "html",
   isHtmlMode: equal("mode", "html"),
   isTextMode: equal("mode", "text"),
-  canSubmitStats: gt("report.testGroupReports.length", 0),
   showGraph: gt("report.testGroupReports.length", 1),
 
   groupedTests: computed("report.testGroupReports.[]", function () {
@@ -67,46 +66,9 @@ export default Ember.Component.extend({
     return result + table.toString();
   }),
 
-  remoteReports: computed("report.testGroupReports.[]", function () {
-    var featureFlags = this.get("report.featureFlags");
-
-    return this.get("report.testGroupReports").map((testGroupReport) => {
-      return {
-        id: testGroupReport.id,
-        emberUrl: testGroupReport.emberVersion.path,
-        compilerUrl: testGroupReport.emberVersion.compilerPath,
-        emberVersion: testGroupReport.emberVersion.name,
-        featureFlags: featureFlags,
-        results: testGroupReport.results,
-        emberPerfVersion: version,
-      };
-    });
-  }),
-
   actions: {
     switchMode(mode) {
       this.set("mode", mode);
-    },
-
-    submitResults() {
-      var ajax = this.get("ajax");
-
-      this.setProperties({
-        sending: true,
-        error: false,
-      });
-
-      var reports = this.get("remoteReports").map((remoteReport) => {
-        return ajax.request("http://perflogger.eviltrout.com/api/results", {
-          type: "POST",
-          data: { results: JSON.stringify(remoteReport) },
-        });
-      });
-
-      Ember.RSVP.Promise.all(reports)
-        .then(() => this.set("sent", true))
-        .catch(() => this.set("error", true))
-        .finally(() => this.set("sending", false));
     },
   },
 });
