@@ -21,9 +21,7 @@
     name: "Baseline: Handlebars List",
 
     setup: function () {
-      return $.getScript(
-        "https://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v2.0.0.js"
-      ).then(function () {
+      return $.getScript("/ember/handlebars.js").then(function () {
         compiled = Handlebars.compile(template);
       });
     },
