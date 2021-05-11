@@ -58,6 +58,9 @@ module.exports = function (defaults) {
       bootstrapVersion: 4,
       importBootstrapCSS: true,
     },
+    fingerprint: {
+      enabled: false,
+    },
   });
   app.import("vendor/bootstrap.css");
 
