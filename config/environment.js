@@ -21,7 +21,7 @@ function benchmarks() {
     return data;
   }).filter(function(data) {
     return data.disabled !== false
-  });
+  }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 module.exports = function(environment) {
