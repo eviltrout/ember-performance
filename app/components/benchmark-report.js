@@ -21,13 +21,25 @@ export default Ember.Component.extend({
         var test = tests[result.name] || {
           name: result.name,
           data: [],
-          chartData: [["Ember Version", "Time in ms (lower is better)"]],
+          chartData: [
+            [
+              "Ember Version",
+              "Time in ms (lower is better)",
+              { role: "interval" },
+              { role: "interval" },
+            ],
+          ],
         };
         test.data.push({
           emberVersion: testGroupReport.emberVersion,
           result: result,
         });
-        test.chartData.push([testGroupReport.emberVersion.name, result.mean]);
+        test.chartData.push([
+          testGroupReport.emberVersion.name,
+          result.mean,
+          result.mean - (result.mean * result.rme) / 100,
+          result.mean + (result.mean * result.rme) / 100,
+        ]);
 
         tests[result.name] = test;
       });
@@ -65,6 +77,15 @@ export default Ember.Component.extend({
 
     return result + table.toString();
   }),
+
+  chartOptions: {
+    title: "Time (ms) (lower is better)",
+    hAxis: {
+      title: "Ember Version",
+    },
+    intervals: { style: "area" },
+    legend: "none",
+  },
 
   actions: {
     switchMode(mode) {
