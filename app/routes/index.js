@@ -15,18 +15,6 @@ const EMBER_VERSIONS = config.LOCAL_EMBER_VERSIONS.map(version => {
 
 EMBER_VERSIONS[EMBER_VERSIONS.length-1].isEnabled = true;
 
-const REMOTE_EMBER_VERSIONS = ['release', 'beta', 'canary'];
-
-REMOTE_EMBER_VERSIONS.forEach(version => {
-  EMBER_VERSIONS.push({
-    name: `latest ${version}`,
-    path: `http://builds.emberjs.com/${version}/ember.prod.js`,
-    compilerPath: `http://builds.emberjs.com/${version}/ember-template-compiler.js`,
-    isEnabled: false,
-    isCustom: false
-  });
-});
-
 EMBER_VERSIONS.push({
   name: 'custom version',
   path: '',
