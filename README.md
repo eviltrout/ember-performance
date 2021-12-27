@@ -35,6 +35,33 @@ the performance of the Ember.js framework. The general strategy is:
 
 And open a browser to http://localhost:4200
 
+### Adding a new Ember Version
+
+To add a new ember version, you'll need to build a production bundle.
+Navigate to an empty scratch directory outside of this project, install
+ember-cli, then run:
+```bash
+VERSION=4.0.1
+ember new myapp --yarn --skip-git --skip-bower --no-welcome
+cd myapp
+yarn add -D ember-source@$VERSION
+```
+
+Edit `ember-cli-build.js` to disable minification and sourcemaps:
+
+```javascript
+let app = new EmberApp(defaults, {
+  'ember-cli-terser': { enabled: false },
+  sourcemaps: { enabled: false },
+});
+```
+
+```bash
+yarn build --target production
+mv dist/assets/vendor-*.js ../../ember-performance/ember/ember-$VERSION.prod.js
+mv node_modules/ember-source/dist/ember-template-compiler.js ../../ember-performance/ember/ember-$VERSION.template-compiler.js
+```
+
 ### License
 
 MIT
