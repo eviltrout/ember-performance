@@ -3,6 +3,7 @@
     name: 'String Classify',
 
     setup: function() {
+      this.EmberString = require("@ember/string");
       function createRandomWord(length) {
         var consonants = 'bcdfghjklmnpqrstvwxyz',
           vowels = 'aeiou',
@@ -27,8 +28,8 @@
     },
 
     test: function(){
-      stringArray.forEach(function(string) {
-        Ember.String.classify(string)
+      stringArray.forEach((string) => {
+        this.EmberString.classify(string)
       });
     }
   });

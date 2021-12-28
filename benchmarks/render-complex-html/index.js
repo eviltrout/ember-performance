@@ -1,14 +1,16 @@
 /* global RenderTemplateTestClient */
 
 (function () {
-  var nestedComponentTemplate = "a: {{a}}";
-
   RenderTemplateTestClient.run({
     name: "Render Complex List (HTML)",
 
     setup() {
-      const MyThing = Ember.Object.extend({
-        d: Ember.computed("a", "b", function () {
+      const EmberObject = require("@ember/object").default;
+      const Component = require("@ember/component").default;
+      const computed = require("@ember/object").computed;
+
+      const MyThing = EmberObject.extend({
+        d: computed("a", "b", function () {
           return this.get("a") + this.get("b");
         }),
       });
@@ -38,6 +40,18 @@
         "template:components/buffer-render",
         this.template("complex-list-data")
       );
+
+      // Default for template-only components is Glimmer
+      // We want to use classic components for this benchmark
+      this.registry.register(
+        "component:component-render",
+        Component.extend({})
+      );
+      this.registry.register(
+        "component:nested-component",
+        Component.extend({})
+      );
+      this.registry.register("component:buffer-render", Component.extend({}));
     },
 
     reset() {
