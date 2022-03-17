@@ -2,11 +2,10 @@
 
 (function () {
   RenderTemplateTestClient.run({
-    name: "Render Complex List (Classic Ember)",
+    name: "Render Complex List (Glimmer)",
 
     setup() {
       const EmberObject = require("@ember/object").default;
-      const Component = require("@ember/component").default;
       const computed = require("@ember/object").computed;
 
       const MyThing = EmberObject.extend({
@@ -26,32 +25,38 @@
         );
       }
 
-      this.setupTemplateTest("complex-list-main", { items: listItems });
+      this.setupTemplateTest(
+        "complex-list-main-wrapped",
+        { items: listItems },
+        { componentMode: "glimmer" }
+      );
 
       this.registry.register(
         "template:components/component-render",
-        this.template("complex-list-component")
+        this.template("complex-list-component-wrapped")
       );
       this.registry.register(
         "template:components/nested-component",
-        this.template("complex-list-nested")
+        this.template("complex-list-nested-wrapped")
       );
       this.registry.register(
         "template:components/buffer-render",
-        this.template("complex-list-data")
+        this.template("complex-list-data-wrapped")
       );
 
-      // Default for template-only components is Glimmer
-      // We want to use classic components for this benchmark
+      const GlimmerComponent = require("@glimmer/component").default;
       this.registry.register(
         "component:component-render",
-        Component.extend({})
+        class extends GlimmerComponent {}
       );
       this.registry.register(
         "component:nested-component",
-        Component.extend({})
+        class extends GlimmerComponent {}
       );
-      this.registry.register("component:buffer-render", Component.extend({}));
+      this.registry.register(
+        "component:buffer-render",
+        class extends GlimmerComponent {}
+      );
     },
 
     reset() {

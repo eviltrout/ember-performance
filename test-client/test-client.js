@@ -198,7 +198,7 @@
     template: function (templateName) {
       var compiled = this.session.getCompiledTemplate(templateName);
       var template = JSON.parse(compiled);
-      return Ember.Handlebars.template(template);
+      return require("@ember/-internals/glimmer").template(template);
     },
 
     updateTitle: function () {
@@ -293,8 +293,45 @@
         test.session.goToNextUrl();
       };
 
+      var patchModules = () => {
+        if (this.noEmber) return;
+        try {
+          require("@ember/object");
+        } catch {
+          // Non-exhaustive polyfill based on https://github.com/ember-cli/ember-rfc176-data
+          // This allows us to use the `require`-based syntax, even on older ember versions
+          define("@ember/object", ["exports"], function (_exports) {
+            _exports.computed = Ember.computed;
+            _exports.default = Ember.Object;
+          });
+          define("@ember/component", ["exports"], function (_exports) {
+            _exports.default = Ember.Component;
+          });
+          define("@ember/controller", ["exports"], function (_exports) {
+            _exports.default = Ember.Controller;
+          });
+          define("@ember/application", ["exports"], function (_exports) {
+            _exports.default = Ember.Application;
+          });
+          define("@ember/runloop", ["exports"], function (_exports) {
+            _exports.run = Ember.run;
+            _exports.schedule = Ember.run.schedule;
+          });
+          define("@ember/string", ["exports"], function (_exports) {
+            _exports.classify = Ember.String.classify;
+          });
+          define("@ember/-internals/glimmer", ["exports"], function (_exports) {
+            _exports.template = Ember.Handlebars.template;
+          });
+          define("ember", ["exports"], function (_exports) {
+            _exports.default = Ember;
+          });
+        }
+      };
+
       // What to run when our dependencies have loaded
       var runner = function () {
+        patchModules();
         RSVP.Promise.resolve(test.setup())
           .then(function () {
             return test.run();
@@ -380,34 +417,63 @@
 
   RenderTemplateTestClient.prototype.setupTemplateTest = function (
     templateName,
-    data
+    data,
+    { componentMode = "classic" } = {}
   ) {
-    this.app = Ember.Application.create({ rootElement: "#scratch" });
+    const Ember = require("ember").default;
+    const Application = require("@ember/application").default;
+    const Resolver = require("ember-resolver").default;
+    const Controller = require("@ember/controller").default;
+    const run = require("@ember/runloop").run;
+
+    this.app = Application.create({
+      rootElement: "#scratch",
+      Resolver,
+      modulePrefix: "scratch-app",
+    });
     this.app.deferReadiness();
 
     this.registry = this.app.__registry__ || this.app.registry;
 
-    this.registry.register("controller:index", Ember.Controller.extend());
+    this.registry.register("controller:index", Controller.extend());
     this.registry.register("template:index", this.template("base"));
     this.registry.register(
       "template:components/benchmarked-component",
       this.template(templateName)
     );
 
-    Ember.run(this.app, "advanceReadiness");
+    if (componentMode === "classic") {
+      const ClassicComponent = require("@ember/component").default;
+      this.registry.register(
+        "component:benchmarked-component",
+        ClassicComponent.extend({})
+      );
+    } else if (componentMode === "glimmer") {
+      const GlimmerComponent = require("@glimmer/component").default;
+      this.registry.register(
+        "component:benchmarked-component",
+        class extends GlimmerComponent {}
+      );
+    } else if (componentMode === "glimmer-template-only") {
+      // Glimmer template-only - no need to register anything
+    } else {
+      throw `Unknown componentMode passed to setupTemplateTest: '${componentMode}'`;
+    }
+
+    run(this.app, "advanceReadiness");
 
     this.controller = this.app.__container__.lookup("controller:index");
     this.controller.set("data", data);
   };
 
   RenderTemplateTestClient.prototype.hideComponent = function () {
-    Ember.run(this, function () {
+    require("@ember/runloop").run(this, function () {
       this.controller.set("showContents", false);
     });
   };
 
   RenderTemplateTestClient.prototype.showComponent = function () {
-    Ember.run(this, function () {
+    require("@ember/runloop").run(this, function () {
       this.controller.set("showContents", true);
     });
   };

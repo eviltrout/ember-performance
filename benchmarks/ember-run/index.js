@@ -10,12 +10,13 @@ MicroTestClient.run({
   name: 'Ember.run',
 
   setup: function() {
+    this.runloop = require("@ember/runloop");
     var ran = false;
   },
 
   test: function() {
-    Ember.run(function() {
-      Ember.run.schedule('afterRender', function() {
+    this.runloop.run(() => {
+      this.runloop.schedule('afterRender', function() {
         ran = true;
       });
     });

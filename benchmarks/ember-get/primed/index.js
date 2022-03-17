@@ -10,11 +10,13 @@ MicroTestClient.run({
   name: 'Ember.get (primed)',
 
   setup: function() {
-    var obj = Ember.Object.create({
+    const EmberObject = require("@ember/object").default;
+
+    var obj = EmberObject.create({
       thingId: 1234,
-      person: Ember.Object.create({
+      person: EmberObject.create({
         name: 'Evil Trout',
-        pet: Ember.Object.create({
+        pet: EmberObject.create({
           name: 'Rover'
         })
       })

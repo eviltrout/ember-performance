@@ -4,9 +4,11 @@ MicroTestClient.run({
   name: 'Ember.set (primed)',
 
   setup: function() {
-    var obj = Ember.Object.create({
-      person: Ember.Object.create({
-        pet: Ember.Object.create({ })
+    const EmberObject = require("@ember/object").default;
+
+    var obj = EmberObject.create({
+      person: EmberObject.create({
+        pet: EmberObject.create({ })
       })
     });
 
